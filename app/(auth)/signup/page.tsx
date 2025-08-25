@@ -86,12 +86,12 @@ const Signup = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-6 py-12 ">
+    <div className="min-h-screen flex items-center justify-center px-4 py-12 ">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="max-w-xl w-full bg-white rounded-md border border-black/10 p-8 flex flex-col gap-6"
+        className="max-w-xl w-full bg-white rounded-md border border-black/10 p-4 sm:p-8 flex flex-col gap-6"
       >
         {/* heading */}
         <h1 className="text-3xl font-bold text-center text-gray-800">

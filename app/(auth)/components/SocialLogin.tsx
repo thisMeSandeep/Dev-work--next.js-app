@@ -3,7 +3,7 @@ import { IconBrandGithub, IconBrandGoogleFilled } from "@tabler/icons-react";
 
 export default function SocialLogin() {
   return (
-    <div className="w-full flex items-center gap-4">
+    <div className="w-full flex flex-col sm:flex-row items-center gap-4">
       {/* GitHub */}
       <form className="w-full">
         <Button

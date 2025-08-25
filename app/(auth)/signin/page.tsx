@@ -50,7 +50,7 @@ const Signup = () => {
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="max-w-xl w-full bg-white rounded-md border border-black/10 p-8 flex flex-col gap-6"
+        className="max-w-xl w-full bg-white rounded-md border border-black/10  p-4 sm:p-8  flex flex-col gap-6"
       >
         {/* heading */}
         <h1 className="text-3xl font-bold text-center text-gray-800">
@@ -68,7 +68,6 @@ const Signup = () => {
           className="flex flex-col gap-5"
           noValidate
         >
-    
           {/* email */}
           <div>
             <Label htmlFor="email" className="text-gray-700 font-medium mb-2">
@@ -119,12 +118,8 @@ const Signup = () => {
             )}
           </div>
 
-
           {/* submit */}
-          <motion.div
-            whileHover={{ scale:1.03 }}
-            className="mx-auto"
-          >
+          <motion.div whileHover={{ scale: 1.03 }} className="mx-auto">
             <Button
               type="submit"
               className="px-8 py-3 rounded-2xl border border-green-500 
