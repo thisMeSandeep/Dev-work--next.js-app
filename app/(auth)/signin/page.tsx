@@ -7,11 +7,13 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { EyeIcon, EyeOff, } from "lucide-react";
+import { EyeIcon, EyeOff } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { motion } from "motion/react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { loginAction } from "@/actions/auth.action";
 
 const userSchema = z.object({
   email: z.email("Invalid email").nonempty("Email is required"),
@@ -26,8 +28,9 @@ focus-visible:border-green-500 focus-visible:ring-2 focus-visible:ring-green-500
 focus-visible:outline-none transition-colors`;
 
 const Signup = () => {
-
   const [passwordVisible, setPasswordVisible] = useState(false);
+
+  const route=useRouter();
 
   const {
     register,
@@ -39,9 +42,16 @@ const Signup = () => {
   });
 
 
-
-  const onSubmit = (data: UserType) => {
+  const onSubmit = async (data: UserType) => {0
     console.log("Form data:", data);
+    const result =await loginAction(data);
+    if (!result.success) {
+      alert(result.message); 
+    }
+    else{
+      alert(result.message);
+      route.push("/");
+    }
   };
 
   return (
@@ -128,7 +138,7 @@ const Signup = () => {
                transition-all duration-300 
                disabled:opacity-80 disabled:cursor-not-allowed cursor-pointer"
             >
-              Create my account
+              Sign In
             </Button>
           </motion.div>
         </form>

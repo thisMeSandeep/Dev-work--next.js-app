@@ -33,7 +33,7 @@ const RoleSelectionPage = ({  setRole }: Props) => {
         <div className="flex flex-col md:flex-row items-center gap-6 w-full">
           {/* Client Card */}
           <div
-            onClick={() => setTempRole("client")}
+            onClick={() => setTempRole("CLIENT")}
             className={`w-full flex-1 border rounded-xl p-6 flex flex-col items-center gap-3 cursor-pointer transition-all group ${
               tempRole === "client"
                 ? "border-green-600 shadow-md"
@@ -57,7 +57,7 @@ const RoleSelectionPage = ({  setRole }: Props) => {
 
           {/* Developer Card */}
           <div
-            onClick={() => setTempRole("developer")}
+            onClick={() => setTempRole("DEVELOPER")}
             className={`w-full flex-1 border rounded-xl p-6 flex flex-col items-center gap-3 cursor-pointer transition-all group ${
               tempRole === "developer"
                 ? "border-green-600 shadow-md"
@@ -86,7 +86,7 @@ const RoleSelectionPage = ({  setRole }: Props) => {
           disabled={!tempRole}
           className="w-full md:w-auto bg-green-600 hover:bg-green-500 rounded-full px-8 py-2 disabled:opacity-50 cursor-pointer"
         >
-          {tempRole ? `Apply as ${tempRole}` : "Create account"}
+          {tempRole ? `Apply as ${tempRole.toLowerCase()}` : "Create account"}
         </Button>
 
         {/* Already have account */}
