@@ -10,23 +10,207 @@ datasource db {
 
 // enums 
 
+// Enums
 enum Role {
   DEVELOPER
   CLIENT
 }
 
+enum ExperienceLevel {
+  EXPERT
+  INTERMEDIATE
+  ENTRY
+}
+
+enum Category {
+  SOFTWARE_DEV
+  DATA_SCIENCE
+  ENGINEERING
+  IT_NETWORKING
+  DESIGN_CREATIVE
+}
+
+enum Speciality {
+  DESKTOP_SOFTWARE
+  SCRIPTING_AUTOMATION
+  AI_CHATBOT
+  AI_INTEGRATION
+  MOBILE_APP
+  MOBILE_GAME
+  WEB_DESIGN
+  UX_UI
+  DATABASE_DEV
+  BACKEND_DEV
+  FRONTEND_DEV
+  FULLSTACK_DEV
+  CMS_DEV
+  GAME_DEV
+  EMERGING_TECH
+  AR_VR
+  CODING_TUTORING
+}
+
+enum JobStatus {
+  OPEN
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum ScopeSize {
+  SMALL
+  MEDIUM
+  LARGE
+}
+
+enum ScopeDuration {
+  ONE_TO_THREE_MONTHS
+  THREE_TO_SIX_MONTHS
+  MORE_THAN_SIX_MONTHS
+}
+
+enum ProposalStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  WITHDRAWN
+}
+
+enum EstimatedDuration {
+  LESS_THAN_ONE_MONTH
+  ONE_TO_THREE_MONTHS
+  THREE_TO_SIX_MONTHS
+  MORE_THAN_SIX_MONTHS
+}
+
+enum ClientRequestStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+// Models
+
 model User {
-  id             String   @id @default(uuid())
-  firstName      String?  // optional for OAuth, required after post-login completion
-  lastName       String?
-  email          String   @unique
-  password       String?  // optional for OAuth
-  country        String?  // optional for OAuth
-  emailVerified  Boolean  @default(false)
-  role           Role
-  profileImage   String?
-  authProviderId String?  // Google/GitHub id
-  emailOTP       String?
-  otpExpiresAt   DateTime?
-  createdAt      DateTime @default(now())
+  id                String             @id @default(uuid())
+  firstName         String?
+  lastName          String?
+  email             String             @unique
+  password          String?
+  country           String?
+  emailVerified     Boolean            @default(false)
+  role              Role
+  profileImage      String?
+  authProviderId    String?
+  emailOTP          String?
+  otpExpiresAt      DateTime?
+  createdAt         DateTime           @default(now())
+
+  // Relations
+  FreelancerProfile FreelancerProfile?
+  ClientProfile     ClientProfile?
+}
+
+model FreelancerProfile {
+  id         String  @id @default(uuid())
+  user       User    @relation(fields: [userId], references: [id])
+  userId     String  @unique
+  available  Boolean @default(true)
+  mobile     String
+  bio        String
+  skills          String[]
+  category        Category
+  speciality      Speciality
+  experienceLevel ExperienceLevel
+  perHourRate     Float
+  languages       String
+  connects        Int             @default(200)
+  portfolioLink   String?
+  otherLink       String?
+  file            String?
+
+  // Relations
+  savedJobs       Job[]            @relation("SavedJobs")
+  proposals       Proposal[]
+  hiredJobs       Job[]            @relation("HiredJobs")
+  clientRequests  ClientRequest[]  @relation("DeveloperRequests")
+}
+
+model ClientProfile {
+  id          String  @id @default(uuid())
+  user        User    @relation(fields: [userId], references: [id])
+  userId      String  @unique
+  mobile      String
+  company     String
+  websiteLink String?
+
+  // Relations
+  postedJobs      Job[]
+  clientRequests  ClientRequest[]  @relation("ClientRequests")
+}
+
+model Job {
+  id                String     @id @default(uuid())
+  title             String
+  description       String
+  category          Category
+  speciality        Speciality
+  skills            String[]
+  budget            Float
+  status            JobStatus  @default(OPEN)
+  numberOfProposals Int        @default(0)
+  completed         Boolean    @default(false)
+
+  scopeSize         ScopeSize
+  duration          ScopeDuration
+  experience        ExperienceLevel
+  createdAt         DateTime   @default(now())
+  connectsRequired  Int        @default(1)
+
+  // Relations
+  client            ClientProfile      @relation(fields: [clientId], references: [id])
+  clientId          String
+
+  hiredFreelancer   FreelancerProfile? @relation("HiredJobs", fields: [hiredFreelancerId], references: [id])
+  hiredFreelancerId String?
+
+  proposals         Proposal[]
+  savedBy           FreelancerProfile[] @relation("SavedJobs")
+
+  clientRequests    ClientRequest[]     @relation("JobRequests")
+}
+
+model Proposal {
+  id           String            @id @default(uuid())
+  coverLetter  String
+  message      String?
+  rate         Float
+  duration     EstimatedDuration
+  attachedFile String?
+  createdAt    DateTime          @default(now())
+  status       ProposalStatus    @default(PENDING)
+  submittedAt  DateTime          @default(now())
+
+  // Relations
+  freelancerProfile   FreelancerProfile @relation(fields: [freelancerProfileId], references: [id])
+  freelancerProfileId String
+
+  job   Job    @relation(fields: [jobId], references: [id])
+  jobId String
+}
+
+model ClientRequest {
+  id          String             @id @default(uuid())
+  message     String?
+  createdAt   DateTime           @default(now())
+  status      ClientRequestStatus @default(PENDING)
+
+  jobId       String
+  job         Job                @relation("JobRequests", fields: [jobId], references: [id])
+
+  clientId    String
+  client      ClientProfile      @relation("ClientRequests", fields: [clientId], references: [id])
+
+  developerId String
+  developer   FreelancerProfile  @relation("DeveloperRequests", fields: [developerId], references: [id])
 }
