@@ -34,12 +34,6 @@ const userSchema = z.object({
     .string()
     .min(1, "Country is required")
     .nonempty("Country is required"),
-  role: z
-    .string()
-    .nullable()
-    .refine((val) => val === "DEVELOPER" || val === "CLIENT", {
-      message: "Role is required",
-    }),
 });
 
 type UserType = z.infer<typeof userSchema>;
@@ -50,7 +44,7 @@ focus-visible:border-green-500 focus-visible:ring-2 focus-visible:ring-green-500
 focus-visible:outline-none transition-colors`;
 
 const Signup = () => {
-  const [selectedRole, setSelectedRole] = useState<string | null>(null);
+  const [isRoleSelected, setIsRoleSelected] = useState<boolean>(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [countriesToShow, setCountriesToShow] = useState([...countries]);
   const [checked, setChecked] = useState(false);
@@ -69,14 +63,9 @@ const Signup = () => {
   });
 
   // role selection
-  if (!selectedRole) {
+  if (!isRoleSelected) {
     return (
-      <RoleSelectionPage
-        setRole={(role) => {
-          setSelectedRole(role);
-          setValue("role", role);
-        }}
-      />
+      <RoleSelectionPage setIsRoleSelected={setIsRoleSelected}/>
     );
   }
 
@@ -283,9 +272,6 @@ const Signup = () => {
               .
             </p>
           </div>
-
-          {/* role hidden */}
-          <input type="hidden" {...register("role")} value={selectedRole!} />
 
           {/* submit */}
           <motion.div

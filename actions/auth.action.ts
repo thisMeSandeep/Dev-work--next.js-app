@@ -4,7 +4,23 @@ import { signIn } from "@/auth";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import { cookies } from "next/headers";
+import { Role } from "@/generated/prisma";
 
+
+// set temorary role cookie
+export const setTempRoleAction = async (role: string) => {
+  const cookieStore = await cookies();
+  cookieStore.set("temp_role", role.toUpperCase(), {
+    path: "/",
+    maxAge: 60 * 60, // 1 hour in seconds
+    httpOnly: false, // Allow client-side read if needed
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+  });
+
+  return { success: true, role };
+};
 
 // sign in with provider
 export async function signInWithProvider(provider: "google" | "github") {
@@ -20,12 +36,11 @@ const registerUserSchema = z.object({
   email: z.email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
   country: z.string().min(1, "Country is required"),
-  role: z.enum(["DEVELOPER", "CLIENT"]),
 });
 
 export type UserRegistrationType = z.infer<typeof registerUserSchema>;
 
-export const registerUserAction=async (data: UserRegistrationType)=>{
+export const registerUserAction = async (data: UserRegistrationType) => {
   try {
     // Validate input
     const parsed = registerUserSchema.safeParse(data);
@@ -36,7 +51,11 @@ export const registerUserAction=async (data: UserRegistrationType)=>{
       };
     }
 
-    const { firstName, lastName, email, password, country, role } = parsed.data;
+    const { firstName, lastName, email, password, country } = parsed.data;
+
+    // get role from cookies
+    const cookieStore = await cookies();
+    const role = cookieStore.get("temp_role")?.value as Role;
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({ where: { email } });
@@ -61,6 +80,9 @@ export const registerUserAction=async (data: UserRegistrationType)=>{
         role,
       },
     });
+
+    // clear cookie after successful registration
+    cookieStore.delete("temp_role");
 
     // Automatically sign in user via credentials
     const signInResult = await signIn("credentials", {
@@ -88,9 +110,9 @@ export const registerUserAction=async (data: UserRegistrationType)=>{
       message: "Internal Server Error",
     };
   }
-}
+};
 
-
+// login user
 export type LoginInputType = {
   email: string;
   password: string;
@@ -101,7 +123,7 @@ export const loginAction = async (data: LoginInputType) => {
 
   try {
     const result = await signIn("credentials", {
-      redirect: false, 
+      redirect: false,
       email,
       password,
     });
