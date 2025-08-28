@@ -23,7 +23,7 @@ import { motion } from "motion/react";
 import Link from "next/link";
 import { registerUserAction } from "@/actions/auth.action";
 import type { UserRegistrationType } from "@/actions/auth.action";
-import { useRouter } from "next/navigation";
+
 
 const userSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -49,7 +49,6 @@ const Signup = () => {
   const [countriesToShow, setCountriesToShow] = useState([...countries]);
   const [checked, setChecked] = useState(false);
 
-  const route = useRouter();
 
   const {
     register,
@@ -85,7 +84,6 @@ const Signup = () => {
     const response = await registerUserAction(data as UserRegistrationType);
     if (response.success) {
       alert(response.message);
-      route.push("/");
     } else {
       alert(response.message);
     }

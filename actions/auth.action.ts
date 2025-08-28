@@ -24,7 +24,7 @@ export const setTempRoleAction = async (role: string) => {
 
 // sign in with provider
 export async function signInWithProvider(provider: "google" | "github") {
-  await signIn(provider, { redirectTo: "/" });
+  await signIn(provider);
 }
 
 // register user
@@ -101,7 +101,6 @@ export const registerUserAction = async (data: UserRegistrationType) => {
     return {
       success: true,
       message: "User registered successfully",
-      data: signInResult, // contains session info
     };
   } catch (err: unknown) {
     console.error(err);
@@ -152,8 +151,6 @@ export const loginAction = async (data: LoginInputType) => {
     return {
       success: true,
       message: "Login successful",
-      // you can also fetch user role from DB if you want:
-      // role: "CLIENT" | "DEVELOPER"
     };
   } catch (error) {
     console.error("Login failed:", error);

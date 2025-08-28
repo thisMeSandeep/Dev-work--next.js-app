@@ -12,7 +12,6 @@ import { EyeIcon, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "motion/react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { loginAction } from "@/actions/auth.action";
 
 const userSchema = z.object({
@@ -30,7 +29,6 @@ focus-visible:outline-none transition-colors`;
 const Signup = () => {
   const [passwordVisible, setPasswordVisible] = useState(false);
 
-  const route=useRouter();
 
   const {
     register,
@@ -50,7 +48,6 @@ const Signup = () => {
     }
     else{
       alert(result.message);
-      route.push("/");
     }
   };
 

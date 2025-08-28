@@ -36,6 +36,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const matched = await bcrypt.compare(password, user.password);
         if (!matched) return null;
 
+        //Credentials login → just return user
         return user;
       },
     }),
@@ -44,21 +45,17 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   session: { strategy: "jwt" },
 
   callbacks: {
-    // Handle OAuth user sign-ins
     async signIn({ user, account }) {
-      // Only handle OAuth users (skip credentials)
       if (account?.provider !== "credentials") {
         const existingUser = await prisma.user.findUnique({
           where: { email: user.email! },
         });
 
         if (!existingUser) {
-          // Ensure role is selected
           const cookieStore = await cookies();
           const rawRole = cookieStore.get("temp_role")?.value;
 
           if (!rawRole) {
-            // No role = reject sign in
             throw new Error("Role not selected. Please choose a role first.");
           }
 
@@ -75,7 +72,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             },
           });
 
-          // Clear temp_role cookie after use
           cookieStore.delete("temp_role");
         }
       }
@@ -83,29 +79,24 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return true;
     },
 
-    // JWT callback - runs on every sign-in
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id;
+        const dbUser = await prisma.user.findUnique({
+          where: { email: user.email! },
+        });
 
-        // Fetch role from DB for OAuth users (credentials already have role)
-        if (!user.role) {
-          const dbUser = await prisma.user.findUnique({
-            where: { email: user.email! },
-          });
-          token.role = dbUser!.role;
-        } else {
-          token.role = user.role;
+        if (dbUser) {
+          token.userId = dbUser.id;
+          token.role = dbUser.role;
         }
       }
       return token;
     },
 
-    // Session callback - runs when client requests session
     async session({ session, token }) {
       if (token) {
-        session.user.id = token.id as string;
         session.user.role = token.role as Role;
+        session.user.userId = token.userId as string;
       }
       return session;
     },
