@@ -92,19 +92,19 @@ enum ClientRequestStatus {
 // Models
 
 model User {
-  id                String             @id @default(uuid())
-  firstName         String?
-  lastName          String?
-  email             String             @unique
-  password          String?
-  country           String?
-  emailVerified     Boolean            @default(false)
-  role              Role
-  profileImage      String?
-  authProviderId    String?
-  emailOTP          String?
-  otpExpiresAt      DateTime?
-  createdAt         DateTime           @default(now())
+  id             String    @id @default(uuid())
+  firstName      String?
+  lastName       String?
+  email          String    @unique
+  password       String?
+  country        String?
+  emailVerified  Boolean   @default(false)
+  role           Role
+  profileImage   String?
+  authProviderId String?
+  emailOTP       String?
+  otpExpiresAt   DateTime?
+  createdAt      DateTime  @default(now())
 
   // Relations
   FreelancerProfile FreelancerProfile?
@@ -112,12 +112,12 @@ model User {
 }
 
 model FreelancerProfile {
-  id         String  @id @default(uuid())
-  user       User    @relation(fields: [userId], references: [id])
-  userId     String  @unique
-  available  Boolean @default(true)
-  mobile     String
-  bio        String
+  id              String          @id @default(uuid())
+  user            User            @relation(fields: [userId], references: [id])
+  userId          String          @unique
+  available       Boolean         @default(true)
+  mobile          String
+  bio             String
   skills          String[]
   category        Category
   speciality      Speciality
@@ -130,10 +130,10 @@ model FreelancerProfile {
   file            String?
 
   // Relations
-  savedJobs       Job[]            @relation("SavedJobs")
-  proposals       Proposal[]
-  hiredJobs       Job[]            @relation("HiredJobs")
-  clientRequests  ClientRequest[]  @relation("DeveloperRequests")
+  savedJobs      Job[]           @relation("SavedJobs")
+  proposals      Proposal[]
+  hiredJobs      Job[]           @relation("HiredJobs")
+  clientRequests ClientRequest[] @relation("DeveloperRequests")
 }
 
 model ClientProfile {
@@ -145,8 +145,8 @@ model ClientProfile {
   websiteLink String?
 
   // Relations
-  postedJobs      Job[]
-  clientRequests  ClientRequest[]  @relation("ClientRequests")
+  postedJobs     Job[]
+  clientRequests ClientRequest[] @relation("ClientRequests")
 }
 
 model Job {
@@ -161,23 +161,24 @@ model Job {
   numberOfProposals Int        @default(0)
   completed         Boolean    @default(false)
 
-  scopeSize         ScopeSize
-  duration          ScopeDuration
-  experience        ExperienceLevel
-  createdAt         DateTime   @default(now())
-  connectsRequired  Int        @default(1)
+  scopeSize        ScopeSize
+  duration         ScopeDuration
+  experience       ExperienceLevel
+  connectsRequired Int             @default(1)
+  attachment       String?
+  createdAt        DateTime        @default(now())
 
   // Relations
-  client            ClientProfile      @relation(fields: [clientId], references: [id])
-  clientId          String
+  client   ClientProfile @relation(fields: [clientId], references: [id])
+  clientId String
 
   hiredFreelancer   FreelancerProfile? @relation("HiredJobs", fields: [hiredFreelancerId], references: [id])
   hiredFreelancerId String?
 
-  proposals         Proposal[]
-  savedBy           FreelancerProfile[] @relation("SavedJobs")
+  proposals Proposal[]
+  savedBy   FreelancerProfile[] @relation("SavedJobs")
 
-  clientRequests    ClientRequest[]     @relation("JobRequests")
+  clientRequests ClientRequest[] @relation("JobRequests")
 }
 
 model Proposal {
@@ -200,17 +201,17 @@ model Proposal {
 }
 
 model ClientRequest {
-  id          String             @id @default(uuid())
-  message     String?
-  createdAt   DateTime           @default(now())
-  status      ClientRequestStatus @default(PENDING)
+  id        String              @id @default(uuid())
+  message   String?
+  createdAt DateTime            @default(now())
+  status    ClientRequestStatus @default(PENDING)
 
-  jobId       String
-  job         Job                @relation("JobRequests", fields: [jobId], references: [id])
+  jobId String
+  job   Job    @relation("JobRequests", fields: [jobId], references: [id])
 
-  clientId    String
-  client      ClientProfile      @relation("ClientRequests", fields: [clientId], references: [id])
+  clientId String
+  client   ClientProfile @relation("ClientRequests", fields: [clientId], references: [id])
 
   developerId String
-  developer   FreelancerProfile  @relation("DeveloperRequests", fields: [developerId], references: [id])
+  developer   FreelancerProfile @relation("DeveloperRequests", fields: [developerId], references: [id])
 }
