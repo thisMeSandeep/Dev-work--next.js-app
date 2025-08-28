@@ -8,7 +8,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { EyeIcon, EyeOff, Search } from "lucide-react";
+import { EyeIcon, EyeOff, Search, ArrowLeft } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -23,6 +23,7 @@ import { motion } from "motion/react";
 import Link from "next/link";
 import { registerUserAction } from "@/actions/auth.action";
 import type { UserRegistrationType } from "@/actions/auth.action";
+import AuthRedirectHandler from "../components/AuthRedirectHandler";
 
 
 const userSchema = z.object({
@@ -90,13 +91,24 @@ const Signup = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-12 ">
+    <>
+      <AuthRedirectHandler />
+      <div className="min-h-screen flex items-center justify-center px-4 py-12 ">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
         className="max-w-xl w-full bg-white rounded-md border border-black/10 p-4 sm:p-8 flex flex-col gap-6"
       >
+        {/* Back to home link */}
+        <Link
+          href="/"
+          className="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors mb-2"
+        >
+          <ArrowLeft size={20} />
+          <span className="text-sm font-medium">Back to Home</span>
+        </Link>
+
         {/* heading */}
         <h1 className="text-3xl font-bold text-center text-gray-800">
           Create your <span className="text-green-600">Dev Work</span> account
@@ -302,6 +314,7 @@ const Signup = () => {
         </p>
       </motion.div>
     </div>
+    </>
   );
 };
 
