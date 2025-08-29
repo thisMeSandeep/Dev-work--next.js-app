@@ -27,7 +27,7 @@ import { ImageUp, Sparkles } from "lucide-react";
 // ------------------ Zod Schema ------------------
 const jobSchema = z.object({
   title: z.string().min(3, "Title is required"),
-  description: z.string().min(10, "Description must be at least 30 characters"),
+  description: z.string().min(100, "Description must be at least 100 characters"),
   category: z.string().nonempty("Category is required"),
   speciality: z.string().nonempty("Speciality is required"),
   skills: z.string().min(2, "Enter at least one skill"),
@@ -39,10 +39,10 @@ const jobSchema = z.object({
   experienceRequired: z.string().nonempty("Experience level is required"),
   connectsRequired: z
     .string()
-    .refine((val) => !isNaN(Number(val)) && Number(val) >= 1, {
-      message: "Connects must be at least 5",
+    .refine((val) => !isNaN(Number(val)) && Number(val) >= 5 && Number(val) <= 40, {
+      message: "Connects must be between 5 and 40",
     }),
-  attachment: z.union([z.instanceof(File), z.null()]).optional(),
+  attachment: z.union([z.instanceof(File), z.null()]).optional().nullable(),
 });
 
 type JobSchemaType = z.infer<typeof jobSchema>;
@@ -77,6 +77,7 @@ export default function CreateJobForm() {
       duration: "",
       experienceRequired: "",
       connectsRequired: "5",
+      attachment: null,
     },
     mode: "onChange",
   });
