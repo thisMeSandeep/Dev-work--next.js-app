@@ -32,10 +32,7 @@ export async function uploadFile(
     // Get public URL
     const { data } = supabase.storage.from("files").getPublicUrl(filePath);
 
-    return {
-      filePath,
-      publicUrl: data.publicUrl,
-    };
+    return data.publicUrl;
   } catch (err) {
     console.error("Upload error:", err);
     return null;
