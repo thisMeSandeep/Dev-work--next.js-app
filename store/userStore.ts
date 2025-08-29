@@ -2,8 +2,8 @@ import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 
 interface UserState {
-  user: unknown | null; 
-  setUser: (user: unknown) => void;
+  user: Record<string, unknown> | null;
+  setUser: (user: Record<string, unknown>) => void;
   clearUser: () => void;
 }
 
