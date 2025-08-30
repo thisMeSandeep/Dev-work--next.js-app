@@ -58,14 +58,12 @@ export default function ProfileDropdown({
         className="flex items-center justify-center w-8 h-8 rounded-full border border-gray-300 bg-gray-100 text-sm font-medium hover:border-green-500 transition-colors overflow-hidden cursor-pointer"
       >
         {profileImage ? (
-          <div className="relative w-full h-full rounded-full overflow-hidden">
-            <Image
-              src={profileImage}
-              alt="profile"
-              fill
-              className="object-cover rounded-full"
-            />
-          </div>
+          <Image
+            src={profileImage}
+            alt="profile"
+            fill
+            className="object-cover rounded-full"
+          />
         ) : (
           avatarText
         )}

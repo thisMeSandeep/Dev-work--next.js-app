@@ -140,6 +140,7 @@ model ClientProfile {
   mobile      String
   company     String
   websiteLink String?
+  rating      Float
 
   // Relations
   postedJobs     Job[]

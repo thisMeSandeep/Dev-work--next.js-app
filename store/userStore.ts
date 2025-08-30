@@ -6,8 +6,8 @@ interface User {
 }
 
 interface UserState {
-  user: User | null;
-  setUser: (user: User) => void;
+  user: User | null | undefined;
+  setUser: (user: User | undefined) => void;
   clearUser: () => void;
 }
 
