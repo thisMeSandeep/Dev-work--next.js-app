@@ -11,12 +11,12 @@ interface DrawerProps {
   headerTitle: string;
 }
 
-const Drawer: React.FC<DrawerProps> = ({
+const Drawer= ({
   isOpen,
   onClose,
   children,
   headerTitle,
-}) => {
+}:DrawerProps) => {
   return (
     <AnimatePresence>
       {isOpen && (
@@ -24,7 +24,7 @@ const Drawer: React.FC<DrawerProps> = ({
           {/* Overlay */}
           <motion.div
             initial={{ opacity: 0 }}
-            animate={{ opacity: 0.5 }}
+            animate={{ opacity: 0.7 }}
             exit={{ opacity: 0 }}
             className="absolute inset-0 bg-black"
             onClick={onClose}

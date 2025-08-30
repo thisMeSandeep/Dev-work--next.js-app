@@ -76,6 +76,7 @@ enum ProposalStatus {
   WITHDRAWN
 }
 
+// for proposals
 enum EstimatedDuration {
   LESS_THAN_ONE_MONTH
   ONE_TO_THREE_MONTHS
@@ -161,7 +162,7 @@ model Job {
 
   scopeSize        ScopeSize
   duration         ScopeDuration
-  experience       ExperienceLevel
+  experienceRequired     ExperienceLevel
   connectsRequired Int             @default(1)
   attachment       String?
   createdAt        DateTime        @default(now())

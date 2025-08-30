@@ -1,6 +1,5 @@
 "use client";
 
-
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -23,11 +22,15 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { ImageUp, Sparkles } from "lucide-react";
+import { createJobAction } from "@/actions/client.actions";
+import { fetchAndSetUser } from "@/lib/fetchUser";
 
 // ------------------ Zod Schema ------------------
 const jobSchema = z.object({
   title: z.string().min(3, "Title is required"),
-  description: z.string().min(100, "Description must be at least 100 characters"),
+  description: z
+    .string()
+    .min(100, "Description must be at least 100 characters"),
   category: z.string().nonempty("Category is required"),
   speciality: z.string().nonempty("Speciality is required"),
   skills: z.string().min(2, "Enter at least one skill"),
@@ -39,10 +42,16 @@ const jobSchema = z.object({
   experienceRequired: z.string().nonempty("Experience level is required"),
   connectsRequired: z
     .string()
-    .refine((val) => !isNaN(Number(val)) && Number(val) >= 5 && Number(val) <= 40, {
-      message: "Connects must be between 5 and 40",
-    }),
-  attachment: z.union([z.instanceof(File), z.null()]).optional().nullable(),
+    .refine(
+      (val) => !isNaN(Number(val)) && Number(val) >= 5 && Number(val) <= 40,
+      {
+        message: "Connects must be between 5 and 40",
+      }
+    ),
+  attachment: z
+    .union([z.instanceof(File), z.null()])
+    .optional()
+    .nullable(),
 });
 
 type JobSchemaType = z.infer<typeof jobSchema>;
@@ -82,7 +91,7 @@ export default function CreateJobForm() {
     mode: "onChange",
   });
 
-  const onSubmit = (data: JobSchemaType) => {
+  const onSubmit = async (data: JobSchemaType) => {
     const formattedData = {
       ...data,
       skills: data.skills.split(",").map((s) => s.trim()),
@@ -92,6 +101,14 @@ export default function CreateJobForm() {
     };
 
     console.log("Job Submitted:", formattedData);
+
+    const response = await createJobAction(formattedData);
+    if (response.success) {
+      alert(response.message);
+      await fetchAndSetUser();
+    } else {
+      alert(response.message);
+    }
   };
 
   return (
