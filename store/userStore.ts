@@ -1,20 +1,21 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 
+interface User {
+  [key: string]: unknown; 
+}
+
 interface UserState {
-  user: Record<string, unknown> | null;
-  setUser: (user: Record<string, unknown>) => void;
+  user: User | null;
+  setUser: (user: User) => void;
   clearUser: () => void;
 }
 
-
 export const useUserStore = create<UserState>()(
-  devtools<UserState>(
+  devtools(
     (set) => ({
       user: null,
-
       setUser: (user) => set({ user }),
-
       clearUser: () => set({ user: null }),
     }),
     { name: "UserStore" }

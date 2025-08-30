@@ -30,7 +30,7 @@ export async function uploadFile(
     if (error) throw error;
 
     // Get public URL
-    const { data } = supabase.storage.from("files").getPublicUrl(filePath);
+    const { data } = supabase.storage.from("DevWork").getPublicUrl(filePath);
 
     return data.publicUrl;
   } catch (err) {
