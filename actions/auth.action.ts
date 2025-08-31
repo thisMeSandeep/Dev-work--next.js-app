@@ -7,7 +7,6 @@ import bcrypt from "bcryptjs";
 import { cookies } from "next/headers";
 import { Role } from "@/generated/prisma";
 
-
 // set temorary role cookie
 export const setTempRoleAction = async (role: string) => {
   const cookieStore = await cookies();
@@ -70,7 +69,7 @@ export const registerUserAction = async (data: UserRegistrationType) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Create user in DB
-    await prisma.user.create({
+    const newUser=await prisma.user.create({
       data: {
         firstName,
         lastName,
@@ -80,6 +79,17 @@ export const registerUserAction = async (data: UserRegistrationType) => {
         role,
       },
     });
+
+    // create a profile alongside with registration
+    if (role === "DEVELOPER") {
+      await prisma.freelancerProfile.create({
+        data: { userId: newUser.id },
+      });
+    } else if (role === "CLIENT") {
+      await prisma.clientProfile.create({
+        data: { userId: newUser.id },
+      });
+    }
 
     // clear cookie after successful registration
     cookieStore.delete("temp_role");

@@ -41,20 +41,13 @@ export const setClientProfileAction = async (data: ClientDataType) => {
     // generate a free rating for client between 3 to 5
     const rating = +(Math.random() * (5 - 3) + 3).toFixed(1);
 
-    // Save or update client profile
-    await prisma.clientProfile.upsert({
+    await prisma.clientProfile.update({
       where: { userId },
-      update: {
+      data: {
         mobile,
         company,
         websiteLink: websiteLink === "" ? null : websiteLink,
-      },
-      create: {
-        userId,
-        mobile,
-        company,
         rating,
-        websiteLink: websiteLink === "" ? null : websiteLink,
       },
     });
 

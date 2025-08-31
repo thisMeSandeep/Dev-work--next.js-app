@@ -61,7 +61,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
           const role = rawRole.toUpperCase() as Role;
 
-          await prisma.user.create({
+          const newUser=await prisma.user.create({
             data: {
               email: user.email!,
               firstName: user.name?.split(" ")[0] || null,
@@ -71,6 +71,17 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
               authProviderId: user.id || null,
             },
           });
+
+          // create a profile alongside with registration
+          if (role === "DEVELOPER") {
+            await prisma.freelancerProfile.create({
+              data: { userId: newUser.id },
+            });
+          } else if (role === "CLIENT") {
+            await prisma.clientProfile.create({
+              data: { userId: newUser.id },
+            });
+          }
 
           cookieStore.delete("temp_role");
         }

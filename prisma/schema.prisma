@@ -93,16 +93,16 @@ enum ClientRequestStatus {
 // Models
 
 model User {
-  id             String    @id @default(uuid())
+  id             String   @id @default(uuid())
   firstName      String?
   lastName       String?
-  email          String    @unique
+  email          String   @unique
   password       String?
   country        String?
   role           Role
   profileImage   String?
   authProviderId String?
-  createdAt      DateTime  @default(now())
+  createdAt      DateTime @default(now())
 
   // Relations
   FreelancerProfile FreelancerProfile?
@@ -114,14 +114,14 @@ model FreelancerProfile {
   user            User            @relation(fields: [userId], references: [id])
   userId          String          @unique
   available       Boolean         @default(true)
-  mobile          String
-  bio             String
-  skills          String[]
-  category        Category
-  speciality      Speciality
-  experienceLevel ExperienceLevel
-  perHourRate     Float
-  languages       String
+  mobile          String?
+  bio             String?
+  skills          String[]        @default([])
+  category        Category?
+  speciality      Speciality?
+  experienceLevel ExperienceLevel?
+  perHourRate     Float?
+  languages       String?
   connects        Int             @default(200)
   portfolioLink   String?
   otherLink       String?
@@ -138,10 +138,10 @@ model ClientProfile {
   id          String  @id @default(uuid())
   user        User    @relation(fields: [userId], references: [id])
   userId      String  @unique
-  mobile      String
-  company     String
+  mobile      String?
+  company     String?
   websiteLink String?
-  rating      Float
+  rating      Float?
 
   // Relations
   postedJobs     Job[]
@@ -160,12 +160,12 @@ model Job {
   numberOfProposals Int        @default(0)
   completed         Boolean    @default(false)
 
-  scopeSize        ScopeSize
-  duration         ScopeDuration
-  experienceRequired     ExperienceLevel
-  connectsRequired Int             @default(1)
-  attachment       String?
-  createdAt        DateTime        @default(now())
+  scopeSize          ScopeSize
+  duration           ScopeDuration
+  experienceRequired ExperienceLevel
+  connectsRequired   Int             @default(1)
+  attachment         String?
+  createdAt          DateTime        @default(now())
 
   // Relations
   client   ClientProfile @relation(fields: [clientId], references: [id])

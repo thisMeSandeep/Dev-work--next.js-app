@@ -1,0 +1,14 @@
+-- AlterTable
+ALTER TABLE "public"."ClientProfile" ALTER COLUMN "mobile" DROP NOT NULL,
+ALTER COLUMN "company" DROP NOT NULL,
+ALTER COLUMN "rating" DROP NOT NULL;
+
+-- AlterTable
+ALTER TABLE "public"."FreelancerProfile" ALTER COLUMN "mobile" DROP NOT NULL,
+ALTER COLUMN "bio" DROP NOT NULL,
+ALTER COLUMN "skills" SET DEFAULT ARRAY[]::TEXT[],
+ALTER COLUMN "category" DROP NOT NULL,
+ALTER COLUMN "speciality" DROP NOT NULL,
+ALTER COLUMN "experienceLevel" DROP NOT NULL,
+ALTER COLUMN "perHourRate" DROP NOT NULL,
+ALTER COLUMN "languages" DROP NOT NULL;
