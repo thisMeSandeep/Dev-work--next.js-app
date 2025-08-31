@@ -36,8 +36,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const matched = await bcrypt.compare(password, user.password);
         if (!matched) return null;
 
-        //Credentials login → just return user
-        return user;
+        // Return consistent user object structure
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.firstName + (user.lastName ? ` ${user.lastName}` : ""),
+          role: user.role,
+          image: user.profileImage,
+        };
       },
     }),
   ],
@@ -46,60 +52,70 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
   callbacks: {
     async signIn({ user, account }) {
-      if (account?.provider !== "credentials") {
-        const existingUser = await prisma.user.findUnique({
-          where: { email: user.email! },
-        });
-
-        if (!existingUser) {
-          const cookieStore = await cookies();
-          const rawRole = cookieStore.get("temp_role")?.value;
-
-          if (!rawRole) {
-            throw new Error("Role not selected. Please choose a role first.");
-          }
-
-          const role = rawRole.toUpperCase() as Role;
-
-          const newUser=await prisma.user.create({
-            data: {
-              email: user.email!,
-              firstName: user.name?.split(" ")[0] || null,
-              lastName: user.name?.split(" ")[1] || null,
-              role,
-              profileImage: user.image || null,
-              authProviderId: user.id || null,
-            },
+      try {
+        // Handle OAuth providers (Google, GitHub)
+        if (account?.provider !== "credentials") {
+          const existingUser = await prisma.user.findUnique({
+            where: { email: user.email! },
           });
 
-          // create a profile alongside with registration
-          if (role === "DEVELOPER") {
-            await prisma.freelancerProfile.create({
-              data: { userId: newUser.id },
+          if (!existingUser) {
+            // New user registration via OAuth
+            const cookieStore = await cookies();
+            const rawRole = cookieStore.get("temp_role")?.value;
+
+            if (!rawRole) {
+              throw new Error("Role not selected. Please choose a role first.");
+            }
+
+            const role = rawRole.toUpperCase() as Role;
+
+            const newUser = await prisma.user.create({
+              data: {
+                email: user.email!,
+                firstName: user.name?.split(" ")[0] || null,
+                lastName: user.name?.split(" ")[1] || null,
+                role,
+                profileImage: user.image || null,
+                authProviderId: user.id || null,
+              },
             });
-          } else if (role === "CLIENT") {
-            await prisma.clientProfile.create({
-              data: { userId: newUser.id },
-            });
+
+            // Create profile based on role
+            if (role === "DEVELOPER") {
+              await prisma.freelancerProfile.create({
+                data: { userId: newUser.id },
+              });
+            } else if (role === "CLIENT") {
+              await prisma.clientProfile.create({
+                data: { userId: newUser.id },
+              });
+            }
+
+            // Update user object with DB data
+            user.id = newUser.id;
+            user.role = newUser.role;
+
+            // Clear role cookie after successful registration
+            cookieStore.delete("temp_role");
+          } else {
+            // Existing user login via OAuth
+            user.id = existingUser.id;
+            user.role = existingUser.role;
           }
+        } 
 
-          cookieStore.delete("temp_role");
-        }
+        return true;
+      } catch (error) {
+        console.error("SignIn callback error:", error);
+        return false;
       }
-
-      return true;
     },
 
     async jwt({ token, user }) {
       if (user) {
-        const dbUser = await prisma.user.findUnique({
-          where: { email: user.email! },
-        });
-
-        if (dbUser) {
-          token.userId = dbUser.id;
-          token.role = dbUser.role;
-        }
+        token.userId = user.id;
+        token.role = user.role;
       }
       return token;
     },

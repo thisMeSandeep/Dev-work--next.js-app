@@ -4,6 +4,8 @@ import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { LogOut } from "lucide-react";
+import { signOut } from "next-auth/react";
+import { useUserStore } from "@/store/userStore";
 
 export type DropdownLink = {
   label: string;
@@ -29,6 +31,8 @@ export default function ProfileDropdown({
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  const clearUser = useUserStore((state) => state.clearUser);
+
   // Close dropdown when clicked outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -43,11 +47,12 @@ export default function ProfileDropdown({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Logout handler (your custom logic here)
+  // Logout handler 
   const handleLogout = async () => {
     console.log("Logout clicked");
     setOpen(false);
-    // TODO: clear auth tokens, reset user store, redirect to login, etc.
+    clearUser();
+    signOut();
   };
 
   return (

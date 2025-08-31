@@ -1,6 +1,6 @@
 
 
-const Home = () => {
+const Home =() => {
 
   return (
     <>

@@ -24,7 +24,7 @@ import Link from "next/link";
 import { registerUserAction } from "@/actions/auth.action";
 import type { UserRegistrationType } from "@/actions/auth.action";
 import AuthRedirectHandler from "../components/AuthRedirectHandler";
-
+import { signIn } from "next-auth/react";
 
 const userSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -49,7 +49,8 @@ const Signup = () => {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [countriesToShow, setCountriesToShow] = useState([...countries]);
   const [checked, setChecked] = useState(false);
-
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const {
     register,
@@ -81,12 +82,38 @@ const Signup = () => {
   };
 
   const onSubmit = async (data: UserType) => {
-    console.log("Form data:", data);
-    const response = await registerUserAction(data as UserRegistrationType);
-    if (response.success) {
-      alert(response.message);
-    } else {
-      alert(response.message);
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      console.log("Form data:", data);
+      const response = await registerUserAction(data as UserRegistrationType);
+      
+      if (response.success) {
+        // Auto-login after successful registration
+        if (response.autoLogin) {
+          const signInResult = await signIn("credentials", {
+            redirect: false,
+            email: response.autoLogin.email,
+            password: response.autoLogin.password,
+          });
+
+          if (signInResult?.error) {
+            console.error("Auto-login failed:", signInResult.error);
+            setError("Registration successful but auto-login failed. Please sign in manually.");
+            return;
+          }
+        }
+        
+        // Successful registration and auto-login - redirect will be handled by middleware
+        window.location.href = "/"; // Force page reload to trigger middleware
+      } else {
+        setError(response.message);
+      }
+    } catch (err) {
+      setError("An unexpected error occurred. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -113,6 +140,13 @@ const Signup = () => {
         <h1 className="text-3xl font-bold text-center text-gray-800">
           Create your <span className="text-green-600">Dev Work</span> account
         </h1>
+
+        {/* Error message */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+            {error}
+          </div>
+        )}
 
         {/* OAuth */}
         <SocialLogin />
@@ -285,19 +319,19 @@ const Signup = () => {
 
           {/* submit */}
           <motion.div
-            whileHover={{ scale: checked ? 1.03 : 1 }}
+            whileHover={{ scale: checked && !isLoading ? 1.03 : 1 }}
             className="mx-auto"
           >
             <Button
               type="submit"
-              disabled={!checked}
+              disabled={!checked || isLoading}
               className="px-8 py-3 rounded-2xl border border-green-500 
                bg-green-600  text-lg font-medium 
                hover:bg-green-500 text-white 
                transition-all duration-300 
                disabled:opacity-80 disabled:cursor-not-allowed cursor-pointer"
             >
-              Create my account
+              {isLoading ? "Creating Account..." : "Create my account"}
             </Button>
           </motion.div>
         </form>

@@ -7,24 +7,19 @@ import bcrypt from "bcryptjs";
 import { cookies } from "next/headers";
 import { Role } from "@/generated/prisma";
 
-// set temorary role cookie
+// set temporary role cookie
 export const setTempRoleAction = async (role: string) => {
   const cookieStore = await cookies();
   cookieStore.set("temp_role", role.toUpperCase(), {
     path: "/",
-    maxAge: 60 * 60, // 1 hour in seconds
-    httpOnly: false, // Allow client-side read if needed
+    maxAge: 60 * 60, 
+    httpOnly: false, 
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
   });
 
   return { success: true, role };
 };
-
-// sign in with provider
-export async function signInWithProvider(provider: "google" | "github") {
-  await signIn(provider);
-}
 
 // register user
 
@@ -56,6 +51,13 @@ export const registerUserAction = async (data: UserRegistrationType) => {
     const cookieStore = await cookies();
     const role = cookieStore.get("temp_role")?.value as Role;
 
+    if (!role) {
+      return {
+        success: false,
+        message: "Role not selected. Please choose a role first.",
+      };
+    }
+
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
@@ -69,7 +71,7 @@ export const registerUserAction = async (data: UserRegistrationType) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Create user in DB
-    const newUser=await prisma.user.create({
+    const newUser = await prisma.user.create({
       data: {
         firstName,
         lastName,
@@ -80,7 +82,7 @@ export const registerUserAction = async (data: UserRegistrationType) => {
       },
     });
 
-    // create a profile alongside with registration
+    // Create profile based on role
     if (role === "DEVELOPER") {
       await prisma.freelancerProfile.create({
         data: { userId: newUser.id },
@@ -91,29 +93,20 @@ export const registerUserAction = async (data: UserRegistrationType) => {
       });
     }
 
-    // clear cookie after successful registration
+    // Clear cookie after successful registration
     cookieStore.delete("temp_role");
 
-    // Automatically sign in user via credentials
-    const signInResult = await signIn("credentials", {
-      redirect: false,
-      email,
-      password,
-    });
-
-    if (signInResult?.error) {
-      return {
-        success: false,
-        message: signInResult.error,
-      };
-    }
-
+    // Return success with credentials for client-side auto-login
     return {
       success: true,
       message: "User registered successfully",
+      autoLogin: {
+        email,
+        password, 
+      },
     };
   } catch (err: unknown) {
-    console.error(err);
+    console.error("Registration error:", err);
     return {
       success: false,
       message: "Internal Server Error",
@@ -150,6 +143,8 @@ export const loginAction = async (data: LoginInputType) => {
         case "AccessDenied":
           message = "Access denied.";
           break;
+        default:
+          message = result.error;
       }
 
       return {

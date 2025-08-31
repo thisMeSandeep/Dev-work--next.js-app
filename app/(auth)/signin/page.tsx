@@ -14,6 +14,7 @@ import { motion } from "motion/react";
 import Link from "next/link";
 import { loginAction } from "@/actions/auth.action";
 import AuthRedirectHandler from "../components/AuthRedirectHandler";
+import { useRouter } from "next/navigation";
 
 const userSchema = z.object({
   email: z.email("Invalid email").nonempty("Email is required"),
@@ -27,9 +28,12 @@ placeholder:text-gray-400
 focus-visible:border-green-500 focus-visible:ring-2 focus-visible:ring-green-500/20 
 focus-visible:outline-none transition-colors`;
 
-const Signup = () => {
+const Signin = () => {
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
+  const router = useRouter();
 
   const {
     register,
@@ -40,15 +44,24 @@ const Signup = () => {
     mode: "onChange",
   });
 
-
-  const onSubmit = async (data: UserType) => {0
-    console.log("Form data:", data);
-    const result =await loginAction(data);
-    if (!result.success) {
-      alert(result.message); 
-    }
-    else{
-      alert(result.message);
+  const onSubmit = async (data: UserType) => {
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      console.log("Form data:", data);
+      const result = await loginAction(data);
+      
+      if (!result.success) {
+        setError(result.message);
+      } else {
+        // Successful login - redirect will be handled by middleware
+        window.location.href = "/"; // Force page reload to trigger middleware
+      }
+    } catch (err) {
+      setError("An unexpected error occurred. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -75,6 +88,13 @@ const Signup = () => {
           <h1 className="text-3xl font-bold text-center text-gray-800">
             Sign in your <span className="text-green-600">Dev Work</span> account
           </h1>
+
+          {/* Error message */}
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+              {error}
+            </div>
+          )}
 
           {/* OAuth */}
           <SocialLogin />
@@ -138,16 +158,17 @@ const Signup = () => {
             </div>
 
             {/* submit */}
-            <motion.div whileHover={{ scale: 1.03 }} className="mx-auto">
+            <motion.div whileHover={{ scale: isLoading ? 1 : 1.03 }} className="mx-auto">
               <Button
                 type="submit"
+                disabled={isLoading}
                 className="px-8 py-3 rounded-2xl border border-green-500 
                  bg-green-600  text-lg font-medium 
                  hover:bg-green-500 text-white 
                  transition-all duration-300 
                  disabled:opacity-80 disabled:cursor-not-allowed cursor-pointer"
               >
-                Sign In
+                {isLoading ? "Signing In..." : "Sign In"}
               </Button>
             </motion.div>
           </form>
@@ -168,4 +189,4 @@ const Signup = () => {
   );
 };
 
-export default Signup;
+export default Signin;
