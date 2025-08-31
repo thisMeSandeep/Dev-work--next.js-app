@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import { setClientProfileAction } from "@/actions/client.actions";
 import { fetchAndSetUser } from "@/lib/fetchUser";
+import toast from "react-hot-toast";
 
 // Validation schema
 const formSchema = z.object({
@@ -45,6 +46,7 @@ interface Props {
 
 const CreateClientProfileForm = ({ initialData }: Props) => {
   const [isEditing, setIsEditing] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const {
     register,
@@ -63,22 +65,25 @@ const CreateClientProfileForm = ({ initialData }: Props) => {
   });
 
   const onSubmit = async (data: FormData) => {
-    console.log("Submitted Data:", data);
-    setIsEditing(false);
+    setIsLoading(true);
     const response = await setClientProfileAction(data);
     if (response.success) {
-      alert(response.message);
+      toast.success(response.message);
       await fetchAndSetUser();
     } else {
-      alert(response.message);
+      toast.error(response.message);
     }
+    setIsLoading(false);
+    setIsEditing(false);
   };
 
   return (
     <Card className="w-full p-6 rounded-md border-none shadow-none">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl md:text-2xl font-semibold text-green-700">Client Profile</h2>
+        <h2 className="text-xl md:text-2xl font-semibold text-green-700">
+          Client Profile
+        </h2>
         <Button
           onClick={() => setIsEditing(!isEditing)}
           variant="outline"
@@ -227,7 +232,7 @@ const CreateClientProfileForm = ({ initialData }: Props) => {
               className="bg-green-600 text-white hover:bg-green-700 flex items-center gap-2"
             >
               <Save className="w-4 h-4" />
-              Save
+              {isLoading ? "Saving..." : "Save"}
             </Button>
           </div>
         </form>

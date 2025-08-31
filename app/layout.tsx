@@ -21,7 +21,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${open_sans.className}`}>
         {children}
-        <Toaster />
+        <Toaster position="top-right" />
       </body>
     </html>
   );

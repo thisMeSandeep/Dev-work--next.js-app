@@ -47,7 +47,7 @@ export default function ProfileDropdown({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Logout handler 
+  // Logout handler
   const handleLogout = async () => {
     console.log("Logout clicked");
     setOpen(false);
@@ -60,13 +60,14 @@ export default function ProfileDropdown({
       {/* Profile Button */}
       <button
         onClick={() => setOpen((prev) => !prev)}
-        className="flex items-center justify-center w-8 h-8 rounded-full border border-gray-300 bg-gray-100 text-sm font-medium hover:border-green-500 transition-colors overflow-hidden cursor-pointer"
+        className="relative flex  items-center justify-center w-8 h-8 rounded-full border border-gray-300 bg-gray-100 text-sm font-medium hover:border-green-500 transition-colors overflow-hidden cursor-pointer"
       >
         {profileImage ? (
           <Image
             src={profileImage}
             alt="profile"
             fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             className="object-cover rounded-full"
           />
         ) : (
@@ -86,6 +87,7 @@ export default function ProfileDropdown({
                     src={profileImage}
                     alt="profile"
                     fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     className="object-cover rounded-full"
                   />
                 </div>

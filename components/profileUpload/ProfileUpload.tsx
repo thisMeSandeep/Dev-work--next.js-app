@@ -7,6 +7,7 @@ import { Loader, Pencil } from "lucide-react";
 import { useForm, Controller } from "react-hook-form";
 import { updateUserProfileImageAction } from "@/actions/user.action";
 import { fetchAndSetUser } from "@/lib/fetchUser";
+import toast from "react-hot-toast";
 
 type FileInputProps = {
   textPlaceholder: string;
@@ -34,7 +35,7 @@ const ProfileUpload = ({
     // Enforce 2 MB max file size
     const MAX_SIZE_BYTES = 2 * 1024 * 1024;
     if (file.size > MAX_SIZE_BYTES) {
-      alert("File is too large. Maximum allowed size is 2 MB.");
+      toast.error("File size must be less than 2MB");
       reset();
       return;
     }
@@ -43,15 +44,15 @@ const ProfileUpload = ({
       setIsLoading(true);
       const response = await updateUserProfileImageAction(file);
 
-      if (response?.success) {
-        console.log("Upload successful:", response);
+      if (response.success) {
+        toast.success(response.message);
         reset();
         await fetchAndSetUser();
       } else {
-        console.error("Upload failed:", response);
+        toast.error(response.message);
       }
     } catch (err) {
-      console.error("Upload failed:", err);
+      toast.error("Something went wrong. Please try again.");
       reset();
     } finally {
       setIsLoading(false);

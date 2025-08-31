@@ -24,6 +24,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { ImageUp, Sparkles } from "lucide-react";
 import { createJobAction } from "@/actions/client.actions";
 import { fetchAndSetUser } from "@/lib/fetchUser";
+import toast from "react-hot-toast";
+import { useState } from "react";
 
 // ------------------ Zod Schema ------------------
 const jobSchema = z.object({
@@ -67,12 +69,17 @@ const LabelStyle = "text-sm font-medium text-gray-700";
 const errorStyle = "text-red-500 text-sm";
 
 export default function CreateJobForm() {
+
+const [isLoading, setIsLoading] = useState(false);
+
+
   const {
     register,
     handleSubmit,
     formState: { errors },
     setValue,
     watch,
+    reset,
   } = useForm<JobSchemaType>({
     resolver: zodResolver(jobSchema),
     defaultValues: {
@@ -92,6 +99,7 @@ export default function CreateJobForm() {
   });
 
   const onSubmit = async (data: JobSchemaType) => {
+    setIsLoading(true);
     const formattedData = {
       ...data,
       skills: data.skills.split(",").map((s) => s.trim()),
@@ -100,15 +108,15 @@ export default function CreateJobForm() {
       attachment: data.attachment || null,
     };
 
-    console.log("Job Submitted:", formattedData);
-
     const response = await createJobAction(formattedData);
     if (response.success) {
-      alert(response.message);
+      toast.success(response.message);
+      reset();
       await fetchAndSetUser();
     } else {
-      alert(response.message);
+      toast.error(response.message);
     }
+    setIsLoading(false);
   };
 
   return (
@@ -357,7 +365,7 @@ export default function CreateJobForm() {
           type="submit"
           className="w-full rounded-md py-3 text-base font-medium bg-green-500 hover:bg-green-600 transition text-white cursor-pointer"
         >
-          Post Job
+          {isLoading ? "Posting Job..." : "Post Job"}
         </Button>
       </form>
     </div>
