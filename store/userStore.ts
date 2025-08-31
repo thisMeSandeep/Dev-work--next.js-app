@@ -1,12 +1,11 @@
+import { User } from "@/types/type";
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 
-interface User {
-  [key: string]: unknown; 
-}
+
 
 interface UserState {
-  user: User | null | undefined;
+  user: User | null 
   setUser: (user: User | undefined) => void;
   clearUser: () => void;
 }

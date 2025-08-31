@@ -4,20 +4,25 @@ import Header from "@/components/header/Header";
 import WaveLoader from "@/components/loader/WaveLoader";
 import { fetchAndSetUser } from "@/lib/fetchUser";
 import { useUserStore } from "@/store/userStore";
-import { User } from "lucide-react";
+import { Settings, User } from "lucide-react";
 import React, { useEffect } from "react";
 
 const navLinks = [
-  { name: "Jobs", path: "/client/jobs" },
-  { name: "Proposals", path: "/client/proposals" },
-  { name: "Requests", path: "/client/requests" },
+  { name: "Find work", path: "/developer" },
+  { name: "Saved Jobs", path: "/developer/saved-jobs" },
+  { name: "Proposals", path: "/developer/proposals" },
 ];
 
 const profileLinks = [
-  { label: "Your Profile", icon: User, href: "/client/profile" },
+  { label: "Your Profile", icon: User, href: "/developer/profile" },
+  {
+    label: "Account Settings",
+    icon: Settings,
+    href: "/developer/account-settings",
+  },
 ];
 
-const Clientlayout = ({ children }: { children: React.ReactNode }) => {
+const Developerlayout = ({ children }: { children: React.ReactNode }) => {
   const user = useUserStore((state) => state.user);
 
   useEffect(() => {
@@ -32,10 +37,10 @@ const Clientlayout = ({ children }: { children: React.ReactNode }) => {
     );
 
   const userData = {
-    firstName: user.firstName!,
-    lastName: user.lastName!,
-    role: user.role!,
-    profileImage: user.profileImage!,
+    firstName: user?.firstName!,
+    lastName: user?.lastName!,
+    role: user?.role!,
+    profileImage: user?.profileImage!,
   };
 
   return (
@@ -52,4 +57,4 @@ const Clientlayout = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-export default Clientlayout;
+export default Developerlayout;
