@@ -1,12 +1,11 @@
+import WaveLoader from "@/components/loader/WaveLoader";
 
-
-const Home =() => {
-
+const Home = () => {
   return (
     <>
-     <div>
-       Home page
-     </div>
+      <div>
+        <WaveLoader />
+      </div>
     </>
   );
 };

@@ -1,6 +1,7 @@
 "use client";
 
 import Header from "@/components/header/Header";
+import WaveLoader from "@/components/loader/WaveLoader";
 import { fetchAndSetUser } from "@/lib/fetchUser";
 import { useUserStore } from "@/store/userStore";
 import { User } from "lucide-react";
@@ -23,7 +24,7 @@ const Clientlayout = ({ children }: { children: React.ReactNode }) => {
     fetchAndSetUser();
   }, []);
 
-  if (!user) return <div>Loading profile...</div>;
+  if (!user) return <div className="flex justify-center items-center h-screen"><WaveLoader/></div>;
 
   const userData = {
     firstName: user.firstName as string,
