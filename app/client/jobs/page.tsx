@@ -3,9 +3,9 @@
 import Drawer from "@/components/reusable/Drawer";
 import { useUserStore } from "@/store/userStore";
 import { Briefcase } from "lucide-react";
-import Link from "next/link";
 import { useState } from "react";
 import CreateJobForm from "../components/CreateJobForm";
+import { Job } from "@/types/type";
 
 const PostedJobs = () => {
   const [openModel, setOpenModel] = useState(false);
@@ -27,7 +27,7 @@ const PostedJobs = () => {
 
       {/* Show empty jobs area */}
       <div className="flex items-center justify-center min-h-[60vh]">
-        {(user.ClientProfile as { postedJobs?: any[] })?.postedJobs?.length ===
+        {(user.ClientProfile as { postedJobs?: Job[] })?.postedJobs?.length ===
         0 ? (
           <div className="flex flex-col items-center text-center space-y-3 text-gray-600">
             <Briefcase className="h-12 w-12 text-green-600" />

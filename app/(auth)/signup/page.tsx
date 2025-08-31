@@ -111,6 +111,7 @@ const Signup = () => {
         toast.error(response.message);
       }
     } catch (err) {
+      console.log("error:", err);
       toast.error("An unexpected error occurred. Please try again.");
     } finally {
       setIsLoading(false);

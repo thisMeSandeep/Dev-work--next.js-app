@@ -55,6 +55,7 @@ const Signin = () => {
         window.location.href = "/"; // Force page reload to trigger middleware
       }
     } catch (err) {
+      console.log("error:", err);
       toast.error("Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);

@@ -1,0 +1,20 @@
+export type Job = {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  speciality: string;
+  skills: string[];
+  budget: number;
+  status: string;
+  numberOfProposals: number;
+  completed: boolean;
+  scopeSize: string;
+  duration: string;
+  experienceRequired: string;
+  connectsRequired: number;
+  attachment?: string | null;
+  createdAt: string;
+  clientId: string;
+  hiredFreelancerId?: string | null;
+};
