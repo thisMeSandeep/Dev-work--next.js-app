@@ -9,7 +9,7 @@ import { ClientStatsCard } from "../components/ClientStatesCard";
 
 
 
-const ClientProfile: React.FC = () => {
+const ClientProfile = () => {
   const user = useUserStore((state) => state.user) 
 
   // extract text placeholder safely
