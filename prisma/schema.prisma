@@ -8,7 +8,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// enums 
+
 
 // Enums
 enum Role {
@@ -91,7 +91,6 @@ enum ClientRequestStatus {
 }
 
 // Models
-
 model User {
   id             String   @id @default(uuid())
   firstName      String?
@@ -110,19 +109,19 @@ model User {
 }
 
 model FreelancerProfile {
-  id              String          @id @default(uuid())
-  user            User            @relation(fields: [userId], references: [id])
-  userId          String          @unique
-  available       Boolean         @default(true)
+  id              String           @id @default(uuid())
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId          String           @unique
+  available       Boolean          @default(true)
   mobile          String?
   bio             String?
-  skills          String[]        @default([])
+  skills          String[]         @default([])
   category        Category?
   speciality      Speciality?
   experienceLevel ExperienceLevel?
   perHourRate     Float?
   languages       String?
-  connects        Int             @default(200)
+  connects        Int              @default(200)
   portfolioLink   String?
   otherLink       String?
   file            String?
@@ -136,7 +135,7 @@ model FreelancerProfile {
 
 model ClientProfile {
   id          String  @id @default(uuid())
-  user        User    @relation(fields: [userId], references: [id])
+  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId      String  @unique
   mobile      String?
   company     String?
@@ -163,15 +162,15 @@ model Job {
   scopeSize          ScopeSize
   duration           ScopeDuration
   experienceRequired ExperienceLevel
-  connectsRequired   Int             @default(1)
+  connectsRequired   Int             @default(5)
   attachment         String?
   createdAt          DateTime        @default(now())
 
   // Relations
-  client   ClientProfile @relation(fields: [clientId], references: [id])
+  client   ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
   clientId String
 
-  hiredFreelancer   FreelancerProfile? @relation("HiredJobs", fields: [hiredFreelancerId], references: [id])
+  hiredFreelancer   FreelancerProfile? @relation("HiredJobs", fields: [hiredFreelancerId], references: [id], onDelete: SetNull)
   hiredFreelancerId String?
 
   proposals Proposal[]
@@ -192,10 +191,10 @@ model Proposal {
   submittedAt  DateTime          @default(now())
 
   // Relations
-  freelancerProfile   FreelancerProfile @relation(fields: [freelancerProfileId], references: [id])
+  freelancerProfile   FreelancerProfile @relation(fields: [freelancerProfileId], references: [id], onDelete: Cascade)
   freelancerProfileId String
 
-  job   Job    @relation(fields: [jobId], references: [id])
+  job   Job    @relation(fields: [jobId], references: [id], onDelete: Cascade)
   jobId String
 }
 
@@ -206,11 +205,11 @@ model ClientRequest {
   status    ClientRequestStatus @default(PENDING)
 
   jobId String
-  job   Job    @relation("JobRequests", fields: [jobId], references: [id])
+  job   Job    @relation("JobRequests", fields: [jobId], references: [id], onDelete: Cascade)
 
   clientId String
-  client   ClientProfile @relation("ClientRequests", fields: [clientId], references: [id])
+  client   ClientProfile @relation("ClientRequests", fields: [clientId], references: [id], onDelete: Cascade)
 
   developerId String
-  developer   FreelancerProfile @relation("DeveloperRequests", fields: [developerId], references: [id])
+  developer   FreelancerProfile @relation("DeveloperRequests", fields: [developerId], references: [id], onDelete: Cascade)
 }
