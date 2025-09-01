@@ -25,46 +25,13 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { formatString } from "@/lib/formatString";
-
-// Zod schema
-const optionalUrl = z.preprocess(
-  (val) => (val === "" ? null : val),
-  z.url("Must be a valid URL").nullable().optional()
-);
-
-const developerProfileSchema = z.object({
-  available: z.boolean(),
-  country: z.string().nonempty("Country is required"),
-  mobile: z
-    .union([
-      z.string().regex(/^\+?[0-9]{7,15}$/, "Invalid phone number"),
-      z.literal(""),
-      z.null(),
-    ])
-    .optional(),
-  bio: z.preprocess(
-    (val) => (val === "" ? null : val),
-    z
-      .string()
-      .min(100, "Bio must be at least 100 characters")
-      .nullable()
-      .optional()
-  ),
-  skills: z.array(z.string().min(1, "Skill cannot be empty")),
-  category: z.enum(Object.values(Category)).optional(),
-  speciality: z.enum(Object.values(Speciality)).optional(),
-  experienceLevel: z.enum(Object.values(ExperienceLevel)).optional(),
-  perHourRate: z.preprocess(
-    (val) => (val === "" ? null : val),
-    z.number().positive("Rate must be positive").nullable().optional()
-  ),
-  languages: z.string().optional().nullable(),
-  portfolioLink: optionalUrl,
-  otherLink: optionalUrl,
-  file: z.instanceof(File).optional().nullable(),
-});
-
-type DeveloperProfileType = z.infer<typeof developerProfileSchema>;
+import { updateDeveloperProfileAction } from "@/actions/developer.action";
+import { fetchAndSetUser } from "@/lib/fetchUser";
+import toast from "react-hot-toast";
+import {
+  developerProfileSchema,
+  DeveloperProfileType,
+} from "@/lib/schemas/developerProfile.schema";
 
 interface Props {
   profile: FreelancerProfile;
@@ -81,7 +48,6 @@ const DeveloperProfileForm = ({ profile, onSuccess, country }: Props) => {
     "w-full border-green-300 focus-visible:border-green-500 focus-visible:ring-2 focus-visible:ring-green-500/20 focus-visible:outline-none";
   const selectStyles =
     "w-full border-green-300 focus-visible:border-green-500 focus-visible:ring-2 focus-visible:ring-green-500/20 focus-visible:outline-none";
-
 
   const defaultValues = {
     available: profile.available ?? true,
@@ -137,10 +103,16 @@ const DeveloperProfileForm = ({ profile, onSuccess, country }: Props) => {
   const watchedValues = watch();
 
   const handleFormSubmit = async (data: DeveloperProfileType) => {
-    // TODO: Implement your form submission logic here
     console.log("Form submitted:", data);
-
-    // Notify parent component of successful submission
+    setIsLoading(true);
+    const response = await updateDeveloperProfileAction(data);
+    if (response.success) {
+      toast.success(response.message);
+      await fetchAndSetUser();
+    } else {
+      toast.error(response.message);
+    }
+    setIsLoading(false);
     onSuccess?.();
   };
 
@@ -165,7 +137,9 @@ const DeveloperProfileForm = ({ profile, onSuccess, country }: Props) => {
           <Checkbox
             id="available"
             checked={watch("available")}
-            onCheckedChange={(checked) => setValue("available", checked as boolean)}
+            onCheckedChange={(checked) =>
+              setValue("available", checked as boolean)
+            }
             className="size-5 data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600 border border-green-300 focus-visible:border-green-500 focus-visible:ring-2 focus-visible:ring-green-500/20 focus-visible:outline-none"
           />
           {errors.available && (
