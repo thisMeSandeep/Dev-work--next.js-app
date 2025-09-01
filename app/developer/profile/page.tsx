@@ -7,7 +7,7 @@ import { MapPin, Pencil, X } from "lucide-react";
 import React from "react";
 import DeveloperProfileDisplay from "../components/DeveloperProfileDisplay";
 import DeveloperProfileForm from "../components/DeveloperProfileForm";
-import { Category, ExperienceLevel, Speciality } from "@/generated/prisma";
+import { FreelancerProfile } from "@/types/type";
 
 const DeveloperProfile = () => {
   const user = useUserStore((state) => state.user);
@@ -17,24 +17,7 @@ const DeveloperProfile = () => {
   const textPlaceholder =
     (user?.firstName?.[0] ?? "") + (user?.lastName?.[0] ?? "");
 
-  // Mock profile data - replace with actual data from your API/database
-  const mockProfile = {
-    available: true,
-    mobile: "+91 9876543210",
-    bio: "I'm a skilled full stack developer with expertise in React, Node.js, and modern web technologies.",
-    skills: ["React", "Node.js", "TypeScript", "MongoDB"],
-    category: Category.SOFTWARE_DEV,
-    speciality: Speciality.AI_CHATBOT,
-    experienceLevel: ExperienceLevel.INTERMEDIATE,
-    perHourRate: 25,
-    languages: "English, Hindi",
-    portfolioLink: "https://myportfolio.com",
-    otherLink: "https://linkedin.com/in/username",
-    file: "/path/to/resume.pdf",
-  };
-
   const handleEditSuccess = () => {
-    // Close edit mode after successful submission
     setIsEditing(false);
   };
 
@@ -77,15 +60,20 @@ const DeveloperProfile = () => {
         </button>
       </div>
 
-      {/* Conditional Rendering */}
-      {isEditing ? (
-        <DeveloperProfileForm
-          profile={mockProfile}
-          onSuccess={handleEditSuccess}
-        />
-      ) : (
-        <DeveloperProfileDisplay profile={mockProfile} />
-      )}
+      <div className="border border-black">
+        {/* Conditional Rendering */}
+        {isEditing ? (
+          <DeveloperProfileForm
+            profile={user?.FreelancerProfile as FreelancerProfile}
+            country={user?.country ?? ""}
+            onSuccess={handleEditSuccess}
+          />
+        ) : (
+          <DeveloperProfileDisplay
+            profile={user?.FreelancerProfile as FreelancerProfile}
+          />
+        )}
+      </div>
     </div>
   );
 };

@@ -25,8 +25,8 @@ export interface User {
   createdAt: Date;
 
   // Relations
-  FreelancerProfile?: FreelancerProfile | null;
-  ClientProfile?: ClientProfile | null;
+  FreelancerProfile?: FreelancerProfile ;
+  ClientProfile?: ClientProfile ;
 }
 
 export interface FreelancerProfile {

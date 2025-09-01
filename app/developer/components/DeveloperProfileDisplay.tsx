@@ -13,25 +13,10 @@ import {
   Link2,
   File,
 } from "lucide-react";
+import { FreelancerProfile } from "@/types/type"; 
+import { formatString } from "@/lib/formatString";
 
-type ProfileDisplayProps = {
-  profile: {
-    available: boolean;
-    mobile: string | null;
-    bio: string | null;
-    skills: string[];
-    category: Category | null;
-    speciality: Speciality | null;
-    experienceLevel: ExperienceLevel | null;
-    perHourRate: number | null;
-    languages: string | null;
-    portfolioLink: string | null;
-    otherLink: string | null;
-    file: string;
-  };
-};
-
-const DeveloperProfileDisplay = ({ profile }: ProfileDisplayProps) => {
+const DeveloperProfileDisplay = ({ profile }: { profile: FreelancerProfile  }) => {
   return (
     <div className="w-full p-6 rounded-md border-none shadow-none">
       {/* Header */}
@@ -43,6 +28,7 @@ const DeveloperProfileDisplay = ({ profile }: ProfileDisplayProps) => {
 
       {/* Profile Data Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-gray-700">
+
         {/* Available Status */}
         <div className="flex flex-col">
           <span className="flex items-center gap-2 font-medium text-green-700">
@@ -97,7 +83,7 @@ const DeveloperProfileDisplay = ({ profile }: ProfileDisplayProps) => {
           <span className="flex items-center gap-2 font-medium text-green-700">
             <Code className="w-4 h-4" /> Category
           </span>
-          <span>{profile.category || "Not set"}</span>
+          <span>{ profile.category && formatString(profile.category) || "Not set"}</span>
         </div>
 
         {/* Speciality */}
@@ -105,7 +91,7 @@ const DeveloperProfileDisplay = ({ profile }: ProfileDisplayProps) => {
           <span className="flex items-center gap-2 font-medium text-green-700">
             <Code className="w-4 h-4" /> Speciality
           </span>
-          <span>{profile.speciality || "Not set"}</span>
+          <span>{profile.speciality && formatString(profile.speciality) || "Not set"}</span>
         </div>
 
         {/* Experience Level */}
@@ -113,7 +99,7 @@ const DeveloperProfileDisplay = ({ profile }: ProfileDisplayProps) => {
           <span className="flex items-center gap-2 font-medium text-green-700">
             <Award className="w-4 h-4" /> Experience Level
           </span>
-          <span>{profile.experienceLevel || "Not set"}</span>
+          <span>{profile.experienceLevel && formatString(profile.experienceLevel) || "Not set"}</span>
         </div>
 
         {/* Hourly Rate */}

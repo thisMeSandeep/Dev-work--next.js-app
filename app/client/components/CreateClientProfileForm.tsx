@@ -82,7 +82,7 @@ const CreateClientProfileForm = ({ initialData }: Props) => {
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl md:text-2xl font-semibold text-green-700">
-          Client Profile
+          {isEditing ? "Edit client profile" : "Client Profile"}
         </h2>
         <Button
           onClick={() => setIsEditing(!isEditing)}

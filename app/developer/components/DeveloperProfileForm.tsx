@@ -5,7 +5,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Label } from "@/components/ui/label";
-import { Plus, X } from "lucide-react";
+import { ImageUp, Plus, Sparkle, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -16,41 +16,63 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Category, ExperienceLevel, Speciality } from "@/generated/prisma";
+import { FreelancerProfile } from "@/types/type";
+import { countries } from "@/data/countries";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { formatString } from "@/lib/formatString";
 
 // Zod schema
+const optionalUrl = z.preprocess(
+  (val) => (val === "" ? null : val),
+  z.url("Must be a valid URL").nullable().optional()
+);
+
 const developerProfileSchema = z.object({
   available: z.boolean(),
+  country: z.string().nonempty("Country is required"),
   mobile: z
-    .string()
-    .regex(/^\+?[0-9]{7,15}$/, "Invalid phone number")
-    .optional()
-    .nullable(),
-  bio: z
-    .string()
-    .max(500, "Bio must be at most 500 characters")
-    .optional()
-    .nullable(),
+    .union([
+      z.string().regex(/^\+?[0-9]{7,15}$/, "Invalid phone number"),
+      z.literal(""),
+      z.null(),
+    ])
+    .optional(),
+  bio: z.preprocess(
+    (val) => (val === "" ? null : val),
+    z
+      .string()
+      .min(100, "Bio must be at least 100 characters")
+      .nullable()
+      .optional()
+  ),
   skills: z.array(z.string().min(1, "Skill cannot be empty")),
   category: z.enum(Object.values(Category)).optional(),
   speciality: z.enum(Object.values(Speciality)).optional(),
   experienceLevel: z.enum(Object.values(ExperienceLevel)).optional(),
-  perHourRate: z.number().positive("Rate must be positive").optional(),
+  perHourRate: z.preprocess(
+    (val) => (val === "" ? null : val),
+    z.number().positive("Rate must be positive").nullable().optional()
+  ),
   languages: z.string().optional().nullable(),
-  portfolioLink: z.url("Must be a valid URL").optional().nullable(),
-  otherLink: z.url("Must be a valid URL").optional().nullable(),
+  portfolioLink: optionalUrl,
+  otherLink: optionalUrl,
   file: z.instanceof(File).optional().nullable(),
 });
 
 type DeveloperProfileType = z.infer<typeof developerProfileSchema>;
 
-type ProfileProp = Omit<DeveloperProfileType, "file"> & { file: string };
-
 interface Props {
-  profile: ProfileProp;
-  onSuccess?: () => void; // Callback to notify parent of successful submission
+  profile: FreelancerProfile;
+  country: string;
+  onSuccess?: () => void;
 }
 
-const DeveloperProfileForm = ({ profile, onSuccess }: Props) => {
+const DeveloperProfileForm = ({ profile, onSuccess, country }: Props) => {
   const [skill, setSkill] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -60,20 +82,22 @@ const DeveloperProfileForm = ({ profile, onSuccess }: Props) => {
   const selectStyles =
     "w-full border-green-300 focus-visible:border-green-500 focus-visible:ring-2 focus-visible:ring-green-500/20 focus-visible:outline-none";
 
-  const defaultValues: DeveloperProfileType = {
+
+  const defaultValues = {
     available: profile.available ?? true,
-    mobile: profile.mobile,
-    bio: profile.bio,
+    country: country ?? "",
+    mobile: profile.mobile ?? null,
+    bio: profile.bio ?? null,
     skills: profile.skills ?? [],
-    category: profile.category,
-    speciality: profile.speciality,
-    experienceLevel: profile.experienceLevel,
-    perHourRate: profile.perHourRate,
-    languages: profile.languages,
-    portfolioLink: profile.portfolioLink,
-    otherLink: profile.otherLink,
+    category: profile.category ?? undefined,
+    speciality: profile.speciality ?? undefined,
+    experienceLevel: profile.experienceLevel ?? undefined,
+    perHourRate: profile.perHourRate ?? null,
+    languages: profile.languages ?? null,
+    portfolioLink: profile.portfolioLink ?? null,
+    otherLink: profile.otherLink ?? null,
     file: null,
-  };
+  } satisfies Partial<DeveloperProfileType>;
 
   const {
     register,
@@ -81,7 +105,7 @@ const DeveloperProfileForm = ({ profile, onSuccess }: Props) => {
     formState: { errors },
     setValue,
     watch,
-  } = useForm<DeveloperProfileType>({
+  } = useForm({
     resolver: zodResolver(developerProfileSchema),
     defaultValues,
     mode: "onChange",
@@ -113,21 +137,11 @@ const DeveloperProfileForm = ({ profile, onSuccess }: Props) => {
   const watchedValues = watch();
 
   const handleFormSubmit = async (data: DeveloperProfileType) => {
-   setIsLoading(true);
-    try {
-      // TODO: Implement your form submission logic here
-      console.log("Form submitted:", data);
+    // TODO: Implement your form submission logic here
+    console.log("Form submitted:", data);
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Notify parent component of successful submission
-      onSuccess?.();
-    } catch (error) {
-      console.error("Error submitting form:", error);
-    } finally {
-      setIsLoading(false);
-    }
+    // Notify parent component of successful submission
+    onSuccess?.();
   };
 
   return (
@@ -150,12 +164,40 @@ const DeveloperProfileForm = ({ profile, onSuccess }: Props) => {
           </Label>
           <Checkbox
             id="available"
-            {...register("available")}
+            checked={watch("available")}
+            onCheckedChange={(checked) => setValue("available", checked as boolean)}
             className="size-5 data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600 border border-green-300 focus-visible:border-green-500 focus-visible:ring-2 focus-visible:ring-green-500/20 focus-visible:outline-none"
           />
           {errors.available && (
             <span className="text-red-500 text-xs">
               {errors.available.message}
+            </span>
+          )}
+        </div>
+
+        {/* country */}
+        <div className="flex flex-col w-full space-y-2">
+          <Label className="flex items-center gap-2 text-green-700">
+            Country
+          </Label>
+          <Select
+            onValueChange={(value) => setValue("country", value as string)}
+            defaultValue={watch("country")}
+          >
+            <SelectTrigger className={selectStyles}>
+              <SelectValue placeholder="Select country" />
+            </SelectTrigger>
+            <SelectContent>
+              {countries.map((item) => (
+                <SelectItem key={item.code} value={item.name}>
+                  {item.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {errors.country && (
+            <span className="text-red-500 text-xs">
+              {errors.country.message}
             </span>
           )}
         </div>
@@ -180,12 +222,24 @@ const DeveloperProfileForm = ({ profile, onSuccess }: Props) => {
         {/* Bio */}
         <div className="flex flex-col w-full space-y-2 md:col-span-2">
           <Label className="flex items-center gap-2 text-green-700">Bio</Label>
-          <textarea
-            {...register("bio")}
-            rows={3}
-            placeholder="eg. I'm a skilled full stack developer..."
-            className={`${inputStyles} resize-none`}
-          />
+          <div className="relative">
+            <Textarea
+              {...register("bio")}
+              rows={3}
+              placeholder="eg. I'm a skilled full stack developer..."
+              className={`${inputStyles} resize-none`}
+            />
+            <div className="absolute right-4 bottom-0">
+              <Tooltip>
+                <TooltipTrigger type="button" className="cursor-pointer">
+                  <Sparkle className="size-5 text-emerald-700" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Enhance with AI</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
+          </div>
           {errors.bio && (
             <span className="text-red-500 text-xs">{errors.bio.message}</span>
           )}
@@ -200,7 +254,7 @@ const DeveloperProfileForm = ({ profile, onSuccess }: Props) => {
             <Input
               onChange={(e) => setSkill(e.target.value)}
               value={skill}
-              placeholder="eg. HTML, CSS, JavaScript"
+              placeholder="eg. HTML"
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   e.preventDefault();
@@ -259,7 +313,7 @@ const DeveloperProfileForm = ({ profile, onSuccess }: Props) => {
             <SelectContent>
               {Object.values(Category).map((item) => (
                 <SelectItem key={item} value={item}>
-                  {item}
+                  {formatString(item)}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -288,7 +342,7 @@ const DeveloperProfileForm = ({ profile, onSuccess }: Props) => {
             <SelectContent>
               {Object.values(Speciality).map((item) => (
                 <SelectItem key={item} value={item}>
-                  {item}
+                  {formatString(item)}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -317,7 +371,7 @@ const DeveloperProfileForm = ({ profile, onSuccess }: Props) => {
             <SelectContent>
               {Object.values(ExperienceLevel).map((item) => (
                 <SelectItem value={item} key={item}>
-                  {item}
+                  {formatString(item)}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -336,9 +390,7 @@ const DeveloperProfileForm = ({ profile, onSuccess }: Props) => {
           </Label>
           <Input
             type="number"
-            {...register("perHourRate", {
-              valueAsNumber: true,
-            })}
+            {...register("perHourRate", {})}
             placeholder="eg. 25"
             className={inputStyles}
           />
@@ -401,22 +453,42 @@ const DeveloperProfileForm = ({ profile, onSuccess }: Props) => {
         </div>
 
         {/* File Upload */}
-        <div className="flex flex-col w-full space-y-2 md:col-span-2">
-          <Label className="flex items-center gap-2 text-green-700">
-            Resume/CV (PDF only)
+        <div className={inputStyles}>
+          <Label
+            className="flex items-center gap-2 text-green-700"
+            htmlFor="attachment"
+          >
+            <div className="border-2 border-dashed border-green-500 w-full flex items-center justify-center flex-col gap-3 p-6 rounded-md cursor-pointer hover:bg-green-50 transition">
+              <ImageUp className="size-12 text-green-500" />
+              <p className="text-sm text-gray-700">Upload Resume/CV</p>
+            </div>
           </Label>
+
           <Input
             type="file"
+            id="attachment"
             accept="application/pdf"
-            onChange={(e) =>
-              setValue("file", e.target.files?.[0] ?? null, {
-                shouldDirty: true,
-              })
-            }
-            className={inputStyles}
+            hidden
+            {...register("file")}
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              setValue("file", file, { shouldValidate: true });
+            }}
           />
-          {errors.file && (
-            <span className="text-red-500 text-xs">{errors.file.message}</span>
+
+          {/* File name display */}
+          {watch("file") && (
+            <p className="mt-2 text-sm text-gray-600">
+              Selected:{" "}
+              <span className="font-medium">{watch("file")?.name}</span>
+            </p>
+          )}
+
+          {/* Error message */}
+          {errors.file?.message && (
+            <p className="mt-1 text-sm text-red-500">
+              {String(errors.file.message)}
+            </p>
           )}
         </div>
 
