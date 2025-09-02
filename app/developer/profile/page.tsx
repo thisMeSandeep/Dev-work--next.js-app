@@ -8,6 +8,7 @@ import React from "react";
 import DeveloperProfileDisplay from "../components/DeveloperProfileDisplay";
 import DeveloperProfileForm from "../components/DeveloperProfileForm";
 import { FreelancerProfile } from "@/types/type";
+import { DeveloperStatsCard } from "../components/DeveloperStatesCard";
 
 const DeveloperProfile = () => {
   const user = useUserStore((state) => state.user);
@@ -17,14 +18,23 @@ const DeveloperProfile = () => {
   const textPlaceholder =
     (user?.firstName?.[0] ?? "") + (user?.lastName?.[0] ?? "");
 
+  // developer stats
+  const stats = {
+    name: `${user?.firstName ?? ""} ${user?.lastName ?? ""}`.trim(),
+    email: user?.email ?? "",
+    jobsApplied: user?.FreelancerProfile?.proposals?.length ?? 0,
+    jobsHired: user?.FreelancerProfile?.hiredJobs?.length ?? 0,
+    totalEarnings: 0,
+  };
+
   const handleEditSuccess = () => {
     setIsEditing(false);
   };
 
   return (
     <div className="max-w-7xl mx-auto py-10 px-4 md:px-10 space-y-5">
-      {/* profile image and name */}
-      <div className="mx-auto flex flex-col sm:flex-row items-center justify-between px-4 py-4 sm:py-2 mb-10 gap-4 sm:gap-0">
+      {/* Profile Header: image + name + location + edit button */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-0 mb-10">
         <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
           <ProfileUpload
             textPlaceholder={textPlaceholder.toUpperCase()}
@@ -60,19 +70,27 @@ const DeveloperProfile = () => {
         </button>
       </div>
 
-      <div className="border border-black">
-        {/* Conditional Rendering */}
-        {isEditing ? (
-          <DeveloperProfileForm
-            profile={user?.FreelancerProfile as FreelancerProfile}
-            country={user?.country ?? ""}
-            onSuccess={handleEditSuccess}
-          />
-        ) : (
-          <DeveloperProfileDisplay
-            profile={user?.FreelancerProfile as FreelancerProfile}
-          />
-        )}
+      {/* Main Dashboard Layout */}
+      <div className="flex flex-col lg:flex-row gap-8">
+        {/* Left: Profile Info/Form */}
+        <div className="flex-1">
+          {isEditing ? (
+            <DeveloperProfileForm
+              profile={user?.FreelancerProfile as FreelancerProfile}
+              country={user?.country ?? ""}
+              onSuccess={handleEditSuccess}
+            />
+          ) : (
+            <DeveloperProfileDisplay
+              profile={user?.FreelancerProfile as FreelancerProfile}
+            />
+          )}
+        </div>
+
+        {/* Right: Stats Card */}
+        <div className="w-full lg:w-1/3">
+          <DeveloperStatsCard {...stats} />
+        </div>
       </div>
     </div>
   );
