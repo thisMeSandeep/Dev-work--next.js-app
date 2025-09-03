@@ -8,7 +8,7 @@ import { formatString } from "@/lib/formatString";
 
 interface JobCardProps {
   job: JobDTO;
-  onClick: (id:string) => void;
+  onClick: (id: string) => void;
   index?: number; // staggered reveal
 }
 
@@ -36,10 +36,7 @@ const WorkCard = ({ job, onClick, index = 0 }: JobCardProps) => {
       custom={index}
     >
       <div
-        role="button"
-        tabIndex={0}
-        onClick={()=>onClick(job.id)}
-        className="w-full text-left group  p-5 bg-white transition-all duration-300 ease-in-out hover:scale-[1.02] cursor-pointer"
+        className="w-full text-left group  p-2 sm:p-5 bg-white transition-all duration-300 ease-in-out hover:scale-[1.02] "
       >
         {/* date */}
         <p className="text-sm text-gray-500">
@@ -48,7 +45,10 @@ const WorkCard = ({ job, onClick, index = 0 }: JobCardProps) => {
 
         {/* title + save button */}
         <div className="flex items-start justify-between gap-4 mt-2">
-          <button className="text-xl text-left font-semibold text-gray-900 transition-colors duration-300 group-hover:text-green-600 cursor-pointer">
+          <button
+            onClick={() => onClick(job.id)}
+            className="text-xl text-left font-semibold text-gray-900 transition-colors duration-300 group-hover:text-green-600 cursor-pointer"
+          >
             {job.title}
           </button>
 
