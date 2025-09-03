@@ -1,56 +1,113 @@
 "use client";
 
 import { Heart, MapPin } from "lucide-react";
-import { Job } from "@/types/type";
+import { motion, Variants } from "motion/react";
 import SkillSlider from "./SkillsSlider";
+import { JobDTO } from "@/types/customtypes";
+import { formatString } from "@/lib/formatString";
 
-interface WorkCardProps {
-  job: Job;
+interface JobCardProps {
+  job: JobDTO;
+  onClick: (id:string) => void;
+  index?: number; // staggered reveal
 }
 
-const WorkCard = ({ job }: WorkCardProps) => {
+const cardVariants: Variants = {
+  hidden: { opacity: 0, y: 40, scale: 0.98 },
+  visible: (i: number = 0) => ({
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      opacity: { duration: 0.45, ease: "easeOut" },
+      y: { duration: 0.5, ease: "easeOut", delay: i * 0.06 },
+      scale: { duration: 0.35, ease: "easeOut" },
+    },
+  }),
+};
+
+const WorkCard = ({ job, onClick, index = 0 }: JobCardProps) => {
   return (
-    <div className="group border-b border-b-gray-300 pb-2">
-      <p className="text-sm text-gray-600">
-        {new Date(job.createdAt).toLocaleDateString()}
-      </p>
+    <motion.div
+      variants={cardVariants}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.18 }}
+      custom={index}
+    >
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={()=>onClick(job.id)}
+        className="w-full text-left group rounded-md border-1 border-green-500/50 p-5 bg-white transition-all duration-300 ease-in-out hover:scale-[1.02]"
+      >
+        {/* date */}
+        <p className="text-sm text-gray-500">
+          {new Date(job.createdAt).toLocaleDateString()}
+        </p>
 
-      {/* title */}
-      <div className="flex items-start justify-between gap-10">
-        <h3 className="text-xl text-gray-900 group-hover:text-green-600">
-          {job.title}
-        </h3>
-        <button>
-          <Heart className="size-5 cursor-pointer hover:text-green-700 hover:scale-105" />
-        </button>
+        {/* title + save button */}
+        <div className="flex items-start justify-between gap-4 mt-2">
+          <button className="text-xl text-left font-semibold text-gray-900 transition-colors duration-300 group-hover:text-green-600 cursor-pointer">
+            {job.title}
+          </button>
+
+          {/* stop propagation so heart doesn’t trigger drawer */}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+            aria-label="Save job"
+            className="p-1.5 rounded-full hover:bg-green-50 transition-colors duration-200"
+          >
+            <Heart className="h-5 w-5 text-gray-500 group-hover:text-green-700 transition-transform duration-200 group-hover:scale-110" />
+          </button>
+        </div>
+
+        {/* meta */}
+        <p className="mt-3 text-gray-500 text-sm">
+          {formatString(job.category)} • {job.experienceRequired} • $
+          {job.budget}
+        </p>
+
+        {/* description */}
+        <p className="text-gray-800 mt-3 text-sm sm:text-base md:text-[15px] leading-6 md:leading-7 font-normal tracking-wide line-clamp-3">
+          {job.description}
+        </p>
+
+        {/* skills */}
+        <div className="mt-4">
+          <SkillSlider skills={job.skills} />
+        </div>
+
+        {/* client info */}
+        <div className="mt-5 text-gray-500 flex items-center gap-6 text-sm">
+          <span>
+            <span className="font-medium">Client:</span>{" "}
+            {job.client.user.firstName} {job.client.user.lastName}
+          </span>
+
+          <span>
+            <span className="font-medium">Status:</span>{" "}
+            {job.status.toLowerCase()}
+          </span>
+
+          <span className="flex items-center gap-1">
+            <MapPin className="h-4 w-4 text-green-600" />{" "}
+            {job.client.user.country}
+          </span>
+        </div>
+
+        {/* proposals */}
+        <p className="mt-5 text-gray-500 font-light">
+          Proposals:{" "}
+          <span className="font-medium text-gray-800">
+            {job.numberOfProposals}
+          </span>
+        </p>
       </div>
-
-      <p className="mt-3 text-gray-500 text-sm">
-        {job.category} • {job.experienceRequired} • ${job.budget}
-      </p>
-
-      {/* description */}
-      <p className="text-gray-700 mt-5 font-light">{job.description}</p>
-
-      {/* skill slider */}
-      <SkillSlider skills={job.skills} />
-
-      {/* client info */}
-      <div className="mt-4 text-gray-500 flex items-center gap-5">
-        <span>
-          Client: {job.client.user.firstName} {job.client.user.lastName}
-        </span>
-        <span>Status: {job.status.toLowerCase()}</span>
-        <span className="flex items-center gap-1">
-          <MapPin className="size-3" /> {job.client.user.country}
-        </span>
-      </div>
-
-      {/* no. of proposals */}
-      <p className="mt-4 text-gray-500 font-light">
-        Proposals: <span className="font-normal">{job.numberOfProposals}</span>
-      </p>
-    </div>
+    </motion.div>
   );
 };
 

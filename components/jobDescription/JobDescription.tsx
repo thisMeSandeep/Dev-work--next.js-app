@@ -11,16 +11,21 @@ import {
 } from "lucide-react";
 import Reviews from "./Reviews";
 import { Button } from "../ui/button";
+import { JobDTO } from "@/types/customtypes";
 
-const JobDescriptionPage = () => {
+type JobProps = {
+  jobId: string;
+};
+
+const JobDescription = ({ jobId }: JobProps) => {
   return (
     <div className="max-w-5xl mx-auto px-6 sm:px-10 py-10 space-y-12">
       {/* Job Header */}
       <header className="space-y-3">
-        <h1 className="text-3xl font-bold text-gray-900">
+        <h1 className="text-xl sm:text-2xl font-semibold text-gray-700">
           Optimize CSS for Website
         </h1>
-        <div className="flex flex-wrap items-center gap-6 text-gray-600 text-base">
+        <div className="flex flex-wrap text-sm items-center gap-6 text-gray-600 ">
           <time dateTime="2025-08-16">Posted on Aug 16, 2025</time>
           <span className="flex items-center gap-2">
             <MapPin className="size-5" />
@@ -30,7 +35,7 @@ const JobDescriptionPage = () => {
       </header>
 
       {/* Connects Info */}
-      <section className="flex gap-10 text-gray-700 text-lg">
+      <section className="flex gap-10 text-gray-700 text-sm">
         <div>
           <p>
             Required Connects:{" "}
@@ -46,7 +51,7 @@ const JobDescriptionPage = () => {
       {/* Job Summary */}
       <section className="space-y-4">
         <h2 className="text-2xl font-semibold text-gray-800">Summary</h2>
-        <p className="text-gray-700 text-lg leading-relaxed">
+        <p className="text-gray-700 text-sm leading-relaxed">
           Lorem ipsum dolor sit amet consectetur, adipisicing elit. Obcaecati
           sed laudantium earum consequuntur, vitae optio voluptas? Nostrum totam
           non, accusantium, hic maiores aperiam, quis ratione autem fuga placeat
@@ -79,9 +84,9 @@ const JobDescriptionPage = () => {
         <h2 className="text-2xl font-semibold text-gray-800">Attachment</h2>
         <a
           href="#"
-          className="mt-3 flex items-center gap-2 text-lg text-green-600 hover:underline"
+          className="mt-3 flex items-center gap-2 text-sm text-green-600 hover:underline"
         >
-          <Link className="size-5" />
+          <Link className="size-4" />
           Attachment link will come here
         </a>
       </section>
@@ -95,7 +100,7 @@ const JobDescriptionPage = () => {
           {Array.from({ length: 10 }, (_, i) => (
             <li
               key={i}
-              className="text-base bg-gray-100 text-gray-800 px-4 py-1 rounded-2xl"
+              className="text-sm bg-gray-100 text-gray-800 px-4 py-1 rounded-2xl"
             >
               Skill-{i + 1}
             </li>
@@ -182,4 +187,4 @@ const JobDescriptionPage = () => {
   );
 };
 
-export default JobDescriptionPage;
+export default JobDescription;

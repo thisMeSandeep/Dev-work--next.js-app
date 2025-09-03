@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { experienceLevels , categories , specialities} from "@/data/JobData";
+import { ExperienceLevel , Category , Speciality } from "@/generated/prisma";
 import { Label } from "@/components/ui/label";
 import { ImageUp, Plus, Sparkle, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -15,7 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Category, ExperienceLevel, Speciality } from "@/generated/prisma";
+// import { Category, ExperienceLevel, Speciality } from "@/generated/prisma";
 import { FreelancerProfile } from "@/types/type";
 import { countries } from "@/data/countries";
 import { Textarea } from "@/components/ui/textarea";
@@ -285,9 +286,9 @@ const DeveloperProfileForm = ({ profile, onSuccess, country }: Props) => {
               <SelectValue placeholder="Select category" />
             </SelectTrigger>
             <SelectContent>
-              {Object.values(Category).map((item) => (
-                <SelectItem key={item} value={item}>
-                  {formatString(item)}
+              {categories.map((item) => (
+                <SelectItem key={item.label} value={item.value}>
+                  {item.label}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -314,9 +315,9 @@ const DeveloperProfileForm = ({ profile, onSuccess, country }: Props) => {
               <SelectValue placeholder="Select speciality" />
             </SelectTrigger>
             <SelectContent>
-              {Object.values(Speciality).map((item) => (
-                <SelectItem key={item} value={item}>
-                  {formatString(item)}
+              {specialities.map((item) => (
+                <SelectItem key={item.label} value={item.value}>
+                  {item.label}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -343,9 +344,9 @@ const DeveloperProfileForm = ({ profile, onSuccess, country }: Props) => {
               <SelectValue placeholder="Choose experience level" />
             </SelectTrigger>
             <SelectContent>
-              {Object.values(ExperienceLevel).map((item) => (
-                <SelectItem value={item} key={item}>
-                  {formatString(item)}
+              {experienceLevels.map((item) => (
+                <SelectItem value={item.value} key={item.label}>
+                  {item.label}
                 </SelectItem>
               ))}
             </SelectContent>

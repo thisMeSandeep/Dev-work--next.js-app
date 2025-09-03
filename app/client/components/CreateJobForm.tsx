@@ -62,7 +62,7 @@ type JobSchemaType = z.infer<typeof jobSchema>;
 const fieldStyle = "space-y-2 flex flex-col"; // spacing + column layout for Label + input + error
 
 const inputStyle =
-  "w-full rounded-sm border border-gray-300 px-3 py-2 text-sm focus-visible:border-green-500 focus-visible:ring-2 focus-visible:ring-green-500/20 focus-visible:outline-none transition-colors transition";
+  "w-full rounded-sm border border-gray-300 px-3 py-2 text-sm focus-visible:border-green-500 focus-visible:ring-2 focus-visible:ring-green-500/20 focus-visible:outline-none transition-colors";
 
 const LabelStyle = "text-sm font-medium text-gray-700";
 

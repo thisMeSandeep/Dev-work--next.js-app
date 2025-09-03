@@ -63,7 +63,7 @@ export default function SkillSlider({ skills }: SkillsSliderprops) {
           {skills.map((skill, i) => (
             <li
               key={i}
-              className="bg-gray-100 group-hover:bg-gray-300 text-gray-600 rounded-2xl px-4  list-none"
+              className="bg-gray-100 text-sm  group-hover:bg-gray-300 text-gray-600 rounded-2xl px-4  list-none duration-300"
               style={{ flex: "0 0 auto" }}
             >
               {skill}

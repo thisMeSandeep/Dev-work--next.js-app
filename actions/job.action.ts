@@ -1,21 +1,22 @@
 "use server";
 import { prisma } from "@/lib/prisma";
+import { JobDTO } from "@/types/customtypes";
 
 interface GetJobsParams {
-  cursor?: string; // last job ID from previous fetch
   category?: string; // filter by category
   speciality?: string; // filter by speciality
   search?: string; // search text
-  take?: number; // number of jobs to fetch at a time
 }
 
-export async function getJobs({
-  cursor,
+interface GetJobsResponse {
+  jobs: JobDTO[];
+}
+
+export const getJobsAction = async ({
   category,
   speciality,
   search,
-  take = 10,
-}: GetJobsParams) {
+}: GetJobsParams): Promise<GetJobsResponse> => {
   // Build where clause
   const where: any = {
     status: "OPEN",
@@ -33,10 +34,11 @@ export async function getJobs({
   // Fetch jobs using cursor
   const jobs = await prisma.job.findMany({
     where,
-    take,
-    skip: cursor ? 1 : 0, // skip the cursor itself if present
-    cursor: cursor ? { id: cursor } : undefined,
     orderBy: { createdAt: "desc" },
+    omit: {
+      hiredFreelancerId: true,
+      completed: true,
+    },
     include: {
       client: {
         include: {
@@ -46,11 +48,45 @@ export async function getJobs({
     },
   });
 
-  // Prepare next cursor
-  const nextCursor = jobs.length > 0 ? jobs[jobs.length - 1].id : null;
+  // Transform the Prisma result to match JobData interface
+  const transformedJobs: JobDTO[] = jobs.map((job: any) => ({
+    id: job.id,
+    title: job.title,
+    description: job.description,
+    category: job.category,
+    speciality: job.speciality,
+    skills: job.skills,
+    budget: job.budget,
+    status: job.status,
+    numberOfProposals: job.numberOfProposals,
+    scopeSize: job.scopeSize,
+    duration: job.duration,
+    experienceRequired: job.experienceRequired,
+    connectsRequired: job.connectsRequired,
+    attachment: job.attachment,
+    createdAt: job.createdAt.toISOString(),
+    clientId: job.clientId,
+    client: {
+      id: job.client.id,
+      userId: job.client.userId,
+      mobile: job.client.mobile,
+      company: job.client.company,
+      websiteLink: job.client.websiteLink,
+      rating: job.client.rating,
+      user: {
+        id: job.client.user.id,
+        firstName: job.client.user.firstName,
+        lastName: job.client.user.lastName,
+        email: job.client.user.email,
+        password: job.client.user.password,
+        country: job.client.user.country,
+        role: job.client.user.role,
+        profileImage: job.client.user.profileImage,
+      },
+    },
+  }));
 
   return {
-    jobs,
-    nextCursor,
+    jobs: transformedJobs,
   };
-}
+};
