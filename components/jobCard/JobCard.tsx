@@ -39,7 +39,7 @@ const WorkCard = ({ job, onClick, index = 0 }: JobCardProps) => {
         role="button"
         tabIndex={0}
         onClick={()=>onClick(job.id)}
-        className="w-full text-left group rounded-md border-1 border-green-500/50 p-5 bg-white transition-all duration-300 ease-in-out hover:scale-[1.02]"
+        className="w-full text-left group  p-5 bg-white transition-all duration-300 ease-in-out hover:scale-[1.02] cursor-pointer"
       >
         {/* date */}
         <p className="text-sm text-gray-500">

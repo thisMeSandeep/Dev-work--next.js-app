@@ -12,7 +12,6 @@ export interface ClientUserDTO {
   firstName: string | null;
   lastName: string | null;
   email: string;
-  password: string | null;
   country: string | null;
   role: string;
   profileImage: string | null;
