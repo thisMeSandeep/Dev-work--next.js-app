@@ -4,16 +4,7 @@ import { MapPin } from "lucide-react";
 
 const WorkCardSkeleton = () => {
   return (
-    <div
-      className="
-        animate-pulse 
-        rounded-2xl 
-        border border-gray-200 
-        p-5 
-        shadow-sm 
-        bg-white 
-      "
-    >
+    <div className="animate-pulse  p-5  bg-white ">
       {/* date */}
       <div className="h-3 w-20 bg-gray-200 rounded mb-2" />
 
