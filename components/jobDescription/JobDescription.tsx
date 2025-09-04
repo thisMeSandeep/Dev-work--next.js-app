@@ -5,6 +5,7 @@ import {
   DollarSign,
   Heart,
   Link,
+  Loader2,
   MapPin,
   Star,
   UserPen,
@@ -16,6 +17,7 @@ import { getAJobAction } from "@/actions/job.action";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import JobDetailsSkeleton from "../loader/JobDetailsSkeleton";
+import { useSaveJob } from "@/hooks/useSaveJob";
 
 type JobProps = {
   jobId: string;
@@ -41,9 +43,23 @@ const JobDescription = ({ jobId }: JobProps) => {
     fetchJob(jobId);
   }, [jobId]);
 
+  const { saveJob, loading: saveJobLoading } = useSaveJob();
+
   if (loading) {
     return <JobDetailsSkeleton />;
   }
+
+  // handle save job action
+  const handleSaveJob = async () => {
+    if (!job) return;
+
+    const response = await saveJob(job.id);
+    if (!response.success) {
+      toast.error(response.message);
+    } else {
+      toast.success(response.message);
+    }
+  };
 
   return (
     <div className="max-w-5xl mx-auto px-6 sm:px-10 py-10 space-y-12">
@@ -245,8 +261,17 @@ const JobDescription = ({ jobId }: JobProps) => {
         <Button className="flex-1 bg-green-600 hover:bg-green-700 text-white font-medium rounded-md py-3 cursor-pointer">
           Apply Now
         </Button>
-        <Button className="flex-1 bg-white border border-green-600 text-green-600 font-medium rounded-md py-3 flex items-center justify-center gap-2 hover:bg-green-500 hover:text-white duration-300 cursor-pointer">
-          <Heart className="size-5" />
+        <Button
+          onClick={handleSaveJob}
+          className="flex-1 bg-white border border-green-600 text-green-600 font-medium rounded-md py-3 flex items-center justify-center gap-2 hover:bg-green-500 hover:text-white duration-300 cursor-pointer"
+        >
+          {saveJobLoading ? (
+            <div className="p-1.5 rounded-full">
+              <Loader2 className="h-5 w-5 animate-spin text-green-700" />
+            </div>
+          ) : (
+            <Heart className="size-5" />
+          )}
           Save Job
         </Button>
       </div>

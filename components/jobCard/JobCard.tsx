@@ -1,10 +1,12 @@
 "use client";
 
-import { Heart, MapPin } from "lucide-react";
+import { Heart, Loader2, MapPin } from "lucide-react";
 import { motion, Variants } from "motion/react";
 import SkillSlider from "./SkillsSlider";
 import { JobDTO } from "@/types/customtypes";
 import { formatString } from "@/lib/formatString";
+import { useSaveJob } from "@/hooks/useSaveJob";
+import toast from "react-hot-toast";
 
 interface JobCardProps {
   job: JobDTO;
@@ -27,6 +29,18 @@ const cardVariants: Variants = {
 };
 
 const WorkCard = ({ job, onClick, index = 0 }: JobCardProps) => {
+  const { saveJob, loading } = useSaveJob();
+
+  // handle save job action
+  const handleSaveJob = async () => {
+    const response = await saveJob(job.id);
+    if (!response.success) {
+      toast.error(response.message);
+    } else {
+      toast.success(response.message);
+    }
+  };
+
   return (
     <motion.div
       variants={cardVariants}
@@ -35,9 +49,7 @@ const WorkCard = ({ job, onClick, index = 0 }: JobCardProps) => {
       viewport={{ once: true, amount: 0.18 }}
       custom={index}
     >
-      <div
-        className="w-full text-left group  p-2 sm:p-5 bg-white transition-all duration-300 ease-in-out hover:scale-[1.02] "
-      >
+      <div className="w-full text-left group  p-2 sm:p-5 bg-white transition-all duration-300 ease-in-out hover:scale-[1.02] ">
         {/* date */}
         <p className="text-sm text-gray-500">
           {new Date(job.createdAt).toLocaleDateString()}
@@ -47,22 +59,26 @@ const WorkCard = ({ job, onClick, index = 0 }: JobCardProps) => {
         <div className="flex items-start justify-between gap-4 mt-2">
           <button
             onClick={() => onClick(job.id)}
-            className="text-xl text-left font-semibold text-gray-900 transition-colors duration-300 group-hover:text-green-600 cursor-pointer"
+            className="text-xl text-left underline font-semibold text-gray-900 transition-colors duration-300 group-hover:text-green-600 cursor-pointer"
           >
             {job.title}
           </button>
 
-          {/* stop propagation so heart doesn’t trigger drawer */}
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-            }}
-            aria-label="Save job"
-            className="p-1.5 rounded-full hover:bg-green-50 transition-colors duration-200"
-          >
-            <Heart className="h-5 w-5 text-gray-500 group-hover:text-green-700 transition-transform duration-200 group-hover:scale-110" />
-          </button>
+          {/* save button */}
+          {loading ? (
+            <div className="p-1.5 rounded-full">
+              <Loader2 className="h-5 w-5 animate-spin text-green-700" />
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={handleSaveJob}
+              aria-label="Save job"
+              className="p-1.5 rounded-full hover:bg-green-50 transition-colors duration-200 cursor-pointer"
+            >
+              <Heart className="h-5 w-5 text-gray-500 group-hover:text-green-700 transition-transform duration-200 group-hover:scale-110" />
+            </button>
+          )}
         </div>
 
         {/* meta */}

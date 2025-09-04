@@ -93,3 +93,95 @@ export const updateDeveloperProfileAction = async (
     return { success: false, message: "Something went wrong" };
   }
 };
+
+// save a job
+export const saveJobAction = async (jobId: string) => {
+  try {
+    const userId = (await getUserId()) as string;
+    if (!userId) {
+      return { success: false, message: "User not authenticated" };
+    }
+
+    const profile = await prisma.freelancerProfile.findUnique({
+      where: { userId },
+      select: { id: true },
+    });
+
+    if (!profile) {
+      return { success: false, message: "Freelancer profile not found" };
+    }
+
+    const alreadySaved = await prisma.freelancerProfile.findFirst({
+      where: {
+        id: profile.id,
+        savedJobs: {
+          some: { id: jobId },
+        },
+      },
+    });
+
+    if (alreadySaved) {
+      return { success: false, message: "Job already saved" };
+    }
+
+    await prisma.freelancerProfile.update({
+      where: { id: profile.id },
+      data: {
+        savedJobs: {
+          connect: { id: jobId },
+        },
+      },
+    });
+
+    return { success: true, message: "Job saved" };
+  } catch (error) {
+    console.error("Error saving job:", error);
+    return { success: false, message: "Something went wrong" };
+  }
+};
+
+// unsave a job
+export const unsaveJobAction = async (jobId: string) => {
+  try {
+    const userId = (await getUserId()) as string;
+    if (!userId) {
+      return { success: false, message: "User not authenticated" };
+    }
+
+    const profile = await prisma.freelancerProfile.findUnique({
+      where: { userId },
+      select: { id: true },
+    });
+
+    if (!profile) {
+      return { success: false, message: "Freelancer profile not found" };
+    }
+
+    const alreadySaved = await prisma.freelancerProfile.findFirst({
+      where: {
+        id: profile.id,
+        savedJobs: {
+          some: { id: jobId },
+        },
+      },
+    });
+
+    if (!alreadySaved) {
+      return { success: false, message: "Job not found in saved list" };
+    }
+
+    await prisma.freelancerProfile.update({
+      where: { id: profile.id },
+      data: {
+        savedJobs: {
+          disconnect: { id: jobId },
+        },
+      },
+    });
+
+    return { success: true, message: "Job unsaved" };
+  } catch (error) {
+    console.error("Error unsaving job:", error);
+    return { success: false, message: "Something went wrong" };
+  }
+};
