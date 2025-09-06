@@ -43,3 +43,10 @@ export const scopeDurations = [
   { label: "3-6 Months", value: "THREE_TO_SIX_MONTHS" },
   { label: "More than 6 Months", value: "MORE_THAN_SIX_MONTHS" },
 ];
+
+export const estimatedDurationOptions = [
+  { label: "Less than 1 Month", value: "LESS_THAN_ONE_MONTH" },
+  { label: "1-3 Months", value: "ONE_TO_THREE_MONTHS" },
+  { label: "3-6 Months", value: "THREE_TO_SIX_MONTHS" },
+  { label: "More than 6 Months", value: "MORE_THAN_SIX_MONTHS" },
+];

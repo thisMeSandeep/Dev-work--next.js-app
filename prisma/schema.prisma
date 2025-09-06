@@ -8,8 +8,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
-
 // Enums
 enum Role {
   DEVELOPER
@@ -178,15 +176,15 @@ model Job {
 }
 
 model Proposal {
-  id           String            @id @default(uuid())
+  id           String             @id @default(uuid())
   coverLetter  String
   message      String?
-  rate         Float
-  duration     EstimatedDuration
+  rate         Float?
+  duration     EstimatedDuration?
   attachedFile String?
-  createdAt    DateTime          @default(now())
-  status       ProposalStatus    @default(PENDING)
-  submittedAt  DateTime          @default(now())
+  createdAt    DateTime           @default(now())
+  status       ProposalStatus     @default(PENDING)
+  submittedAt  DateTime           @default(now())
 
   // Relations
   freelancerProfile   FreelancerProfile @relation(fields: [freelancerProfileId], references: [id], onDelete: Cascade)
@@ -194,6 +192,8 @@ model Proposal {
 
   job   Job    @relation(fields: [jobId], references: [id], onDelete: Cascade)
   jobId String
+
+  @@unique([freelancerProfileId, jobId])
 }
 
 model ClientRequest {

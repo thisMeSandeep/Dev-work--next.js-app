@@ -7,6 +7,9 @@ import {
 import { prisma } from "@/lib/prisma";
 import { getUserId } from "@/lib/server-utils";
 import { uploadFile } from "@/lib/uploadFile";
+import { proposalSchema } from "@/lib/schemas/proposal.schema";
+import { ProposalSchemaType } from "@/lib/schemas/proposal.schema";
+import { EstimatedDuration } from "@/generated/prisma";
 
 // -----------------action to update developer profile---------------
 export const updateDeveloperProfileAction = async (
@@ -185,3 +188,87 @@ export const unsaveJobAction = async (jobId: string) => {
     return { success: false, message: "Something went wrong" };
   }
 };
+
+export async function createProposalAction(
+  jobId: string,
+  data: ProposalSchemaType
+) {
+  try {
+    if (!jobId) {
+      return { success: false, message: "Job not found" };
+    }
+
+    // Validate data
+    const result = await proposalSchema.safeParseAsync(data);
+    if (!result.success) {
+      return { success: false, message: result.error.issues[0].message };
+    }
+
+    const { coverLetter, message, rate, duration, attachedFile } = result.data;
+
+    //Get the logged-in user id
+    const userId = await getUserId();
+    if (!userId) throw new Error("User not authenticated");
+
+    // Fetch freelancerProfileId for that user
+    const freelancer = await prisma.freelancerProfile.findUnique({
+      where: { userId },
+      select: { id: true },
+    });
+    if (!freelancer) {
+      return { success: false, message: "Freelancer profile not found" };
+    }
+
+    // Check if proposal already exists
+    const existingProposal = await prisma.proposal.findFirst({
+      where: {
+        freelancerProfileId: freelancer.id,
+        jobId,
+      },
+    });
+    if (existingProposal) {
+      return { success: false, message: "You have already applied to this job." };
+    }
+
+    // Upload file if exists
+    let fileUrl: string | null = null;
+    if (attachedFile) {
+      fileUrl = await uploadFile(attachedFile, "resumes");
+      if (!fileUrl) {
+        return {
+          success: false,
+          message: "Error saving attached file, please try again",
+        };
+      }
+    }
+
+    // 4. Create the proposal
+    await prisma.proposal.create({
+      data: {
+        coverLetter,
+        message: message ?? null,
+        rate: rate ?? null,
+        duration: (duration as EstimatedDuration) ?? null,
+        attachedFile: fileUrl ?? null,
+        freelancerProfile: {
+          connect: { id: freelancer.id },
+        },
+        job: {
+          connect: { id: jobId },
+        },
+      },
+    });
+
+    // 5. Increment numberOfProposals on Job
+    await prisma.job.update({
+      where: { id: jobId },
+      data: { numberOfProposals: { increment: 1 } },
+    });
+
+    return { success: true, message: "Proposal created successfully" };
+  } catch (error: any) {
+    console.error("Error creating proposal:", error);
+    return { success: false, message: "Something went wrong. Please try again." };
+  }
+}
+

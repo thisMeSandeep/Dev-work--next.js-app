@@ -4,26 +4,23 @@ import {
   CheckCircle,
   DollarSign,
   Heart,
-  Link2,
+  Link,
   Loader2,
   MapPin,
   Star,
   UserPen,
 } from "lucide-react";
-import Reviews from "./Reviews";
-import { Button } from "../ui/button";
+import Reviews from "@/components/jobDescription/Reviews";
+import { Button} from "@/components/ui/button";
 import { JobDTO } from "@/types/customtypes";
 import { getAJobAction } from "@/actions/job.action";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import JobDetailsSkeleton from "../loader/JobDetailsSkeleton";
+import JobDetailsSkeleton from "@/components/loader/JobDetailsSkeleton";
 import { useSaveJob } from "@/hooks/useSaveJob";
-import Link from "next/link";
-type JobProps = {
-  jobId: string;
-};
 
-const JobDescription = ({ jobId }: JobProps) => {
+
+const JobDescriptionPage = () => {
   const [job, setJob] = useState<JobDTO>();
   const [loading, setLoading] = useState(false);
 
@@ -39,9 +36,9 @@ const JobDescription = ({ jobId }: JobProps) => {
     setLoading(false);
   };
 
-  useEffect(() => {
-    fetchJob(jobId);
-  }, [jobId]);
+//   useEffect(() => {
+//     fetchJob(jobId);
+//   }, [jobId]);
 
   const { saveJob, loading: saveJobLoading } = useSaveJob();
 
@@ -141,7 +138,7 @@ const JobDescription = ({ jobId }: JobProps) => {
             rel="noopener noreferrer"
             className="mt-3 flex items-center gap-2 text-sm text-green-600 hover:underline"
           >
-            <Link2 className="size-4" />
+            <Link className="size-4" />
             View Attachment
           </a>
         ) : (
@@ -259,14 +256,8 @@ const JobDescription = ({ jobId }: JobProps) => {
       {/* Action Buttons */}
       <div className="flex flex-wrap gap-4 mt-10">
         <Button className="flex-1 bg-green-600 hover:bg-green-700 text-white font-medium rounded-md py-3 cursor-pointer">
-          <Link
-            href={`/developer/make-proposal?jobId=${jobId}`}
-            className="size-full"
-          >
-            Apply Now
-          </Link>
+          Apply Now
         </Button>
-
         <Button
           onClick={handleSaveJob}
           className="flex-1 bg-white border border-green-600 text-green-600 font-medium rounded-md py-3 flex items-center justify-center gap-2 hover:bg-green-500 hover:text-white duration-300 cursor-pointer"
@@ -285,4 +276,4 @@ const JobDescription = ({ jobId }: JobProps) => {
   );
 };
 
-export default JobDescription;
+export default JobDescriptionPage;
