@@ -10,6 +10,7 @@ import { uploadFile } from "@/lib/uploadFile";
 import { proposalSchema } from "@/lib/schemas/proposal.schema";
 import { ProposalSchemaType } from "@/lib/schemas/proposal.schema";
 import { EstimatedDuration } from "@/generated/prisma";
+import { ProposalDTO } from "@/types/propoalDTO";
 
 // -----------------action to update developer profile---------------
 export const updateDeveloperProfileAction = async (
@@ -97,7 +98,7 @@ export const updateDeveloperProfileAction = async (
   }
 };
 
-// save a job
+// -----------------save a job-------------------------
 export const saveJobAction = async (jobId: string) => {
   try {
     const userId = (await getUserId()) as string;
@@ -143,7 +144,7 @@ export const saveJobAction = async (jobId: string) => {
   }
 };
 
-// unsave a job
+//--------------- unsave a job------------------
 export const unsaveJobAction = async (jobId: string) => {
   try {
     const userId = (await getUserId()) as string;
@@ -189,6 +190,7 @@ export const unsaveJobAction = async (jobId: string) => {
   }
 };
 
+// ---------- send a proposal action--------------
 export async function createProposalAction(
   jobId: string,
   data: ProposalSchemaType
@@ -224,10 +226,15 @@ export async function createProposalAction(
       where: {
         freelancerProfileId: freelancer.id,
         jobId,
+        status: "PENDING",
       },
     });
+
     if (existingProposal) {
-      return { success: false, message: "You have already applied to this job." };
+      return {
+        success: false,
+        message: "You already have an active proposal for this job.",
+      };
     }
 
     // Upload file if exists
@@ -268,7 +275,208 @@ export async function createProposalAction(
     return { success: true, message: "Proposal created successfully" };
   } catch (error: any) {
     console.error("Error creating proposal:", error);
-    return { success: false, message: "Something went wrong. Please try again." };
+    return {
+      success: false,
+      message: "Something went wrong. Please try again.",
+    };
   }
 }
 
+
+//update a proposal action
+export async function updateProposalAction(
+  proposalId: string,
+  data: ProposalSchemaType
+) {
+  try {
+    if (!proposalId) {
+      return { success: false, message: "Proposal ID not provided" };
+    }
+
+    // Validate data
+    const result = await proposalSchema.safeParseAsync(data);
+    if (!result.success) {
+      return { success: false, message: result.error.issues[0].message };
+    }
+
+    const { coverLetter, message, rate, duration, attachedFile } = result.data;
+
+    // Fetch the existing proposal
+    const existingProposal = await prisma.proposal.findUnique({
+      where: { id: proposalId },
+    });
+    if (!existingProposal) {
+      return { success: false, message: "Proposal not found" };
+    }
+
+    // Optional: check if the user owns this proposal (security)
+    const userId = await getUserId();
+       
+    if(!userId){
+      return {
+        success: false,
+        message: "User not authenticated",
+      }
+    }
+
+    const freelancer = await prisma.freelancerProfile.findUnique({
+      where: { userId },
+      select: { id: true },
+    });
+    if (!freelancer || freelancer.id !== existingProposal.freelancerProfileId) {
+      return {
+        success: false,
+        message: "Not authorized to update this proposal",
+      };
+    }
+
+    // Upload file if new file is attached
+    let fileUrl = existingProposal.attachedFile;
+    if (attachedFile) {
+      fileUrl = await uploadFile(attachedFile, "resumes");
+      if (!fileUrl) {
+        return {
+          success: false,
+          message: "Error saving attached file, please try again",
+        };
+      }
+    }
+
+    // Update the proposal
+    await prisma.proposal.update({
+      where: { id: proposalId },
+      data: {
+        coverLetter,
+        message: message ?? null,
+        rate: rate ?? null,
+        duration: (duration as EstimatedDuration) ?? null,
+        attachedFile: fileUrl ?? null,
+      },
+    });
+
+    return { success: true, message: "Proposal updated successfully" };
+  } catch (error: any) {
+    console.error("Error updating proposal:", error);
+    return {
+      success: false,
+      message: "Something went wrong. Please try again.",
+    };
+  }
+}
+
+
+
+// ------------fetch all proposals made by a developer--------------
+
+type FetchProposalsResponse =
+  | { success: true; proposals: ProposalDTO[] }
+  | { success: false; message: string };
+
+export async function fetchProposalsAction():Promise<FetchProposalsResponse> {
+  try {
+    //Get logged-in user
+    const userId = await getUserId();
+    if (!userId) {
+      return {
+        success: false,
+        message: "User not authenticated",
+      };
+    }
+
+    //Get freelancer profile of user
+    const freelancer = await prisma.freelancerProfile.findUnique({
+      where: { userId },
+      select: { id: true },
+    });
+    if (!freelancer) {
+      return { success: false, message: "Freelancer profile not found" };
+    }
+
+    //  Fetch proposals
+    const proposals: ProposalDTO[] = await prisma.proposal.findMany({
+      where: { freelancerProfileId: freelancer.id },
+      include: {
+        job: {
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            budget: true,
+            status: true,
+            createdAt: true,
+          },
+        },
+      },
+    });
+
+    return {
+      success: true,
+      proposals,
+    };
+  } catch (error) {
+    console.error("Error fetching proposals:", error);
+    return { success: false, message: "Something went wrong" };
+  }
+}
+
+// ----------------withdraw a proposal----------------
+export async function withdrawProposalAction(proposalId: string) {
+  try {
+    //Get logged-in user
+    const userId = await getUserId();
+    if (!userId) {
+      return {
+        success: false,
+        message: "User not authenticated",
+      };
+    }
+
+    //Get freelancer profile of user
+    const freelancer = await prisma.freelancerProfile.findUnique({
+      where: { userId },
+      select: { id: true },
+    });
+    if (!freelancer) {
+      return { success: false, message: "Freelancer profile not found" };
+    }
+
+    // 3. Fetch proposal
+    const proposal = await prisma.proposal.findUnique({
+      where: { id: proposalId },
+      select: { freelancerProfileId: true, status: true },
+    });
+
+    if (!proposal) {
+      return { success: false, message: "Proposal not found" };
+    }
+
+    //ensure proposal belongs to this freelancer
+    if (proposal.freelancerProfileId !== freelancer.id) {
+      return {
+        success: false,
+        message: "Not authorized to withdraw this proposal",
+      };
+    }
+
+    if (proposal.status !== "PENDING") {
+      return {
+        success: false,
+        message: "Only pending proposals can be withdrawn",
+      };
+    }
+
+    // 4. Update status to withdrawn
+    await prisma.proposal.update({
+      where: { id: proposalId },
+      data: { status: "WITHDRAWN" },
+    });
+
+    return { success: true, message: "Proposal withdrawn successfully" };
+  } catch (error: any) {
+    console.error("Error withdrawing proposal:", error);
+    return {
+      success: false,
+      message: "Something went wrong, please try again.",
+    };
+  }
+}

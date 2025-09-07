@@ -166,11 +166,6 @@ const MakeProposal = () => {
 
       {/* proposal form */}
       <section>
-        <p className="text-red-500 text-xs flex items-center gap-2 mb-5">
-          {" "}
-          <MessageCircleWarning className="size-3" />{" "}
-          <span>Proposals are not allowed to edit later once send!</span>
-        </p>
         {!jobLoading && <ProposalForm jobId={jobId as string} />}
       </section>
     </div>

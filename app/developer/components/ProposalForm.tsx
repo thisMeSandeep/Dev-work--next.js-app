@@ -23,25 +23,50 @@ import {
 import { estimatedDurationOptions } from "@/data/JobData";
 import { proposalSchema } from "@/lib/schemas/proposal.schema";
 import { ProposalSchemaType } from "@/lib/schemas/proposal.schema";
-import { createProposalAction } from "@/actions/developer.action";
+import { createProposalAction, updateProposalAction } from "@/actions/developer.action";
 import toast from "react-hot-toast";
 import { fetchAndSetUser } from "@/lib/fetchUser";
+import { EstimatedDuration } from "@/generated/prisma";
+
+
+type ProposalType = {
+  id:string;
+  coverLetter: string;
+  message?: string;
+  rate?: number;
+  duration?: EstimatedDuration;
+};
+
+interface ProposalFormProps {
+  jobId?: string;
+  proposalDetails?: ProposalType;
+}
 
 const inputStyles =
   "w-full border-green-300 focus-visible:border-green-500 focus-visible:ring-2 focus-visible:ring-green-500/20 focus-visible:outline-none";
 const selectStyles =
   "w-full border-green-300 focus-visible:border-green-500 focus-visible:ring-2 focus-visible:ring-green-500/20 focus-visible:outline-none";
 
-export default function ProposalForm({ jobId }: { jobId: string }) {
+export default function ProposalForm({
+  jobId,
+  proposalDetails,
+}: ProposalFormProps) {
   const {
     register,
     handleSubmit,
     setValue,
+    getValues,
     watch,
     reset,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(proposalSchema),
+    defaultValues: {
+      coverLetter: proposalDetails?.coverLetter,
+      message: proposalDetails?.message,
+      rate: proposalDetails?.rate,
+      duration: proposalDetails?.duration
+    },
     mode: "onChange",
   });
 
@@ -50,14 +75,28 @@ export default function ProposalForm({ jobId }: { jobId: string }) {
 
   const onSubmit = async (data: ProposalSchemaType) => {
     setLoading(true);
-    const response = await createProposalAction(jobId, data);
-    if (!response.success) {
-      toast.error(response?.message);
+    let response;
+
+    if (proposalDetails?.id) {
+      // Update 
+      response = await updateProposalAction(proposalDetails.id, data);
+    } else if (jobId) {
+      // Create scenario
+      response = await createProposalAction(jobId, data);
     } else {
-      toast.success(response?.message);
+      toast.error("Cannot submit proposal: Missing job information.");
+      setLoading(false);
+      return;
+    }
+
+    if (!response.success) {
+      toast.error(response.message);
+    } else {
+      toast.success(response.message);
       reset();
       await fetchAndSetUser();
     }
+
     setLoading(false);
   };
 
@@ -147,15 +186,15 @@ export default function ProposalForm({ jobId }: { jobId: string }) {
       </div>
 
       {/* Duration */}
-      <div className="space-y-2">
+      <div className="space-y-2 relative">
         <Label htmlFor="duration">
           Duration (Optional - Estimated time you can finish this job)
         </Label>
-        <Select onValueChange={(val) => setValue("duration", val)}>
+        <Select value={getValues("duration")} onValueChange={(val) => setValue("duration", val)} >
           <SelectTrigger className={selectStyles}>
             <SelectValue placeholder="Select duration" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="z-10000">
             {estimatedDurationOptions.map((option) => (
               <SelectItem key={option.value} value={option.value}>
                 {option.label}
