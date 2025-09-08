@@ -73,10 +73,10 @@ const JobDescription = ({ jobId }: JobProps) => {
             Posted on{" "}
             {job?.createdAt
               ? new Date(job.createdAt).toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "numeric",
-                  year: "numeric",
-                })
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              })
               : "Unknown date"}
           </p>
           <span className="flex items-center gap-2">
@@ -244,10 +244,10 @@ const JobDescription = ({ jobId }: JobProps) => {
             Member since{" "}
             {job?.createdAt
               ? new Date(job.createdAt).toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "numeric",
-                  year: "numeric",
-                })
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              })
               : "Unknown date"}
           </p>
         </div>
@@ -258,10 +258,10 @@ const JobDescription = ({ jobId }: JobProps) => {
 
       {/* Action Buttons */}
       <div className="flex flex-wrap gap-4 mt-10">
-        <Button className="flex-1 bg-green-600 hover:bg-green-700 text-white font-medium rounded-md py-3 cursor-pointer">
+        <Button className="flex-1 bg-green-600 hover:bg-green-700 text-white font-medium rounded-md cursor-pointer p-0">
           <Link
             href={`/developer/make-proposal?jobId=${jobId}`}
-            className="size-full"
+            className="flex items-center justify-center w-full h-full py-3"
           >
             Apply Now
           </Link>

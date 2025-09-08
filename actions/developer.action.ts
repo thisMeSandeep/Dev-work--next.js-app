@@ -282,7 +282,6 @@ export async function createProposalAction(
   }
 }
 
-
 //update a proposal action
 export async function updateProposalAction(
   proposalId: string,
@@ -311,12 +310,12 @@ export async function updateProposalAction(
 
     // Optional: check if the user owns this proposal (security)
     const userId = await getUserId();
-       
-    if(!userId){
+
+    if (!userId) {
       return {
         success: false,
         message: "User not authenticated",
-      }
+      };
     }
 
     const freelancer = await prisma.freelancerProfile.findUnique({
@@ -364,15 +363,13 @@ export async function updateProposalAction(
   }
 }
 
-
-
 // ------------fetch all proposals made by a developer--------------
 
 type FetchProposalsResponse =
   | { success: true; proposals: ProposalDTO[] }
   | { success: false; message: string };
 
-export async function fetchProposalsAction():Promise<FetchProposalsResponse> {
+export async function fetchProposalsAction(): Promise<FetchProposalsResponse> {
   try {
     //Get logged-in user
     const userId = await getUserId();
@@ -406,6 +403,9 @@ export async function fetchProposalsAction():Promise<FetchProposalsResponse> {
             createdAt: true,
           },
         },
+      },
+      orderBy: {
+        createdAt: "desc",
       },
     });
 

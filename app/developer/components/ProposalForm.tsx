@@ -25,21 +25,15 @@ import { proposalSchema } from "@/lib/schemas/proposal.schema";
 import { ProposalSchemaType } from "@/lib/schemas/proposal.schema";
 import { createProposalAction, updateProposalAction } from "@/actions/developer.action";
 import toast from "react-hot-toast";
-import { fetchAndSetUser } from "@/lib/fetchUser";
-import { EstimatedDuration } from "@/generated/prisma";
+import { fetchAndSetProposals } from "@/lib/fetchProposals";
+import { useProposalStore } from "@/store/proposalStore";
 
 
-type ProposalType = {
-  id:string;
-  coverLetter: string;
-  message?: string;
-  rate?: number;
-  duration?: EstimatedDuration;
-};
+
 
 interface ProposalFormProps {
   jobId?: string;
-  proposalDetails?: ProposalType;
+  proposalId?: string;
 }
 
 const inputStyles =
@@ -49,8 +43,22 @@ const selectStyles =
 
 export default function ProposalForm({
   jobId,
-  proposalDetails,
+  proposalId,
 }: ProposalFormProps) {
+
+
+  // fetch proposal details
+  const proposal = useProposalStore((state) => state.getProposalById(proposalId || ""));
+
+  const proposalDetails = {
+    id: proposal?.id,
+    coverLetter: proposal?.coverLetter || "",
+    message: proposal?.message || undefined,
+    rate: proposal?.rate || undefined,
+    duration: proposal?.duration || undefined
+  }
+
+
   const {
     register,
     handleSubmit,
@@ -73,12 +81,13 @@ export default function ProposalForm({
   const [filePreview, setFilePreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+
   const onSubmit = async (data: ProposalSchemaType) => {
     setLoading(true);
     let response;
 
     if (proposalDetails?.id) {
-      // Update 
+      // Update scenario
       response = await updateProposalAction(proposalDetails.id, data);
     } else if (jobId) {
       // Create scenario
@@ -88,15 +97,13 @@ export default function ProposalForm({
       setLoading(false);
       return;
     }
-
     if (!response.success) {
       toast.error(response.message);
     } else {
+      await fetchAndSetProposals();
       toast.success(response.message);
       reset();
-      await fetchAndSetUser();
     }
-
     setLoading(false);
   };
 
@@ -213,9 +220,9 @@ export default function ProposalForm({
           <p>Attached File (optional - Resume/CV, PDF only)</p>
           <Label
             htmlFor="attachedFile"
-            className="flex items-center justify-center bg-green-500 p-5 rounded-full cursor-pointer"
+            className="flex items-center justify-center bg-green-500 p-5 rounded-full cursor-pointer group"
           >
-            <UploadIcon className="w-5 h-5 text-green-800" />
+            <UploadIcon className="w-5 h-5 text-white group-hover:-translate-y-1 transition-transform duration-300" />
           </Label>
         </div>
         <Input

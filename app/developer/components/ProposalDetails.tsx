@@ -9,24 +9,25 @@ import { useState } from "react";
 import ProposalForm from "./ProposalForm";
 import { withdrawProposalAction } from "@/actions/developer.action";
 import toast from "react-hot-toast";
+import { fetchAndSetProposals } from "@/lib/fetchProposals";
+import { useProposalStore } from "@/store/proposalStore";
 
 
 
 type ProposalProps = {
-    proposal: ProposalDTO;
+    proposalId: string;
 }
 
-const ProposalDetails = ({ proposal }: ProposalProps) => {
+const ProposalDetails = ({ proposalId }: ProposalProps) => {
     const [isEdit, setIsEdit] = useState(false);
     const [loading, setLoading] = useState(false);
 
-    const proposalDetails = {
-        id: proposal.id,
-        coverLetter: proposal.coverLetter || "",
-        message: proposal.message || undefined,
-        rate: proposal.rate || undefined,
-        duration: proposal.duration || undefined
-    }
+    const proposal = useProposalStore(state => state.getProposalById(proposalId));
+
+    if (!proposal) return <p>No proposal found</p>;
+
+
+
 
 
     // withdraw proposal
@@ -35,9 +36,11 @@ const ProposalDetails = ({ proposal }: ProposalProps) => {
         const response = await withdrawProposalAction(proposal.id);
         if (response.success) {
             toast.success(response.message);
+
         } else {
             toast.error(response.message ?? "Something went wrong");
         }
+        await fetchAndSetProposals();
         setLoading(false);
     };
 
@@ -117,7 +120,7 @@ const ProposalDetails = ({ proposal }: ProposalProps) => {
                 <div className="flex flex-col sm:flex-row gap-4 text-sm">
                     <span className="flex items-center gap-2 text-gray-700 bg-gray-100 px-3 py-1 rounded-full">
                         <DollarSign size={16} className="text-gray-500" /> Proposed rate:{" "}
-                        <span className="font-medium">{proposal.rate}</span>
+                        <span className="font-medium">{proposal?.rate || "Not provided"}</span>
                     </span>
                     <span className="flex items-center gap-2 text-gray-700 bg-gray-100 px-3 py-1 rounded-full">
                         <Clock size={16} className="text-gray-500" /> Proposed duration:{" "}
@@ -187,7 +190,7 @@ const ProposalDetails = ({ proposal }: ProposalProps) => {
 
             {/* proposal form */}
             <div>
-                {isEdit && <ProposalForm proposalDetails={proposalDetails} />}
+                {isEdit && <ProposalForm proposalId={proposalId} />}
             </div>
 
 

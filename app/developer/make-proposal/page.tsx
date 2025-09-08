@@ -134,7 +134,7 @@ const MakeProposal = () => {
                 <p className="text-gray-500 text-sm">Experience Required</p>
               </div>
               <div>
-                <p className="text-black font-medium">{job?.budget}</p>
+                <p className="text-black font-medium">${job?.budget}</p>
                 <p className="text-gray-500 text-sm">Fixed-price</p>
               </div>
               <div>
