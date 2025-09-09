@@ -16,6 +16,7 @@ import {
   ScopeSize,
   ScopeDuration,
 } from "@/generated/prisma";
+import { JobCoreDTO, ProposalCoreDTO } from "@/types/CoreDTO";
 
 // ------------- Set client profile---------------
 export const setClientProfileAction = async (data: ClientDataType) => {
@@ -136,5 +137,49 @@ export const createJobAction = async (data: JobSchemaType) => {
       success: false,
       message: "Internal server error",
     };
+  }
+};
+
+// -------------get all jobs posted by clients----------------
+type GetAllPostedJobsSuccess = {
+  success: true;
+  jobs: (JobCoreDTO & { proposals: ProposalCoreDTO[] })[];
+};
+
+type GetAllPostedJobsFailure = {
+  success: false;
+  message: string;
+};
+
+export const getAllPostedJobsAction = async (): Promise<
+  GetAllPostedJobsSuccess | GetAllPostedJobsFailure
+> => {
+  // fetch user id
+  const userId = await getUserId();
+  if (!userId) {
+    return { success: false, message: "User not authenticated" };
+  }
+
+  try {
+    // get client id
+    const client = await prisma.clientProfile.findUnique({
+      where: { userId },
+      select: { id: true },
+    });
+
+    if (!client) {
+      return { success: false, message: "Client profile not found" };
+    }
+
+    // fetch jobs
+    const jobs: (JobCoreDTO & { proposals: ProposalCoreDTO[] })[] =
+      await prisma.job.findMany({
+        where: { clientId: client.id },
+        include: { proposals: true },
+      });
+
+    return { success: true,  jobs };
+  } catch (err) {
+    return { success: false, message: "Something went wrong" };
   }
 };

@@ -2,6 +2,7 @@
 
 import Header from "@/components/header/Header";
 import WaveLoader from "@/components/loader/WaveLoader";
+import { fetchClientJobsAndSet } from "@/lib/fetchClientJobs";
 import { fetchAndSetUser } from "@/lib/fetchUser";
 import { useUserStore } from "@/store/userStore";
 import { User } from "lucide-react";
@@ -22,6 +23,7 @@ const Clientlayout = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     fetchAndSetUser();
+    fetchClientJobsAndSet();
   }, []);
 
   if (!user)
