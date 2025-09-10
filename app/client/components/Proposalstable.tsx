@@ -16,6 +16,7 @@ import { formatString } from "@/lib/formatString";
 import { ExternalLink } from "lucide-react";
 import Popup from "@/components/reusable/Popup";
 import DeveloperProfile from "@/components/reusable/DeveloperProfile";
+import ProposalView from "./ProposalView";
 
 
 type ProposalWithUser = ProposalCoreDTO & {
@@ -98,8 +99,8 @@ const ProposalsTable = ({ jobId }: { jobId: string }) => {
                             <TableCell>{proposal.freelancerProfile.user.country ?? "-"}</TableCell>
                             <TableCell>{proposal.freelancerProfile.experienceLevel}</TableCell>
                             <TableCell>{formatString(proposal.freelancerProfile.speciality as string)}</TableCell>
-                            <TableCell>{proposal.rate}</TableCell>
-                            <TableCell>{proposal.duration}</TableCell>
+                            <TableCell>{proposal.rate ?? "-"}</TableCell>
+                            <TableCell>{proposal.duration ?? "-"}</TableCell>
                             <TableCell>{proposal.status}</TableCell>
                             <TableCell>
                                 <button
@@ -147,7 +148,7 @@ const ProposalsTable = ({ jobId }: { jobId: string }) => {
 
                     {viewType === "proposal" && selectedProposal && (
 
-                        <p>hello</p>
+                        <ProposalView proposal={selectedProposal} />
                     )}
                 </Popup>
             )}

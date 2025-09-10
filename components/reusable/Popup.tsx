@@ -23,7 +23,7 @@ export default function Popup({ headerTitle, children, onClose }: PopupProps) {
                 </div>
 
                 {/* Content  */}
-                <div className="p-4 overflow-y-auto">{children}</div>
+                <div className="overflow-y-auto">{children}</div>
             </div>
         </div>
     );

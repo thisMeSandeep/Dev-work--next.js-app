@@ -1,5 +1,6 @@
 import { formatString } from "@/lib/formatString";
 import { Mail, Phone, Globe, Link as LinkIcon, MapPin } from "lucide-react";
+import Image from "next/image";
 
 type DeveloperProfileProps = {
     dev: {
@@ -31,8 +32,10 @@ export default function DeveloperProfile({ dev }: DeveloperProfileProps) {
             {/* Top section */}
             <div className="flex items-center gap-4">
                 {dev.profileImage ? (
-                    <img
+                    <Image
                         src={dev.profileImage}
+                        height={96}
+                        width={96}
                         alt={fullName}
                         className="w-24 h-24 rounded-full object-cover border-2 border-green-500"
                     />
