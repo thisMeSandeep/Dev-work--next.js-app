@@ -19,12 +19,8 @@ export interface UserCoreDTO {
   firstName?: string | null;
   lastName?: string | null;
   email: string;
-  password?: string | null;
   country?: string | null;
-  role: Role;
   profileImage?: string | null;
-  authProviderId?: string | null;
-  createdAt: Date;
 }
 
 // FreelancerProfile

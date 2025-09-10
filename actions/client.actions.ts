@@ -16,7 +16,12 @@ import {
   ScopeSize,
   ScopeDuration,
 } from "@/generated/prisma";
-import { JobCoreDTO, ProposalCoreDTO } from "@/types/CoreDTO";
+import {
+  FreelancerProfileCoreDTO,
+  JobCoreDTO,
+  ProposalCoreDTO,
+  UserCoreDTO,
+} from "@/types/CoreDTO";
 
 // ------------- Set client profile---------------
 export const setClientProfileAction = async (data: ClientDataType) => {
@@ -178,8 +183,40 @@ export const getAllPostedJobsAction = async (): Promise<
         include: { proposals: true },
       });
 
-    return { success: true,  jobs };
+    return { success: true, jobs };
   } catch (err) {
+    return { success: false, message: "Something went wrong" };
+  }
+};
+
+// --------------get all the proposals for a job------------
+
+export const getJobProposalsAction = async (jobId: string) => {
+  try {
+    const proposals: (ProposalCoreDTO & {
+      freelancerProfile: FreelancerProfileCoreDTO & { user: UserCoreDTO };
+    })[] = await prisma.proposal.findMany({
+      where: { jobId },
+      include: {
+        freelancerProfile: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                country: true,
+                email: true,
+                profileImage: true,
+              },
+            },
+          },
+        },
+      },
+    });
+    return { success: true, proposals };
+  } catch (err) {
+    console.error("Error fetching proposals:", err);
     return { success: false, message: "Something went wrong" };
   }
 };
