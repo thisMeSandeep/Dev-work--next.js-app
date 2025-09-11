@@ -50,15 +50,19 @@ enum Speciality {
 
 enum JobStatus {
   OPEN
+  ONGOING
   CLOSED
+  COMPLETED
 }
 
+// project scope size
 enum ScopeSize {
   SMALL
   MEDIUM
   LARGE
 }
 
+// project scope duration
 enum ScopeDuration {
   ONE_TO_THREE_MONTHS
   THREE_TO_SIX_MONTHS
@@ -137,6 +141,8 @@ model ClientProfile {
   company     String?
   websiteLink String?
   rating      Float?
+  jobsPosted  Int?    @default(0)
+  jobsHired   Int?    @default(0)
 
   // Relations
   postedJobs     Job[]
@@ -173,18 +179,22 @@ model Job {
   savedBy   FreelancerProfile[] @relation("SavedJobs")
 
   clientRequests ClientRequest[] @relation("JobRequests")
+
+  @@index([category])
+  @@index([speciality])
+  @@index([status])
 }
 
 model Proposal {
-  id           String             @id @default(uuid())
+  id           String            @id @default(uuid())
   coverLetter  String
   message      String?
-  rate         Float?
-  duration     EstimatedDuration?
+  rate         Float
+  duration     EstimatedDuration
   attachedFile String?
-  createdAt    DateTime           @default(now())
-  status       ProposalStatus     @default(PENDING)
-  submittedAt  DateTime           @default(now())
+  createdAt    DateTime          @default(now())
+  status       ProposalStatus    @default(PENDING)
+  submittedAt  DateTime          @default(now())
 
   // Relations
   freelancerProfile   FreelancerProfile @relation(fields: [freelancerProfileId], references: [id], onDelete: Cascade)

@@ -47,7 +47,6 @@ const ProposalsTable = ({ jobId }: { jobId: string }) => {
         fetchProposals()
     }, [jobId])
 
-    console.log(proposals);
 
     const developerData = {
         firstName: selectedProposal?.freelancerProfile.user.firstName ?? "",

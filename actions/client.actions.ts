@@ -220,3 +220,44 @@ export const getJobProposalsAction = async (jobId: string) => {
     return { success: false, message: "Something went wrong" };
   }
 };
+
+// ------------- get suggested dev profile action----------------
+export const getSuggestedDevProfileAction = async ({
+  category,
+  speciality,
+}: {
+  category: Category;
+  speciality: Speciality;
+}) => {
+  try {
+    // get profiles
+    const profiles = await prisma.freelancerProfile.findMany({
+      where: {
+        category: category,
+        speciality: speciality,
+        NOT: [{ category: null }, { speciality: null }],
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            country: true,
+            email: true,
+            profileImage: true,
+          },
+        },
+      },
+    });
+    return {
+      success: true,
+      profiles,
+    };
+  } catch (err) {
+    return {
+      success: false,
+      message: "Something went wrong",
+    };
+  }
+};
