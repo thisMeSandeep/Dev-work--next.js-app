@@ -7,6 +7,7 @@ import Link from "next/link";
 import ProfileDropdown, {
   DropdownLink,
 } from "../profile-dropdown/ProfileDropdown";
+import Image from "next/image";
 
 interface NavItem {
   name: string;
@@ -41,7 +42,9 @@ export default function Header({ navItems, profileLinks, user }: HeaderProps) {
         </button>
 
         {/* Logo */}
-        <div className="text-lg font-semibold text-green-600">DevWork</div>
+        <div className="w-32 h-20">
+          <Image src="/logo.png/" alt="Logo" width={100} height={100} />
+        </div>
 
         {/* Desktop Nav */}
         <nav className="hidden sm:flex gap-6">

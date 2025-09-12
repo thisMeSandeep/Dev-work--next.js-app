@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 const navlinks = [
@@ -7,32 +8,21 @@ const navlinks = [
 
 const Header = () => {
   return (
-    <header className="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-md shadow-sm z-50">
-      <div className="mx-auto flex justify-between items-center px-8 py-4">
-        {/* Logo + Nav */}
+    <header className="fixed top-0 left-0 right-0  z-50  bg-white">
+      <div className="mx-auto flex justify-between items-center px-4 md:px-8 py-4">
+        {/* Logo */}
         <div className="flex items-center gap-12">
           {/* Logo */}
-          <Link
-            href="/"
-            className="text-xl font-bold text-gray-800 hover:text-green-600 transition-colors"
-          >
-            WeWork
+          <Link href="/" className="w-32 h-10 relative flex items-center justify-center">
+            <Image
+              src="/logo.png"
+              alt="Logo"
+              height={40}
+              width={128}
+              priority // optional, makes logo load faster
+              className="bg-green-500 size-full"
+            />
           </Link>
-
-          {/* Navlinks */}
-          <nav className="flex gap-8">
-            {navlinks.map((nav) => (
-              <Link
-                key={nav.title}
-                href={nav.path}
-                className="text-sm font-medium text-gray-600 hover:text-green-600 transition-colors relative group"
-              >
-                {nav.title}
-                {/* underline effect */}
-                <span className="absolute left-0 bottom-[-2px] w-0 h-[2px] bg-green-600 transition-all duration-300 group-hover:w-full"></span>
-              </Link>
-            ))}
-          </nav>
         </div>
 
         {/* Action Links */}
@@ -46,11 +36,12 @@ const Header = () => {
 
           <Link
             href="/signup"
-            className="text-sm font-semibold bg-green-600 px-6 py-2 rounded-full text-white shadow-sm hover:bg-green-500 transition-colors"
+            className="text-sm font-semibold bg-green-600 px-6 md:px-10 py-2 rounded-full text-white shadow-sm hover:bg-green-500 transition-colors"
           >
             Sign Up
           </Link>
         </div>
+
       </div>
     </header>
   );

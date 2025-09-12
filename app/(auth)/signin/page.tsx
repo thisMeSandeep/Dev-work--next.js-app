@@ -23,10 +23,7 @@ const userSchema = z.object({
 
 type UserType = z.infer<typeof userSchema>;
 
-const inputFieldStyling = `w-full rounded-2xl border border-black/20 px-3 py-2 text-sm text-gray-800
-placeholder:text-gray-400 
-focus-visible:border-green-500 focus-visible:ring-2 focus-visible:ring-green-500/20 
-focus-visible:outline-none transition-colors`;
+const inputFieldStyling = "w-full rounded-sm border border-gray-300 px-3 py-2 text-sm focus-visible:border-green-500 focus-visible:ring-2 focus-visible:ring-green-500/20 focus-visible:outline-none transition-colors"
 
 const Signin = () => {
   const [passwordVisible, setPasswordVisible] = useState(false);
