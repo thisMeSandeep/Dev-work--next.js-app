@@ -1,5 +1,4 @@
 import {
-  Role,
   ExperienceLevel,
   Category,
   Speciality,
@@ -9,6 +8,7 @@ import {
   ProposalStatus,
   EstimatedDuration,
   ClientRequestStatus,
+  Role,
 } from "../generated/prisma";
 
 // ------------------ Core DTOs ------------------
@@ -18,6 +18,7 @@ export interface UserCoreDTO {
   id: string;
   firstName?: string | null;
   lastName?: string | null;
+  role: Role;
   email: string;
   country?: string | null;
   profileImage?: string | null;
@@ -40,6 +41,9 @@ export interface FreelancerProfileCoreDTO {
   portfolioLink?: string | null;
   otherLink?: string | null;
   file?: string | null;
+  jobsApplied?: number | null;
+  totalJobsHired?: number | null;
+  totalIncome?: number | null;
 }
 
 // ClientProfile
@@ -50,6 +54,9 @@ export interface ClientProfileCoreDTO {
   company?: string | null;
   websiteLink?: string | null;
   rating?: number | null;
+  jobsPosted?: number | null;
+  jobsHired?: number | null;
+  totalSpent?: number | null;
 }
 
 // Job
@@ -72,6 +79,7 @@ export interface JobCoreDTO {
   createdAt: Date;
   clientId: string;
   hiredFreelancerId?: string | null;
+
 }
 
 // Proposal
@@ -79,8 +87,8 @@ export interface ProposalCoreDTO {
   id: string;
   coverLetter: string;
   message?: string | null;
-  rate?: number | null;
-  duration?: EstimatedDuration | null;
+  rate: number;
+  duration: EstimatedDuration;
   attachedFile?: string | null;
   createdAt: Date;
   status: ProposalStatus;

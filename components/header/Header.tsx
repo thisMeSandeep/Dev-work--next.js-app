@@ -42,8 +42,15 @@ export default function Header({ navItems, profileLinks, user }: HeaderProps) {
         </button>
 
         {/* Logo */}
-        <div className="w-32 h-20">
-          <Image src="/logo.png/" alt="Logo" width={100} height={100} />
+        <div className="w-32 h-10 relative flex items-center justify-center">
+          <Image
+            src="/logo.png"
+            alt="Logo"
+            height={40}
+            width={128}
+            priority
+            className="bg-green-500 size-full"
+          />
         </div>
 
         {/* Desktop Nav */}

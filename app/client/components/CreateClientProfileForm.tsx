@@ -18,7 +18,6 @@ import {
 import { Card } from "@/components/ui/card";
 import {
   Pencil,
-  Save,
   Globe,
   Building2,
   Phone,
@@ -29,6 +28,8 @@ import {
 import { setClientProfileAction } from "@/actions/client.actions";
 import { fetchAndSetUser } from "@/lib/fetchUser";
 import toast from "react-hot-toast";
+import LoadingButton from "@/components/loader/LoadingButton";
+import Link from "next/link";
 
 // Validation schema
 const formSchema = z.object({
@@ -68,8 +69,8 @@ const CreateClientProfileForm = ({ initialData }: Props) => {
     setIsLoading(true);
     const response = await setClientProfileAction(data);
     if (response.success) {
-      toast.success(response.message);
       await fetchAndSetUser();
+      toast.success(response.message);
     } else {
       toast.error(response.message);
     }
@@ -128,14 +129,14 @@ const CreateClientProfileForm = ({ initialData }: Props) => {
               <Globe className="w-4 h-4" /> Website
             </span>
             {initialData?.websiteLink ? (
-              <a
+              <Link
                 href={initialData.websiteLink}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-green-700 underline"
               >
                 {initialData.websiteLink}
-              </a>
+              </Link>
             ) : (
               "Not set"
             )}
@@ -226,14 +227,10 @@ const CreateClientProfileForm = ({ initialData }: Props) => {
           </div>
 
           {/* Save Button */}
-          <div className="col-span-1 md:col-span-2 flex justify-end">
-            <Button
-              type="submit"
-              className="bg-green-600 text-white hover:bg-green-700 flex items-center gap-2"
-            >
-              <Save className="w-4 h-4" />
+          <div className="w-full sm:w-[200px]">
+            <LoadingButton isLoading={isLoading} disabled={isLoading}>
               {isLoading ? "Saving..." : "Save"}
-            </Button>
+            </LoadingButton>
           </div>
         </form>
       )}

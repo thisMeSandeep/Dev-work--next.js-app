@@ -45,9 +45,9 @@ const ProfileUpload = ({
       const response = await updateUserProfileImageAction(file);
 
       if (response.success) {
-        toast.success(response.message);
         reset();
         await fetchAndSetUser();
+        toast.success(response.message);
       } else {
         toast.error(response.message);
       }
@@ -71,7 +71,7 @@ const ProfileUpload = ({
             className="w-16 h-16 sm:w-[100px] sm:h-[100px] rounded-full object-cover"
           />
         ) : (
-          <div className="w-14 h-14 sm:w-20 sm:h-20 flex items-center justify-center rounded-full border text-2xl text-green-500">
+          <div className="w-16 h-16 sm:w-[100px] sm:h-[100px] flex items-center justify-center rounded-full border text-2xl text-green-500">
             {textPlaceholder}
           </div>
         )}

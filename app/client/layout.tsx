@@ -10,7 +10,7 @@ import React, { useEffect } from "react";
 
 const navLinks = [
   { name: "Jobs", path: "/client/jobs" },
-  { name: "Proposals", path: "/client/proposals" },
+  { name: "Post job", path: "/client/post-job" },
   { name: "Requests", path: "/client/requests" },
 ];
 
@@ -34,10 +34,10 @@ const Clientlayout = ({ children }: { children: React.ReactNode }) => {
     );
 
   const userData = {
-    firstName: user.firstName!,
-    lastName: user.lastName!,
-    role: user.role!,
-    profileImage: user.profileImage!,
+    firstName: user?.firstName ?? "",
+    lastName: user?.lastName ?? "",
+    role: user?.role ?? "",
+    profileImage: user?.profileImage ?? "",
   };
 
   return (

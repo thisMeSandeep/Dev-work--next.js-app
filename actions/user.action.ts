@@ -1,9 +1,10 @@
-"use server"
+"use server";
 
 import { Role } from "@/generated/prisma";
 import { getUserId, getUserRole } from "@/lib/server-utils";
 import { prisma } from "@/lib/prisma";
 import { uploadFile } from "@/lib/uploadFile";
+import { UserType } from "@/types/type";
 
 // get user profile
 export const getUserProfileAction = async () => {
@@ -11,24 +12,17 @@ export const getUserProfileAction = async () => {
     const role = (await getUserRole()) as Role;
     const userId = (await getUserId()) as string;
 
-
-    let user;
+    let user : UserType | null;
 
     if (role == "DEVELOPER") {
       user = await prisma.user.findUnique({
         where: { id: userId },
         omit: {
           password: true,
+          authProviderId: true,
         },
         include: {
-          FreelancerProfile: {
-            include: {
-              savedJobs: true,
-              proposals: true,
-              hiredJobs: true,
-              clientRequests: true,
-            },
-          },
+          FreelancerProfile: true,
         },
       });
     } else {
@@ -36,14 +30,10 @@ export const getUserProfileAction = async () => {
         where: { id: userId },
         omit: {
           password: true,
+          authProviderId: true,
         },
         include: {
-          ClientProfile: {
-            include: {
-              postedJobs: true,
-              clientRequests: true,
-            },
-          },
+          ClientProfile: true,
         },
       });
     }

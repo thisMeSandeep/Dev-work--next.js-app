@@ -115,32 +115,44 @@ export const createJobAction = async (data: JobSchemaType) => {
       }
     }
 
-    await prisma.job.create({
-      data: {
-        title,
-        description,
-        category: category as Category,
-        speciality: speciality as Speciality,
-        skills,
-        budget,
-        scopeSize: scopeSize as ScopeSize,
-        duration: duration as ScopeDuration,
-        experienceRequired: experienceRequired as ExperienceLevel,
-        connectsRequired,
-        attachment: fileUrl,
-        clientId: client.id,
-      },
+    await prisma.$transaction(async (tx) => {
+      // Create job
+      const job = await tx.job.create({
+        data: {
+          title,
+          description,
+          category: category as Category,
+          speciality: speciality as Speciality,
+          skills,
+          budget,
+          scopeSize: scopeSize as ScopeSize,
+          duration: duration as ScopeDuration,
+          experienceRequired: experienceRequired as ExperienceLevel,
+          connectsRequired,
+          attachment: fileUrl,
+          clientId: client.id,
+        },
+      });
+
+      // Update posted job count
+      await tx.clientProfile.update({
+        where: { userId },
+        data: {
+          jobsPosted: { increment: 1 },
+        },
+      });
+      return job;
     });
 
     return {
       success: true,
-      message: "Job created successfully",
+      message: "Job posted successfully",
     };
   } catch (err) {
     console.error("Error creating job:", err);
     return {
       success: false,
-      message: "Internal server error",
+      message: "Something went wrong",
     };
   }
 };

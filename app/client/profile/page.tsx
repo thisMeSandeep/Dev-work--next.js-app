@@ -7,10 +7,8 @@ import React from "react";
 import CreateClientProfileForm from "../components/CreateClientProfileForm";
 import { ClientStatsCard } from "../components/ClientStatesCard";
 
-
-
 const ClientProfile = () => {
-  const user = useUserStore((state) => state.user) 
+  const user = useUserStore((state) => state.user);
 
   // extract text placeholder safely
   const textPlaceholder =
@@ -26,9 +24,9 @@ const ClientProfile = () => {
   const clientData = {
     name: `${user?.firstName ?? ""} ${user?.lastName ?? ""}`.trim(),
     email: user?.email ?? "",
-    jobsPosted: user?.ClientProfile?.postedJobs?.length ?? 0,
-    totalSpent: 0, 
-    proposals: 0, 
+    jobsPosted: user?.ClientProfile?.jobsPosted ?? 0,
+    totalSpent: user?.ClientProfile?.totalSpent ?? 0,
+    jobsHired: user?.ClientProfile?.jobsHired ?? 0,
     rating: user?.ClientProfile?.rating ?? 0,
   };
 

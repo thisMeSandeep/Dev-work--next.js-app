@@ -26,6 +26,7 @@ import { createJobAction } from "@/actions/client.actions";
 import { fetchAndSetUser } from "@/lib/fetchUser";
 import toast from "react-hot-toast";
 import { useState } from "react";
+import LoadingButton from "@/components/loader/LoadingButton";
 
 // ------------------ Zod Schema ------------------
 const jobSchema = z.object({
@@ -59,7 +60,7 @@ const jobSchema = z.object({
 type JobSchemaType = z.infer<typeof jobSchema>;
 
 // ------------------ Tailwind Styles ------------------
-const fieldStyle = "space-y-2 flex flex-col"; // spacing + column layout for Label + input + error
+const fieldStyle = "space-y-2 flex flex-col";
 
 const inputStyle =
   "w-full rounded-sm border border-gray-300 px-3 py-2 text-sm focus-visible:border-green-500 focus-visible:ring-2 focus-visible:ring-green-500/20 focus-visible:outline-none transition-colors";
@@ -68,10 +69,8 @@ const LabelStyle = "text-sm font-medium text-gray-700";
 
 const errorStyle = "text-red-500 text-sm";
 
-export default function CreateJobForm() {
-
-const [isLoading, setIsLoading] = useState(false);
-
+export default function CreateJob() {
+  const [isLoading, setIsLoading] = useState(false);
 
   const {
     register,
@@ -110,9 +109,9 @@ const [isLoading, setIsLoading] = useState(false);
 
     const response = await createJobAction(formattedData);
     if (response.success) {
-      toast.success(response.message);
-      reset();
       await fetchAndSetUser();
+      reset();
+      toast.success(response.message);
     } else {
       toast.error(response.message);
     }
@@ -120,7 +119,7 @@ const [isLoading, setIsLoading] = useState(false);
   };
 
   return (
-    <div className="w-full  bg-whitespace-y-8">
+    <div className="w-full max-w-7xl mx-auto py-10 px-4 md:px-10  space-y-8">
       {/* Form filling options */}
       <div className="space-y-3">
         <p className="text-gray-600 text-sm text-center">
@@ -361,12 +360,11 @@ const [isLoading, setIsLoading] = useState(false);
         </div>
 
         {/* Submit */}
-        <Button
-          type="submit"
-          className="w-full rounded-md py-3 text-base font-medium bg-green-500 hover:bg-green-600 transition text-white cursor-pointer"
-        >
-          {isLoading ? "Posting Job..." : "Post Job"}
-        </Button>
+        <div className="w-full md:max-w-[200px] ml-auto">
+          <LoadingButton isLoading={isLoading} type="submit">
+            {isLoading ? "Posting Job..." : "Post Job"}
+          </LoadingButton>
+        </div>
       </form>
     </div>
   );

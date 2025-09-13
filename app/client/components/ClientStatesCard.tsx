@@ -6,7 +6,7 @@ interface ClientStatsCardProps {
   email: string;
   jobsPosted: number;
   totalSpent: number; 
-  proposals: number;
+  jobsHired: number;
   rating: number; 
 }
 
@@ -15,7 +15,7 @@ export const ClientStatsCard = ({
   email,
   jobsPosted,
   totalSpent,
-  proposals,
+  jobsHired,
   rating,
 }: ClientStatsCardProps) => {
   return (
@@ -54,15 +54,15 @@ export const ClientStatsCard = ({
           <span className="flex items-center gap-2 font-medium text-green-700">
             <DollarSign className="w-4 h-4" /> Total Spent
           </span>
-          <span>{totalSpent}</span>
+          <span>${totalSpent}</span>
         </div>
 
-        {/* Proposals */}
+        {/* Jobs hired */}
         <div className="flex flex-col">
           <span className="flex items-center gap-2 font-medium text-green-700">
-            <FileText className="w-4 h-4" /> Proposals
+            <FileText className="w-4 h-4" /> Jobs hired
           </span>
-          <span>{proposals}</span>
+          <span>{jobsHired}</span>
         </div>
 
         {/* Rating */}
