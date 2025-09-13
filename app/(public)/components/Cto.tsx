@@ -1,12 +1,13 @@
 "use client";
 
 import { motion, useInView } from "motion/react";
+import Link from "next/link";
 import { useRef, useState, useEffect } from "react";
 
 const stats = [
     { label: "Jobs Posted", value: 12500, suffix: "+" },
-    { label: "Developers Joined", value: 8500, suffix: "+" },
-    { label: "Earnings Paid", value: 3200000, suffix: "$" },
+    { label: "Developers Joined", value: 5000, suffix: "+" },
+    { label: "Earnings Paid", value: 320000, suffix: "$" },
 ];
 
 function AnimatedCounter({ value, suffix }: { value: number; suffix: string }) {
@@ -95,12 +96,12 @@ export default function Cto() {
                     transition={{ duration: 0.6 }}
                     className="mt-16 text-center"
                 >
-                    <a
+                    <Link
                         href="/signup"
                         className="inline-block px-8 py-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-lg font-semibold text-white shadow-lg transition-transform hover:scale-105"
                     >
                         Join DevWork Today
-                    </a>
+                    </Link>
                     <p className="mt-4 text-emerald-200">
                         Start building your future—whether hiring talent or finding opportunities.
                     </p>

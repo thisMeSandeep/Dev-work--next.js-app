@@ -3,6 +3,7 @@
 import { motion } from "motion/react";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Hero() {
     return (
@@ -29,37 +30,39 @@ export default function Hero() {
                         Built for speed, trust, and growth.
                     </p>
 
-                    <div className="flex flex-col sm:flex-row gap-4 pt-4 justify-center lg:justify-start">
-                        <Link href="/get-started">
+                    {/* action buttons  */}
+                    <div className="flex flex-col sm:flex-row gap-3 pt-4 w-full sm:w-auto sm:justify-center lg:justify-start">
+                        <Link href="/signup" className="w-full sm:w-auto group">
                             <motion.button
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.98 }}
-                                className="flex items-center justify-center gap-2 rounded-2xl bg-emerald-500 px-6 py-3 font-semibold text-emerald-950 shadow-lg transition hover:bg-emerald-400"
+                                className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-2xl bg-emerald-500 px-6 py-3 font-semibold text-emerald-950 shadow-lg transition hover:bg-emerald-400 cursor-pointer"
                             >
                                 Get Started
-                                <ArrowRight className="h-5 w-5" />
+                                <ArrowRight className="h-5 w-5  group-hover:translate-x-1 transition-all ease-in-out" />
                             </motion.button>
                         </Link>
 
-                        <Link href="/explore">
+                        <Link href="/signin" className="w-full sm:w-auto">
                             <motion.button
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.98 }}
-                                className="rounded-2xl border border-emerald-400/60 px-6 py-3 font-semibold text-emerald-100 transition hover:bg-emerald-800/40"
+                                className="w-full sm:w-auto rounded-2xl border border-emerald-400/60 px-6 py-3 font-semibold text-emerald-100 transition hover:bg-emerald-800/40 cursor-pointer"
                             >
                                 Explore Projects
                             </motion.button>
                         </Link>
                     </div>
 
-                    {/* Social proof / tagline */}
+
+                    {/* Social proof */}
                     <div className="mt-6 flex items-center justify-center lg:justify-start gap-3 text-sm text-emerald-200">
                         <CheckCircle2 className="h-4 w-4 text-emerald-400" />
                         Trusted by 5,000+ developers & growing
                     </div>
                 </motion.div>
 
-                {/* Visual / Illustration */}
+                {/* image*/}
                 <motion.div
                     initial={{ opacity: 0, x: 40 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -67,9 +70,16 @@ export default function Hero() {
                     className="col-span-5 mt-12 flex justify-center lg:mt-0"
                 >
                     <div className="relative w-[280px] sm:w-[360px] md:w-[420px] lg:w-[480px]">
-                        <img
-                            src="https://images.pexels.com/photos/3184357/pexels-photo-3184357.jpeg"
+                        <Image
+                            src="/assets/hero.jpeg"
                             alt="Freelancers collaborating on DevWork"
+                            width={480}
+                            height={480}
+                            priority
+                            sizes="(max-width: 640px) 280px,
+                           (max-width: 768px) 360px,
+                           (max-width: 1024px) 420px,
+                           480px"
                             className="rounded-3xl shadow-xl transition-transform duration-500 hover:scale-[1.02] hover:rotate-1"
                         />
                         {/* Glass overlay accent */}

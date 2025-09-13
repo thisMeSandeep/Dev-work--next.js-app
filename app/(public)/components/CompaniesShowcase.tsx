@@ -18,7 +18,7 @@ export default function CompaniesShowcase() {
 
     return (
         <section className="relative bg-gradient-to-r from-emerald-200 via-emerald-50 to-teal-100 text-gray-800 overflow-hidden">
-            {/* Subtle background pattern */}
+            {/*  background pattern */}
             <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-[100%] lg:w-[80%] h-full pointer-events-none">
                 <div
                     className="w-full h-full bg-no-repeat"
@@ -128,7 +128,7 @@ export default function CompaniesShowcase() {
                     ))}
                 </motion.div>
 
-                {/* Additional context or call-to-action */}
+                {/* Additional context */}
                 <motion.div
                     initial={{ opacity: 0 }}
                     whileInView={{ opacity: 1 }}

@@ -4,6 +4,7 @@ import { testimonials } from "@/data/testimonials";
 import { motion, useScroll, useTransform } from "motion/react";
 import { useRef } from "react";
 import { Quote } from "lucide-react";
+import Image from "next/image";
 
 function MobileTestimonials() {
     const cardsRef = useRef(null);
@@ -13,7 +14,7 @@ function MobileTestimonials() {
     });
 
     const totalCards = testimonials.length;
-    const scrollLengthPerCard = 80; // scroll length per card
+    const scrollLengthPerCard = 100; // vh per card
 
     return (
         <section className="relative block sm:hidden bg-white py-12">
@@ -39,25 +40,25 @@ function MobileTestimonials() {
                         const start = i / totalCards;
                         const end = (i + 1) / totalCards;
 
-                        const opacity = useTransform(
+                        // map scroll progress to [0,1] just for this card
+                        const cardProgress = useTransform(
                             scrollYProgress,
-                            [start, start + 0.1, end - 0.1, end],
-                            [0, 1, 1, 0]
+                            [start, end],
+                            [0, 1],
+                            { clamp: true }
                         );
 
-                        const scale = useTransform(
-                            scrollYProgress,
-                            [start, start + 0.1, end - 0.1, end],
-                            [0.9, 1, 1, 0.9]
-                        );
-
-                        const y = useTransform(scrollYProgress, [start, end], ["20%", "0%"]);
+                        // y: card comes up and then freezes
+                        const y = useTransform(cardProgress, [0, 1], ["100%", "0%"]);
 
                         return (
                             <motion.div
                                 key={i}
-                                style={{ y, opacity, scale }}
-                                className="absolute w-[88vw] max-w-sm bg-white/80 backdrop-blur-md rounded-2xl shadow-xl p-5 flex flex-col border border-emerald-100"
+                                style={{
+                                    y,
+                                    zIndex: i, // each new card stacks above previous
+                                }}
+                                className="absolute w-[88vw] max-w-sm bg-white rounded-2xl shadow-xl p-5 flex flex-col border border-emerald-100"
                             >
                                 {/* Quote icon header */}
                                 <div className="flex justify-between items-center mb-3">
@@ -66,9 +67,12 @@ function MobileTestimonials() {
 
                                 {/* Profile */}
                                 <div className="flex items-center gap-4 mb-4">
-                                    <img
+                                    <Image
                                         src={item.image}
                                         alt={item.name}
+                                        width={56}
+                                        height={56}
+                                        unoptimized
                                         className="w-14 h-14 rounded-full object-cover border-2 border-emerald-400 shadow-sm"
                                     />
                                     <div>

@@ -38,6 +38,7 @@ const steps = [
         img: "/assets/dev4.svg",
     },
 ];
+
 export default function DeveloperSteps() {
     return (
         <section className="relative bg-gradient-to-b from-white to-emerald-50 overflow-hidden">
@@ -70,9 +71,10 @@ export default function DeveloperSteps() {
                     </p>
                 </motion.div>
 
-                {/* Zig-Zag Timeline */}
+                {/* Timeline wrapper */}
                 <div className="mt-20 relative z-10 flex flex-col lg:flex-row lg:justify-between items-center">
-                    {/* Curved path behind cards */}
+
+                    {/* Desktop Zig-Zag Path */}
                     <svg
                         className="absolute inset-0 w-full h-full hidden lg:block z-0"
                         viewBox="0 0 1000 400"
@@ -101,7 +103,7 @@ export default function DeveloperSteps() {
                         ))}
                     </svg>
 
-                    {/* Cards */}
+                    {/* Step Cards */}
                     {steps.map((step, i) => (
                         <motion.div
                             key={step.id}
@@ -113,7 +115,7 @@ export default function DeveloperSteps() {
                                 }`}
                         >
                             {/* Number Badge */}
-                            <span className="absolute -left-10 lg:-left-10 flex h-10 w-10 items-center justify-center rounded-full bg-emerald-600 text-white font-bold shadow">
+                            <span className="absolute -left-10 flex h-10 w-10 items-center justify-center rounded-full bg-emerald-600 text-white font-bold shadow">
                                 {step.id}
                             </span>
 

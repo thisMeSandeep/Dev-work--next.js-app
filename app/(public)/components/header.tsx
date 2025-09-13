@@ -1,25 +1,40 @@
+"use client"
+
 import Image from "next/image";
 import Link from "next/link";
-
-const navlinks = [
-  { title: "About us", path: "/about" },
-  { title: "Contact us", path: "/contact" },
-];
+import { useState, useEffect } from "react";
 
 const Header = () => {
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 10) {
+        setScrolled(true);
+      } else {
+        setScrolled(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
-    <header className="fixed top-0 left-0 right-0  z-50  bg-white">
-      <div className="mx-auto flex justify-between items-center px-4 md:px-8 py-4">
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 bg-white transition-all ${scrolled ? "border-b border-gray-200 shadow-sm" : ""
+        }`}
+    >
+      <div className="mx-auto flex justify-between items-center px-4 md:px-8 py-3">
         {/* Logo */}
         <div className="flex items-center gap-12">
-          {/* Logo */}
           <Link href="/" className="w-32 h-10 relative flex items-center justify-center">
             <Image
               src="/logo.png"
               alt="Logo"
               height={40}
               width={128}
-              priority // optional, makes logo load faster
+              priority
               className="bg-green-500 size-full"
             />
           </Link>
@@ -41,7 +56,6 @@ const Header = () => {
             Sign Up
           </Link>
         </div>
-
       </div>
     </header>
   );

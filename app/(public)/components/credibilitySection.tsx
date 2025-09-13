@@ -3,6 +3,7 @@
 import { motion } from "motion/react";
 import { Briefcase, Globe2, Users } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function CredibilitySection() {
     return (
@@ -55,30 +56,31 @@ export default function CredibilitySection() {
                     </div>
 
                     {/* CTAs */}
-                    <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                        <Link href="/explore">
+                    <div className="mt-8 flex flex-col sm:flex-row gap-5 w-full sm:w-auto items-center justify-center lg:justify-start">
+                        <Link href="/signup" className="w-full sm:w-auto ">
                             <motion.button
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.98 }}
-                                className="rounded-xl bg-emerald-600 px-6 py-3 font-semibold text-white shadow hover:bg-emerald-500"
+                                className="w-full sm:w-auto rounded-xl bg-emerald-600 px-6 py-3 font-semibold text-white shadow hover:bg-emerald-500 cursor-pointer"
                             >
                                 Explore DevWork
                             </motion.button>
                         </Link>
 
-                        <Link href="/learn-more">
+                        <Link href="/signin" className="w-full sm:w-auto ">
                             <motion.button
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.98 }}
-                                className="flex items-center gap-2 text-emerald-700 font-semibold"
+                                className="w-full sm:w-auto flex items-center justify-center sm:justify-start gap-2 text-emerald-700 font-semibold cursor-pointer"
                             >
                                 Learn More →
                             </motion.button>
                         </Link>
                     </div>
+
                 </motion.div>
 
-                {/* Right Image / Visual */}
+                {/* Right Image  */}
                 <motion.div
                     initial={{ opacity: 0, x: 40 }}
                     whileInView={{ opacity: 1, x: 0 }}
@@ -87,9 +89,16 @@ export default function CredibilitySection() {
                     className="col-span-5 mt-12 flex justify-center lg:mt-0"
                 >
                     <div className="relative w-[280px] sm:w-[360px] md:w-[420px] lg:w-[480px]">
-                        <img
-                            src="https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg"
+                        <Image
+                            src="/assets/handshake.jpeg"
                             alt="Team collaboration on DevWork"
+                            width={480}
+                            height={480}
+                            priority
+                            sizes="(max-width: 640px) 280px,
+                           (max-width: 768px) 360px,
+                           (max-width: 1024px) 420px,
+                           480px"
                             className="rounded-2xl shadow-lg"
                         />
                     </div>
