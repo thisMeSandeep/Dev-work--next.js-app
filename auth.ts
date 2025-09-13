@@ -30,20 +30,37 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           password: string;
         };
 
-        const user = await prisma.user.findUnique({ where: { email } });
-        if (!user || !user.password) return null;
+        try {
+          const user = await prisma.user.findUnique({ where: { email } });
 
-        const matched = await bcrypt.compare(password, user.password);
-        if (!matched) return null;
+          if (!user) {
+            console.log("User not found:", email);
+            return null; 
+          }
 
-        // Return consistent user object structure
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.firstName + (user.lastName ? ` ${user.lastName}` : ""),
-          role: user.role,
-          image: user.profileImage,
-        };
+          if (!user.password) {
+            console.log("User has no password:", email);
+            return null;
+          }
+
+          const matched = await bcrypt.compare(password, user.password);
+          if (!matched) {
+            console.log("Invalid password for user:", email);
+            return null; 
+          }
+
+          // Return consistent user object structure
+          return {
+            id: user.id,
+            email: user.email,
+            name: user.firstName + (user.lastName ? ` ${user.lastName}` : ""),
+            role: user.role,
+            image: user.profileImage,
+          };
+        } catch (error) {
+          console.error("Authorization error:", error);
+          return null;
+        }
       },
     }),
   ],
@@ -53,6 +70,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   callbacks: {
     async signIn({ user, account }) {
       try {
+        // Handle credentials provider - validation already done in authorize
+        if (account?.provider === "credentials") {
+          return true;
+        }
+
         // Handle OAuth providers (Google, GitHub)
         if (account?.provider !== "credentials") {
           const existingUser = await prisma.user.findUnique({
@@ -65,7 +87,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             const rawRole = cookieStore.get("temp_role")?.value;
 
             if (!rawRole) {
-              throw new Error("Role not selected. Please choose a role first.");
+              console.error("Role not selected for OAuth registration");
+              return false; // Return false instead of throwing error
             }
 
             const role = rawRole.toUpperCase() as Role;
@@ -103,7 +126,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             user.id = existingUser.id;
             user.role = existingUser.role;
           }
-        } 
+        }
 
         return true;
       } catch (error) {

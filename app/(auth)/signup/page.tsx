@@ -26,6 +26,7 @@ import type { UserRegistrationType } from "@/actions/auth.action";
 import AuthRedirectHandler from "../components/AuthRedirectHandler";
 import { signIn } from "next-auth/react";
 import toast from "react-hot-toast";
+import LoadingButton from "@/components/loader/LoadingButton";
 
 const userSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -320,22 +321,9 @@ const Signup = () => {
             </div>
 
             {/* submit */}
-            <motion.div
-              whileHover={{ scale: checked && !isLoading ? 1.03 : 1 }}
-              className="mx-auto"
-            >
-              <Button
-                type="submit"
-                disabled={!checked || isLoading}
-                className="px-8 py-3 rounded-2xl border border-green-500 
-               bg-green-600  text-lg font-medium 
-               hover:bg-green-500 text-white 
-               transition-all duration-300 
-               disabled:opacity-80 disabled:cursor-not-allowed cursor-pointer"
-              >
-                {isLoading ? "Creating Account..." : "Create my account"}
-              </Button>
-            </motion.div>
+            <LoadingButton isLoading={isLoading} type="submit">
+              {isLoading ? "Logging you in..." : "Sign up"}
+            </LoadingButton>
           </form>
 
           {/* Already have account */}

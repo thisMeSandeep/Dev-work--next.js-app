@@ -12,9 +12,10 @@ import { EyeIcon, EyeOff, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "motion/react";
 import Link from "next/link";
-import { loginAction } from "@/actions/auth.action";
 import AuthRedirectHandler from "../components/AuthRedirectHandler";
 import toast from "react-hot-toast";
+import { signIn } from "next-auth/react";
+import LoadingButton from "@/components/loader/LoadingButton";
 
 const userSchema = z.object({
   email: z.email("Invalid email").nonempty("Email is required"),
@@ -42,14 +43,21 @@ const Signin = () => {
     setIsLoading(true);
 
     try {
-      const result = await loginAction(data);
+      const result = await signIn("credentials", {
+        redirect: false,
+        email: data.email,
+        password: data.password
+      });
 
-      if (!result.success) {
-        toast.error(result.message);
+      if (result?.error) {
+        if (result.error === 'CredentialsSignin') {
+          toast.error("Invalid email or password");
+        } else {
+          toast.error("Authentication failed. Please try again.");
+        }
       } else {
-        toast.success(result.message);
-        // Successful login - redirect will be handled by middleware
-        window.location.href = "/"; // Force page reload to trigger middleware
+        toast.success("Login successful");
+        window.location.href = "/";
       }
     } catch (err) {
       console.log("error:", err);
@@ -150,22 +158,9 @@ const Signin = () => {
             </div>
 
             {/* submit */}
-            <motion.div
-              whileHover={{ scale: isLoading ? 1 : 1.03 }}
-              className="mx-auto"
-            >
-              <Button
-                type="submit"
-                disabled={isLoading}
-                className="px-8 py-3 rounded-2xl border border-green-500 
-                 bg-green-600  text-lg font-medium 
-                 hover:bg-green-500 text-white 
-                 transition-all duration-300 
-                 disabled:opacity-80 disabled:cursor-not-allowed cursor-pointer"
-              >
-                {isLoading ? "Signing In..." : "Sign In"}
-              </Button>
-            </motion.div>
+            <LoadingButton isLoading={isLoading} type="submit">
+              {isLoading ? "Logging you in..." : "Sign in"}
+            </LoadingButton>
           </form>
 
           {/* don't have account */}

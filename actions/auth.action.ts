@@ -1,6 +1,5 @@
 "use server";
 
-import { signIn } from "@/auth";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
@@ -114,54 +113,4 @@ export const registerUserAction = async (data: UserRegistrationType) => {
   }
 };
 
-// login user
-export type LoginInputType = {
-  email: string;
-  password: string;
-};
 
-export const loginAction = async (data: LoginInputType) => {
-  const { email, password } = data;
-
-  try {
-    const result = await signIn("credentials", {
-      redirect: false,
-      email,
-      password,
-    });
-
-    if (result?.error) {
-      let message = "Something went wrong. Please try again.";
-
-      switch (result.error) {
-        case "CredentialsSignin":
-          message = "Invalid email or password";
-          break;
-        case "Configuration":
-          message = "Authentication misconfigured. Please contact support.";
-          break;
-        case "AccessDenied":
-          message = "Access denied.";
-          break;
-        default:
-          message = result.error;
-      }
-
-      return {
-        success: false,
-        message,
-      };
-    }
-
-    return {
-      success: true,
-      message: "Login successful",
-    };
-  } catch (error) {
-    console.error("Login failed:", error);
-    return {
-      success: false,
-      message: "Internal Server Error",
-    };
-  }
-};
