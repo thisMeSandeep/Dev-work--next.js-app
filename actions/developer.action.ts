@@ -254,8 +254,8 @@ export async function createProposalAction(
       data: {
         coverLetter,
         message: message ?? null,
-        rate: rate ?? null,
-        duration: (duration as EstimatedDuration) ?? null,
+        rate: rate,
+        duration: (duration as EstimatedDuration),
         attachedFile: fileUrl ?? null,
         freelancerProfile: {
           connect: { id: freelancer.id },

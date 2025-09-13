@@ -10,13 +10,13 @@ export const proposalSchema = z.object({
   message: z.string().optional(),
 
   rate: z.preprocess((val) => {
-    if (val === "" || val === undefined || val === null) return null;
+    if (val === "" || val === undefined || val === null) {
+      return undefined; // required check kicks in
+    }
     return Number(val);
-  }, z.number().positive("Rate must be greater than 0").nullable()),
+  }, z.number().positive("Rate must be greater than 0")),
 
-  duration: z
-    .enum(Object.values(EstimatedDuration) as [string, ...string[]])
-    .optional(),
+  duration: z.enum(Object.values(EstimatedDuration) as [string, ...string[]]),
 
   attachedFile: z
     .preprocess((val) => {
