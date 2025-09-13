@@ -74,7 +74,7 @@ const MakeProposal = () => {
                 Connects
               </p>
               <p>
-                When you submit this proposal, you'll have{" "}
+                When you submit this proposal, you&apos;ll have{" "}
                 <span className="text-black font-semibold">
                   {(user?.FreelancerProfile?.connects ?? 0) -
                     (job?.connectsRequired ?? 0)}

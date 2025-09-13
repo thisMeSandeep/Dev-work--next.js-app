@@ -21,7 +21,7 @@ export default function DesktopTestimonials() {
                         Loved by <span className="text-emerald-600">Clients & Developers</span>
                     </h2>
                     <p className="mt-4 text-xl text-gray-600 max-w-3xl mx-auto">
-                        Join thousands of professionals thriving with DevWork's innovative platform.
+                        Join thousands of professionals thriving with DevWork&apos;s innovative platform.
                     </p>
                 </motion.div>
 

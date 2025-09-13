@@ -37,10 +37,10 @@ const Developerlayout = ({ children }: { children: React.ReactNode }) => {
     );
 
   const userData = {
-    firstName: user?.firstName!,
-    lastName: user?.lastName!,
-    role: user?.role!,
-    profileImage: user?.profileImage!,
+    firstName: user?.firstName ?? "",
+    lastName: user?.lastName ?? "",
+    role: user?.role ?? "",
+    profileImage: user?.profileImage ?? "",
   };
 
   return (

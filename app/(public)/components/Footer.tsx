@@ -108,13 +108,13 @@ export default function Footer() {
                         <h3 className="text-lg font-semibold text-white">Follow Us</h3>
                         <div className="mt-4 flex gap-4">
                             {[Twitter, Linkedin, Github, Mail].map((Icon, i) => (
-                                <a
+                                <Link
                                     key={i}
                                     href="/"
                                     className="p-2 rounded-full bg-white/10 hover:bg-emerald-500 transition"
                                 >
                                     <Icon className="w-5 h-5 text-white" />
-                                </a>
+                                </Link>
                             ))}
                         </div>
                     </motion.div>
