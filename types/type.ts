@@ -61,6 +61,8 @@ export interface ClientProfile {
   company?: string | null;
   websiteLink?: string | null;
   rating?: number | null;
+  jobsPosted?: number | null;
+  jobsHired?: number | null;
 
   // Relations
   user: User;
