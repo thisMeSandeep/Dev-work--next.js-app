@@ -388,3 +388,155 @@ export const sendRequestAction = async (data: Request) => {
     return { success: false, message: "Something went wrong" };
   }
 };
+
+// ------------accept proposal------------------------
+export const acceptProposalAction = async (proposalId: string) => {
+  try {
+    const userId = await getUserId();
+    if (!userId) {
+      return { success: false, message: "User not authenticated" };
+    }
+
+    const client = await prisma.clientProfile.findUnique({
+      where: { userId },
+      select: { id: true },
+    });
+
+    if (!client) {
+      return { success: false, message: "Client profile not found" };
+    }
+
+    // Get proposal with job details
+    const proposal = await prisma.proposal.findUnique({
+      where: { id: proposalId },
+      include: {
+        job: true,
+        freelancerProfile: true,
+      },
+    });
+
+    if (!proposal) {
+      return { success: false, message: "Proposal not found" };
+    }
+
+    // Verify the job belongs to this client
+    if (proposal.job.clientId !== client.id) {
+      return { success: false, message: "Job not found or unauthorized" };
+    }
+
+    if (proposal.status !== "PENDING") {
+      return { success: false, message: "Proposal has already been processed" };
+    }
+
+    // Check if job already has a hired freelancer
+    if (proposal.job.hiredFreelancerId) {
+      return { success: false, message: "Job already has a hired freelancer" };
+    }
+
+    await prisma.$transaction(async (tx) => {
+      // Update proposal status to ACCEPTED
+      await tx.proposal.update({
+        where: { id: proposalId },
+        data: { status: "ACCEPTED" },
+      });
+
+      // Update job with hired freelancer and status
+      await tx.job.update({
+        where: { id: proposal.jobId },
+        data: {
+          hiredFreelancerId: proposal.freelancerProfileId,
+          status: "ONGOING",
+        },
+      });
+
+      // Update client profile stats
+      await tx.clientProfile.update({
+        where: { id: client.id },
+        data: {
+          jobsHired: { increment: 1 },
+          totalSpent: { increment: proposal.job.budget },
+        },
+      });
+
+      // Update freelancer profile stats
+      await tx.freelancerProfile.update({
+        where: { id: proposal.freelancerProfileId },
+        data: {
+          totalJobsHired: { increment: 1 },
+        },
+      });
+
+      // Reject all other pending proposals for this job
+      await tx.proposal.updateMany({
+        where: {
+          jobId: proposal.jobId,
+          status: "PENDING",
+          id: { not: proposalId },
+        },
+        data: { status: "REJECTED" },
+      });
+    });
+
+    return {
+      success: true,
+      message: "Proposal accepted successfully",
+    };
+  } catch (error) {
+    console.error("Error in acceptProposalAction:", error);
+    return { success: false, message: "Something went wrong" };
+  }
+};
+
+// ------------reject proposal------------------------
+export const rejectProposalAction = async (proposalId: string) => {
+  try {
+    const userId = await getUserId();
+    if (!userId) {
+      return { success: false, message: "User not authenticated" };
+    }
+
+    const client = await prisma.clientProfile.findUnique({
+      where: { userId },
+      select: { id: true },
+    });
+
+    if (!client) {
+      return { success: false, message: "Client profile not found" };
+    }
+
+    // Get proposal with job details
+    const proposal = await prisma.proposal.findUnique({
+      where: { id: proposalId },
+      include: {
+        job: true,
+      },
+    });
+
+    if (!proposal) {
+      return { success: false, message: "Proposal not found" };
+    }
+
+    // Verify the job belongs to this client
+    if (proposal.job.clientId !== client.id) {
+      return { success: false, message: "Job not found or unauthorized" };
+    }
+
+    if (proposal.status !== "PENDING") {
+      return { success: false, message: "Proposal has already been processed" };
+    }
+
+    // Update proposal status to REJECTED
+    await prisma.proposal.update({
+      where: { id: proposalId },
+      data: { status: "REJECTED" },
+    });
+
+    return {
+      success: true,
+      message: "Proposal rejected successfully",
+    };
+  } catch (error) {
+    console.error("Error in rejectProposalAction:", error);
+    return { success: false, message: "Something went wrong" };
+  }
+};
