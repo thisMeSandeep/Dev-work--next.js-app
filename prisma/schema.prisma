@@ -1,6 +1,7 @@
 generator client {
-  provider = "prisma-client-js"
-  output   = "../generated/prisma"
+  provider      = "prisma-client-js"
+  output        = "../generated/prisma"
+  binaryTargets = ["windows", "native", "rhel-openssl-3.0.x"]
 }
 
 datasource db {
@@ -109,27 +110,26 @@ model User {
 }
 
 model FreelancerProfile {
-  id                String           @id @default(uuid())
-  user              User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId            String           @unique
-  available         Boolean          @default(true)
-  mobile            String?
-  bio               String?
-  skills            String[]         @default([])
-  category          Category?
-  speciality        Speciality?
-  experienceLevel   ExperienceLevel?
-  perHourRate       Float?
-  languages         String?
-  connects          Int              @default(200)
-  portfolioLink     String?
-  otherLink         String?
-  file              String?
+  id              String           @id @default(uuid())
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId          String           @unique
+  available       Boolean          @default(true)
+  mobile          String?
+  bio             String?
+  skills          String[]         @default([])
+  category        Category?
+  speciality      Speciality?
+  experienceLevel ExperienceLevel?
+  perHourRate     Float?
+  languages       String?
+  connects        Int              @default(200)
+  portfolioLink   String?
+  otherLink       String?
+  file            String?
   // stats 
-  jobsApplied Int?             @default(0)
+  jobsApplied     Int?             @default(0)
   totalJobsHired  Int?             @default(0)
-  totalIncome       Float?           @default(0)
-
+  totalIncome     Float?           @default(0)
 
   // Relations
   savedJobs      Job[]           @relation("SavedJobs")
