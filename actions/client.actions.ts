@@ -267,6 +267,7 @@ export const getJobProposalsAction = async (jobId: string) => {
                 id: true,
                 firstName: true,
                 lastName: true,
+                role: true,
                 country: true,
                 email: true,
                 profileImage: true,
