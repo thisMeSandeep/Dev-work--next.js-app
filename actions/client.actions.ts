@@ -252,7 +252,6 @@ export const changeJobStatusAction = async ({
 };
 
 // --------------get all the proposals for a job------------
-
 export const getJobProposalsAction = async (jobId: string) => {
   try {
     const proposals: (ProposalCoreDTO & {
@@ -308,6 +307,7 @@ export const getSuggestedDevProfileAction = async ({
             lastName: true,
             country: true,
             email: true,
+            role: true,
             profileImage: true,
           },
         },
@@ -322,5 +322,69 @@ export const getSuggestedDevProfileAction = async ({
       success: false,
       message: "Something went wrong",
     };
+  }
+};
+
+// ------------send request to dev------------------------
+type Request = {
+  message?: string;
+  jobId: string;
+  developerId: string;
+};
+
+export const sendRequestAction = async (data: Request) => {
+  try {
+    const userId = await getUserId();
+    if (!userId) {
+      return { success: false, message: "User not authenticated" };
+    }
+
+    const client = await prisma.clientProfile.findUnique({
+      where: { userId },
+      select: { id: true },
+    });
+
+    if (!client) {
+      return { success: false, message: "Profile not found" };
+    }
+
+    // Validate job existence
+    const job = await prisma.job.findUnique({
+      where: { id: data.jobId },
+    });
+    if (!job) {
+      return { success: false, message: "Job not found" };
+    }
+
+    // Prevent duplicate requests for the same job
+    const existingRequest = await prisma.clientRequest.findFirst({
+      where: {
+        clientId: client.id,
+        developerId: data.developerId,
+        jobId: data.jobId,
+      },
+    });
+
+    if (existingRequest) {
+      return { success: false, message: "Request already sent" };
+    }
+
+    // Create the request
+    await prisma.clientRequest.create({
+      data: {
+        message: data.message || null,
+        jobId: data.jobId,
+        clientId: client.id,
+        developerId: data.developerId,
+      },
+    });
+
+    return {
+      success: true,
+      message: "Request sent to developer",
+    };
+  } catch (error) {
+    console.error("Error in sendRequestAction:", error);
+    return { success: false, message: "Something went wrong" };
   }
 };
