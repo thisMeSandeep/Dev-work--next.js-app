@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { EstimatedDuration } from "@/generated/prisma";
+import { EstimatedDuration } from "@prisma/client";
 
 export const proposalSchema = z.object({
   coverLetter: z

@@ -1,5 +1,5 @@
 import { auth } from "@/auth";
-import { Role } from "@/generated/prisma";
+import { Role } from "@prisma/client";
 
 export async function getUserRole(): Promise<Role | null> {
   const session = await auth();

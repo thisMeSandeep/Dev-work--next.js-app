@@ -5,7 +5,7 @@ import type {
   ScopeSize,
   ScopeDuration,
   ExperienceLevel,
-} from "@/generated/prisma";
+} from "@prisma/client";
 
 export interface ClientUserDTO {
   id: string;

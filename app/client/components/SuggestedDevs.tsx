@@ -1,7 +1,7 @@
 "use client";
 
 import { getSuggestedDevProfileAction } from "@/actions/client.actions";
-import { Category, Speciality } from "@/generated/prisma";
+import { Category, Speciality } from "@prisma/client";
 import { useEffect, useState } from "react";
 import { FreelancerProfileCoreDTO, UserCoreDTO } from "@/types/CoreDTO";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";

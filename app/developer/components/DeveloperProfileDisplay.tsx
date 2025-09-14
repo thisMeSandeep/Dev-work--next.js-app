@@ -1,6 +1,6 @@
 // "use client";
 
-// import { Category, ExperienceLevel, Speciality } from "@/generated/prisma";
+// import { Category, ExperienceLevel, Speciality } from "@prisma/client";
 // import {
 //   User,
 //   Phone,

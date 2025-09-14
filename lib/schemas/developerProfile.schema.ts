@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { Category, ExperienceLevel, Speciality } from "@/generated/prisma";
+import { Category, ExperienceLevel, Speciality } from "@prisma/client";
 
 // Zod schema
 const optionalUrl = z.preprocess(

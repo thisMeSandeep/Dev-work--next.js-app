@@ -16,7 +16,7 @@ import {
   ScopeSize,
   ScopeDuration,
   JobStatus,
-} from "@/generated/prisma";
+} from "@prisma/client";
 import {
   FreelancerProfileCoreDTO,
   JobCoreDTO,

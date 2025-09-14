@@ -9,7 +9,7 @@ import {
   EstimatedDuration,
   ClientRequestStatus,
   Role,
-} from "../generated/prisma";
+} from "@prisma/client";
 
 // ------------------ Core DTOs ------------------
 

@@ -1,6 +1,6 @@
 "use server";
 
-import { Role } from "@/generated/prisma";
+import { Role } from "@prisma/client";
 import { getUserId, getUserRole } from "@/lib/server-utils";
 import { prisma } from "@/lib/prisma";
 import { uploadFile } from "@/lib/uploadFile";

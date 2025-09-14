@@ -2,7 +2,7 @@ import {
   ProposalStatus,
   EstimatedDuration,
   JobStatus,
-} from "@/generated/prisma";
+} from "@prisma/client";
 
 export interface JobPreviewDTO {
   id: string;

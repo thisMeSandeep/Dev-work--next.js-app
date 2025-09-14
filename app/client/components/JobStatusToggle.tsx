@@ -2,7 +2,7 @@
 
 import { changeJobStatusAction } from "@/actions/client.actions";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { JobStatus } from "@/generated/prisma";
+import { JobStatus } from "@prisma/client";
 import { fetchClientJobsAndSet } from "@/lib/fetchClientJobs";
 import { useTransition } from "react";
 import toast from "react-hot-toast";

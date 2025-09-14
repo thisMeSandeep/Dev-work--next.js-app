@@ -9,7 +9,7 @@ import { getUserId } from "@/lib/server-utils";
 import { uploadFile } from "@/lib/uploadFile";
 import { proposalSchema } from "@/lib/schemas/proposal.schema";
 import { ProposalSchemaType } from "@/lib/schemas/proposal.schema";
-import { EstimatedDuration } from "@/generated/prisma";
+import { EstimatedDuration } from "@prisma/client";
 import { ProposalDTO } from "@/types/propoalDTO";
 
 // -----------------action to update developer profile---------------

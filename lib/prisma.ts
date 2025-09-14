@@ -1,4 +1,4 @@
-import { PrismaClient } from "@/generated/prisma";
+import { PrismaClient } from "@prisma/client";
 
 // Avoids type conflicts when Next.js does fast reloads in dev
 const globalForPrisma = globalThis as unknown as {

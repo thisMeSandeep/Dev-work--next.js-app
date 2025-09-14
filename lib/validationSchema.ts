@@ -5,7 +5,7 @@ import {
   Speciality,
   ScopeSize,
   ScopeDuration,
-} from "@/generated/prisma";
+} from "@prisma/client";
 
 // client data
 export const clientDataSchema = z.object({

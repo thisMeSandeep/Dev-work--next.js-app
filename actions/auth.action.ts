@@ -4,7 +4,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { cookies } from "next/headers";
-import { Role } from "@/generated/prisma";
+import { Role } from "@prisma/client";
 
 // set temporary role cookie
 export const setTempRoleAction = async (role: string) => {

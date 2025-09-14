@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { auth } from "@/auth";
-import { Role } from "@/generated/prisma";
+import { Role } from "@prisma/client";
 
 export default async function middleware(req: NextRequest) {
   const { nextUrl } = req;
