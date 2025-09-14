@@ -24,7 +24,7 @@ const JobDescriptionPage = () => {
           <AlertTriangle className="w-12 h-12" />
           <h2 className="text-lg font-semibold">Job not found</h2>
           <p className="text-sm text-center">
-            We couldn't find the job you are looking for. Please try again later
+            We couldn not find the job you are looking for. Please try again later
             or check other listings.
           </p>
         </div>
