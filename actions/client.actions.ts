@@ -15,6 +15,7 @@ import {
   Speciality,
   ScopeSize,
   ScopeDuration,
+  JobStatus,
 } from "@/generated/prisma";
 import {
   FreelancerProfileCoreDTO,
@@ -22,6 +23,7 @@ import {
   ProposalCoreDTO,
   UserCoreDTO,
 } from "@/types/CoreDTO";
+import { success } from "zod";
 
 // ------------- Set client profile---------------
 export const setClientProfileAction = async (data: ClientDataType) => {
@@ -158,46 +160,94 @@ export const createJobAction = async (data: JobSchemaType) => {
 };
 
 // -------------get all jobs posted by clients----------------
-type GetAllPostedJobsSuccess = {
-  success: true;
-  jobs: (JobCoreDTO & { proposals: ProposalCoreDTO[] })[];
-};
-
-type GetAllPostedJobsFailure = {
-  success: false;
-  message: string;
-};
-
-export const getAllPostedJobsAction = async (): Promise<
-  GetAllPostedJobsSuccess | GetAllPostedJobsFailure
-> => {
-  // fetch user id
+export const getPostedJobsAction = async () => {
+  // extract client id
   const userId = await getUserId();
   if (!userId) {
-    return { success: false, message: "User not authenticated" };
+    return {
+      success: false,
+      message: "User not authorized",
+    };
   }
-
   try {
-    // get client id
+    // extract client data
     const client = await prisma.clientProfile.findUnique({
-      where: { userId },
+      where: { userId: userId },
       select: { id: true },
     });
 
     if (!client) {
-      return { success: false, message: "Client profile not found" };
+      return {
+        success: false,
+        message: "Client profile not found",
+      };
     }
 
-    // fetch jobs
-    const jobs: (JobCoreDTO & { proposals: ProposalCoreDTO[] })[] =
-      await prisma.job.findMany({
-        where: { clientId: client.id },
-        include: { proposals: true },
-      });
+    //  get all the posted jobs by client
+    const jobs: JobCoreDTO[] = await prisma.job.findMany({
+      where: { clientId: client.id },
+      orderBy: { createdAt: "desc" },
+    });
 
-    return { success: true, jobs };
+    return {
+      success: true,
+      jobs,
+    };
   } catch (err) {
-    return { success: false, message: "Something went wrong" };
+    console.log(err);
+    return {
+      success: false,
+      message: "Something went wrong",
+    };
+  }
+};
+
+// -----------change job status----------------
+export const changeJobStatusAction = async ({
+  jobId,
+  status,
+}: {
+  jobId: string;
+  status: JobStatus;
+}) => {
+  const userId = await getUserId();
+  if (!userId) {
+    return {
+      success: false,
+      message: "User not authorized",
+    };
+  }
+
+  try {
+    // extract client data
+    const client = await prisma.clientProfile.findUnique({
+      where: { userId: userId },
+      select: { id: true },
+    });
+
+    if (!client) {
+      return {
+        success: false,
+        message: "Client profile not found",
+      };
+    }
+
+    // change job status
+    await prisma.job.update({
+      where: { id: jobId, clientId: client.id },
+      data: { status: status },
+    });
+
+    return {
+      success: true,
+      message: `Job status changed to ${status.toLowerCase()} `,
+    };
+  } catch (err) {
+    console.log(err);
+    return {
+      success: false,
+      message: "Something",
+    };
   }
 };
 

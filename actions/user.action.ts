@@ -94,7 +94,6 @@ export const updateUserProfileImageAction = async (file: File) => {
         message: err.message || "Internal server error",
       };
     }
-    // If the error is not an instance of Error
     return {
       success: false,
       message: "Unknown error occurred",

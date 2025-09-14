@@ -1,10 +1,7 @@
 "use client";
 
-import Drawer from "@/components/reusable/Drawer";
 import { useUserStore } from "@/store/userStore";
 import { Award, Briefcase, DollarSign, User, Users } from "lucide-react";
-import { useState } from "react";
-import CreateJobForm from "../components/CreateJobForm";
 import { useClientJobsStore } from "@/store/clientJobsStore";
 import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
@@ -57,7 +54,7 @@ const PostedJobs = () => {
             <h3 className="text-lg font-semibold text-gray-700">
               {jobs?.length} jobs posted
             </h3>
-
+          {/* jobs list */}
             <div className="space-y-5 mt-5">
               {jobs?.map((job) => (
                 <Card
@@ -74,7 +71,7 @@ const PostedJobs = () => {
                     </Link>
 
                     {/* Short description */}
-                    <p className="text-gray-600 text-sm line-clamp-3">
+                    <p className="mt-2 text-gray-600 text-sm line-clamp-3">
                       {job.description}
                     </p>
 
@@ -105,7 +102,7 @@ const PostedJobs = () => {
                     </div>
 
                     {/* Created At */}
-                    <p className="text-xs text-gray-400">
+                    <p className="text-xs text-gray-600">
                       Posted on {new Date(job.createdAt).toLocaleDateString()}
                     </p>
                   </CardContent>
