@@ -182,3 +182,13 @@
 // };
 
 // export default DeveloperProfileDisplay;
+
+
+
+const DeveloperProfileDisplay = () => {
+  return (
+    <div>DeveloperProfileDisplay</div>
+  )
+}
+
+export default DeveloperProfileDisplay

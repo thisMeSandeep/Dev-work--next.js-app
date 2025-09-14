@@ -483,3 +483,12 @@
 // };
 
 // export default DeveloperProfileForm;
+
+
+const DeveloperProfileForm = () => {
+  return (
+    <div>DeveloperProfileForm</div>
+  )
+}
+
+export default DeveloperProfileForm
