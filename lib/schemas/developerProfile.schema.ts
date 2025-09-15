@@ -9,7 +9,7 @@ const optionalUrl = z.preprocess(
 
 export const developerProfileSchema = z.object({
   available: z.boolean(),
-  country: z.string().nonempty("Country is required"),
+  country: z.string().min(1, { message: "Country is required" }),
   mobile: z
     .union([
       z.string().regex(/^\+?[0-9]{7,15}$/, "Invalid phone number"),
@@ -29,14 +29,11 @@ export const developerProfileSchema = z.object({
   category: z.enum(Object.values(Category)).optional(),
   speciality: z.enum(Object.values(Speciality)).optional(),
   experienceLevel: z.enum(Object.values(ExperienceLevel)).optional(),
-  perHourRate: z.preprocess(
-    (val) => {
-      if (val === "" || val === null || val === undefined) return null;
-      const num = Number(val);
-      return isNaN(num) ? null : num;
-    },
-    z.number().positive("Rate must be positive").nullable().optional()
-  ),
+  perHourRate: z.preprocess((val) => {
+    if (val === "" || val === null || val === undefined) return null;
+    const num = Number(val);
+    return isNaN(num) ? null : num;
+  }, z.number().positive("Rate must be positive").nullable().optional()),
   languages: z.string().optional().nullable(),
   portfolioLink: optionalUrl,
   otherLink: optionalUrl,

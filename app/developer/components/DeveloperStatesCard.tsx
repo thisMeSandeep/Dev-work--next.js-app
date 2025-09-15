@@ -5,7 +5,6 @@ import {
   Briefcase,
   DollarSign,
   FileText,
-  Star,
 } from "lucide-react";
 
 interface DeveloperStatsCardProps {
