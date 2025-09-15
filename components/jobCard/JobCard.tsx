@@ -3,13 +3,13 @@
 import { Heart, Loader2, MapPin } from "lucide-react";
 import { motion, Variants } from "motion/react";
 import SkillSlider from "./SkillsSlider";
-import { JobDTO } from "@/types/customtypes";
 import { formatString } from "@/lib/formatString";
 import { useSaveJob } from "@/hooks/useSaveJob";
 import toast from "react-hot-toast";
+import { JobWithClient } from "@/types/type";
 
 interface JobCardProps {
-  job: JobDTO;
+  job: JobWithClient;
   onClick: (id: string) => void;
   index?: number; // staggered reveal
 }
