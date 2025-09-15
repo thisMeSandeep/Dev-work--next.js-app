@@ -70,7 +70,7 @@ export interface JobCoreDTO {
   budget: number;
   status: JobStatus;
   numberOfProposals: number;
-  completed: boolean;
+  completed?: boolean;
   scopeSize: ScopeSize;
   duration: ScopeDuration;
   experienceRequired: ExperienceLevel;

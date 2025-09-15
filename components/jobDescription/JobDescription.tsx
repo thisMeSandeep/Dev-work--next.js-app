@@ -12,25 +12,34 @@ import {
 } from "lucide-react";
 import Reviews from "./Reviews";
 import { Button } from "../ui/button";
-import { JobDTO } from "@/types/customtypes";
-import { getAJobAction } from "@/actions/job.action";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import JobDetailsSkeleton from "../loader/JobDetailsSkeleton";
 import { useSaveJob } from "@/hooks/useSaveJob";
 import Link from "next/link";
+import { getJobDetailsAction } from "@/actions/job.action";
+import { JobWithClient } from "@/types/type";
+import Image from "next/image";
 type JobProps = {
   jobId: string;
 };
 
-const JobDescription = ({ jobId }: JobProps) => {
-  const [job, setJob] = useState<JobDTO>();
-  const [loading, setLoading] = useState(false);
 
-  //fetch job using jobId
+const JobDescription = ({ jobId }: JobProps) => {
+  const [job, setJob] = useState<JobWithClient>();
+  const [loading, setLoading] = useState(false);
+  const [readMore, setReadMore] = useState(false);
+
+
+  // scroll to top
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  // fetch job details
   const fetchJob = async (jobId: string) => {
     setLoading(true);
-    const response = await getAJobAction(jobId);
+    const response = await getJobDetailsAction(jobId);
     if (response.success) {
       setJob(response.job);
     } else {
@@ -49,7 +58,7 @@ const JobDescription = ({ jobId }: JobProps) => {
     return <JobDetailsSkeleton />;
   }
 
-  // handle save job action
+  // handle save job
   const handleSaveJob = async () => {
     if (!job) return;
 
@@ -61,11 +70,19 @@ const JobDescription = ({ jobId }: JobProps) => {
     }
   };
 
+  // description handling
+  const MAX_LENGTH = 250;
+  const isLong = job?.description && job.description.length > MAX_LENGTH;
+  const visibleDescription =
+    !isLong || readMore
+      ? job?.description
+      : job?.description.slice(0, MAX_LENGTH) + "...";
+
   return (
     <div className="max-w-5xl mx-auto px-6 sm:px-10 py-10 space-y-12">
       {/* Job Header */}
       <header className="space-y-3">
-        <h1 className="text-xl sm:text-2xl font-semibold text-gray-700">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
           {job?.title}
         </h1>
         <div className="flex flex-wrap text-sm items-center gap-6 text-gray-600 ">
@@ -103,11 +120,23 @@ const JobDescription = ({ jobId }: JobProps) => {
       </section>
 
       {/* Job Summary */}
-      <section className="space-y-4">
+      <section className="space-y-4 relative">
         <h2 className="text-2xl font-semibold text-gray-800">Summary</h2>
-        <p className="text-gray-700 text-sm leading-relaxed">
-          {job?.description}
+        <p
+          className={`text-gray-700 text-sm leading-relaxed whitespace-pre-line ${!readMore && isLong ? "line-clamp-6" : ""
+            }`}
+        >
+          {visibleDescription}
         </p>
+
+        {isLong && (
+          <button
+            onClick={() => setReadMore(!readMore)}
+            className="text-green-600 hover:text-green-700 text-sm font-medium mt-2"
+          >
+            {readMore ? "Hide" : "Read more"}
+          </button>
+        )}
       </section>
 
       {/* Price & Level */}
@@ -115,14 +144,16 @@ const JobDescription = ({ jobId }: JobProps) => {
         <div className="flex items-start gap-3">
           <DollarSign className="size-5 mt-1 text-gray-500" />
           <div>
-            <p className="text-lg font-medium text-gray-900">{job?.budget}</p>
+            <p className="text-lg font-semibold text-gray-900">
+              {job?.budget}
+            </p>
             <p className="text-sm text-gray-500">Fixed-price</p>
           </div>
         </div>
         <div className="flex items-start gap-3">
           <UserPen className="size-5 mt-1 text-gray-500" />
           <div>
-            <p className="text-lg font-medium text-gray-900">
+            <p className="text-lg font-semibold text-gray-900">
               {job?.experienceRequired}
             </p>
             <p className="text-sm text-gray-500">Experience</p>
@@ -160,7 +191,7 @@ const JobDescription = ({ jobId }: JobProps) => {
           {job?.skills?.map((skill, i) => (
             <li
               key={i}
-              className="text-sm bg-gray-100 text-gray-800 px-4 py-1 rounded-2xl"
+              className="text-sm bg-gray-100 text-gray-800 px-4 py-1 rounded-2xl hover:bg-green-100 transition"
             >
               {skill}
             </li>
@@ -176,13 +207,29 @@ const JobDescription = ({ jobId }: JobProps) => {
       </footer>
 
       {/* Client Details */}
-      <section className="mt-10 border p-6 px-5 bg-white rounded-lg shadow-sm space-y-5">
+      <section className="mt-10 border p-6 bg-white rounded-2xl shadow-sm space-y-5">
         <h2 className="text-2xl font-semibold text-gray-900">
           About the Client
         </h2>
 
+        {/* profile */}
+        {job?.client.user.profileImage ? (
+          <Image
+            src={job.client.user.profileImage}
+            height={96}
+            width={96}
+            alt="user profile"
+            className="w-24 h-24 rounded-full object-cover border-2 border-green-500"
+          />
+        ) : (
+          <div className="w-24 h-24 flex items-center justify-center rounded-full bg-green-100 text-green-700 font-bold text-xl border-2 border-green-500">
+            {job?.client.user.firstName?.[0] || ""}
+            {job?.client.user.lastName?.[0] || ""}
+          </div>
+        )}
+
         <div>
-          <p className="text-lg font-medium text-gray-900 capitalize">
+          <p className="text-lg font-semibold text-gray-900 capitalize">
             {job?.client.user.firstName + " " + job?.client.user.lastName}
           </p>
           <p className="text-gray-600">{job?.client.company}</p>
@@ -238,8 +285,8 @@ const JobDescription = ({ jobId }: JobProps) => {
             <MapPin className="size-5 text-gray-500" />
             {job?.client?.user?.country || "Not Available"}
           </p>
-          <p>4 jobs posted</p>
-          <p>$482 total spent</p>
+          <p>{job?.client?.jobsPosted || 0} jobs posted</p>
+          <p>${job?.client.totalSpent || 0} total spent</p>
           <p>
             Member since{" "}
             {job?.createdAt
@@ -258,7 +305,7 @@ const JobDescription = ({ jobId }: JobProps) => {
 
       {/* Action Buttons */}
       <div className="flex flex-wrap gap-4 mt-10">
-        <Button className="flex-1 bg-green-600 hover:bg-green-700 text-white font-medium rounded-md cursor-pointer p-0">
+        <Button className="flex-1 bg-green-600 hover:bg-green-700 text-white font-medium rounded-md cursor-pointer p-0 transition">
           <Link
             href={`/developer/make-proposal?jobId=${jobId}`}
             className="flex items-center justify-center w-full h-full py-3"
@@ -269,12 +316,10 @@ const JobDescription = ({ jobId }: JobProps) => {
 
         <Button
           onClick={handleSaveJob}
-          className="flex-1 bg-white border border-green-600 text-green-600 font-medium rounded-md py-3 flex items-center justify-center gap-2 hover:bg-green-500 hover:text-white duration-300 cursor-pointer"
+          className="flex-1 bg-white border border-green-600 text-green-600 font-medium rounded-md py-3 flex items-center justify-center gap-2 hover:bg-green-500 hover:text-white transition"
         >
           {saveJobLoading ? (
-            <div className="p-1.5 rounded-full">
-              <Loader2 className="h-5 w-5 animate-spin text-green-700" />
-            </div>
+            <Loader2 className="h-5 w-5 animate-spin text-green-700" />
           ) : (
             <Heart className="size-5" />
           )}
@@ -286,3 +331,4 @@ const JobDescription = ({ jobId }: JobProps) => {
 };
 
 export default JobDescription;
+

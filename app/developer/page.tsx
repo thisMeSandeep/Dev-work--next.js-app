@@ -15,14 +15,14 @@ import {
 } from "@/components/ui/select";
 
 import { categories, specialities } from "@/data/JobData";
-import { JobDTO } from "@/types/customtypes";
+import { JobWithClient } from "@/types/type";
 
 import { ArrowRight, FileQuestion, Search } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
 const Developer = () => {
-  const [jobs, setJobs] = useState<JobDTO[]>([]);
+  const [jobs, setJobs] = useState<JobWithClient[]>([]);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
   const [speciality, setSpeciality] = useState("");

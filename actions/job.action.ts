@@ -1,6 +1,6 @@
 "use server";
 import { prisma } from "@/lib/prisma";
-import { JobDTO } from "@/types/customtypes";
+import { JobWithClient } from "@/types/type";
 
 interface GetJobsParams {
   category?: string; // filter by category
@@ -8,16 +8,12 @@ interface GetJobsParams {
   search?: string; // search text
 }
 
-interface GetJobsResponse {
-  jobs: JobDTO[];
-}
-
 // -------------------get jobs---------------------
 export const getJobsAction = async ({
   category,
   speciality,
   search,
-}: GetJobsParams): Promise<GetJobsResponse> => {
+}: GetJobsParams) => {
   // Build where clause
   const where: any = {
     status: "OPEN",
@@ -49,8 +45,7 @@ export const getJobsAction = async ({
     },
   });
 
-  // Transform the Prisma result to match JobData interface
-  const transformedJobs: JobDTO[] = jobs.map((job: any) => ({
+  const transformedJobs: JobWithClient[] = jobs.map((job: any) => ({
     id: job.id,
     title: job.title,
     description: job.description,
@@ -92,7 +87,7 @@ export const getJobsAction = async ({
 };
 
 //---------------------get a job--------------------
-export const getAJobAction = async (jobId: string) => {
+export const getJobDetailsAction = async (jobId: string) => {
   if (!jobId) {
     return {
       success: false,
@@ -125,7 +120,7 @@ export const getAJobAction = async (jobId: string) => {
     };
   }
 
-  const transformedJob: JobDTO = {
+  const transformedJob: JobWithClient = {
     id: job.id,
     title: job.title,
     description: job.description,
@@ -140,7 +135,7 @@ export const getAJobAction = async (jobId: string) => {
     experienceRequired: job.experienceRequired,
     connectsRequired: job.connectsRequired,
     attachment: job.attachment,
-    createdAt: job.createdAt.toISOString(),
+    createdAt: job.createdAt,
     clientId: job.clientId,
     client: {
       id: job.client.id,
@@ -149,14 +144,15 @@ export const getAJobAction = async (jobId: string) => {
       company: job.client.company,
       websiteLink: job.client.websiteLink,
       rating: job.client.rating,
+      jobsPosted: job.client.jobsPosted,
+      jobsHired: job.client.jobsHired,
       user: {
         id: job.client.user.id,
         firstName: job.client.user.firstName,
         lastName: job.client.user.lastName,
         email: job.client.user.email,
-
-        country: job.client.user.country,
         role: job.client.user.role,
+        country: job.client.user.country,
         profileImage: job.client.user.profileImage,
       },
     },
