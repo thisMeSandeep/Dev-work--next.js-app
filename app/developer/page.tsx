@@ -28,7 +28,7 @@ const Developer = () => {
   const [speciality, setSpeciality] = useState("");
   const [loading, setLoading] = useState(false);
   const [openDrawer, setOpenDrawer] = useState(false);
-  const [jobId, setJobId] = useState<string>("");
+
 
   // fetch jobs
   const fetchJobs = async () => {
@@ -48,7 +48,9 @@ const Developer = () => {
   }, []);
 
   const handleJobClick = (jobId: string) => {
-    setJobId(jobId);
+    const url = new URL(window.location.href);
+    url.searchParams.set('job', jobId);
+    window.history.pushState({}, '', url);
     setOpenDrawer(true);
   };
 
@@ -147,11 +149,11 @@ const Developer = () => {
           isOpen={openDrawer}
           onClose={() => {
             setOpenDrawer(false);
-            setJobId("");
+            window.history.pushState({}, '', '/developer/saved-jobs');
           }}
           headerTitle="Job desciption"
         >
-          {jobId && <JobDescription jobId={jobId} />}
+          {<JobDescription />}
         </Drawer>
       )}
     </div>

@@ -20,15 +20,18 @@ import Link from "next/link";
 import { getJobDetailsAction } from "@/actions/job.action";
 import { JobWithClient } from "@/types/type";
 import Image from "next/image";
-type JobProps = {
-  jobId: string;
-};
+import { useSearchParams } from "next/navigation";
+import CollapsibleText from "../reusable/CollapsibleText";
 
 
-const JobDescription = ({ jobId }: JobProps) => {
+const JobDescription = () => {
   const [job, setJob] = useState<JobWithClient>();
   const [loading, setLoading] = useState(false);
-  const [readMore, setReadMore] = useState(false);
+
+
+  const searchParams = useSearchParams();
+  const jobId = searchParams.get("job");
+
 
 
   // scroll to top
@@ -49,6 +52,7 @@ const JobDescription = ({ jobId }: JobProps) => {
   };
 
   useEffect(() => {
+    if(!jobId) return;
     fetchJob(jobId);
   }, [jobId]);
 
@@ -70,13 +74,6 @@ const JobDescription = ({ jobId }: JobProps) => {
     }
   };
 
-  // description handling
-  const MAX_LENGTH = 250;
-  const isLong = job?.description && job.description.length > MAX_LENGTH;
-  const visibleDescription =
-    !isLong || readMore
-      ? job?.description
-      : job?.description.slice(0, MAX_LENGTH) + "...";
 
   return (
     <div className="max-w-5xl mx-auto px-6 sm:px-10 py-10 space-y-12">
@@ -122,21 +119,7 @@ const JobDescription = ({ jobId }: JobProps) => {
       {/* Job Summary */}
       <section className="space-y-4 relative">
         <h2 className="text-2xl font-semibold text-gray-800">Summary</h2>
-        <p
-          className={`text-gray-700 text-sm leading-relaxed whitespace-pre-line ${!readMore && isLong ? "line-clamp-6" : ""
-            }`}
-        >
-          {visibleDescription}
-        </p>
-
-        {isLong && (
-          <button
-            onClick={() => setReadMore(!readMore)}
-            className="text-green-600 hover:text-green-700 text-sm font-medium mt-2"
-          >
-            {readMore ? "Hide" : "Read more"}
-          </button>
-        )}
+        <CollapsibleText text={job?.description ?? ""} />
       </section>
 
       {/* Price & Level */}

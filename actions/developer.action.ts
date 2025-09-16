@@ -11,6 +11,7 @@ import { proposalSchema } from "@/lib/schemas/proposal.schema";
 import { ProposalSchemaType } from "@/lib/schemas/proposal.schema";
 import { EstimatedDuration } from "@prisma/client";
 import { ProposalDTO } from "@/types/propoalDTO";
+import { JobCoreDTO } from "@/types/CoreDTO";
 
 // -----------------action to update developer profile---------------
 export const updateDeveloperProfileAction = async (
@@ -190,6 +191,30 @@ export const unsaveJobAction = async (jobId: string) => {
   }
 };
 
+//------------------get saved jobs----------------------
+export const getSavedJobsAction = async () => {
+  try {
+    const userId = await getUserId();
+    if (!userId) {
+      return { success: false, message: "User not authenticated" };
+    }
+
+    //get saved jobs
+    const savedJobs: JobCoreDTO[] = await prisma.job.findMany({
+      where: {
+        savedBy: {
+          some: { userId },
+        },
+      },
+    });
+
+    return { success: true, data: savedJobs };
+  } catch (error) {
+    console.error("Error getting saved jobs:", error);
+    return { success: false, message: "Something went wrong" };
+  }
+};
+
 // ---------- send a proposal action--------------
 export async function createProposalAction(
   jobId: string,
@@ -255,7 +280,7 @@ export async function createProposalAction(
         coverLetter,
         message: message ?? null,
         rate: rate,
-        duration: (duration as EstimatedDuration),
+        duration: duration as EstimatedDuration,
         attachedFile: fileUrl ?? null,
         freelancerProfile: {
           connect: { id: freelancer.id },

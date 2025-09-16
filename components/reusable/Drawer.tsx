@@ -2,7 +2,7 @@
 
 import { ArrowLeft } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
-import React from "react";
+import { useEffect } from "react";
 
 interface DrawerProps {
   isOpen: boolean;
@@ -17,6 +17,16 @@ const Drawer= ({
   children,
   headerTitle,
 }:DrawerProps) => {
+
+  
+  // scroll to top
+  useEffect(()=>{
+    if(isOpen){
+      window.scrollTo(0, 0);
+    }
+  },[isOpen])
+
+
   return (
     <AnimatePresence>
       {isOpen && (
