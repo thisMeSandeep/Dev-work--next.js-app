@@ -3,6 +3,7 @@
 import {
   CheckCircle,
   DollarSign,
+  ExternalLink,
   Heart,
   Link2,
   Loader2,
@@ -32,13 +33,6 @@ const JobDescription = () => {
   const searchParams = useSearchParams();
   const jobId = searchParams.get("job");
 
-
-
-  // scroll to top
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
   // fetch job details
   const fetchJob = async (jobId: string) => {
     setLoading(true);
@@ -52,7 +46,7 @@ const JobDescription = () => {
   };
 
   useEffect(() => {
-    if(!jobId) return;
+    if (!jobId) return;
     fetchJob(jobId);
   }, [jobId]);
 
@@ -76,7 +70,19 @@ const JobDescription = () => {
 
 
   return (
-    <div className="max-w-5xl mx-auto px-6 sm:px-10 py-10 space-y-12">
+    <div className="max-w-5xl mx-auto px-6 sm:px-10 py-5 space-y-12">
+
+      <Link
+        href={`/job/?_id=${jobId}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-green-500 flex items-center justify-end gap-2 text-sm"
+      >
+        <ExternalLink />
+        Open Job in a new Window
+      </Link>
+
+
       {/* Job Header */}
       <header className="space-y-3">
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">

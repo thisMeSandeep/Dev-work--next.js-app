@@ -3,8 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { formatDate } from "@/lib/formatDate";
 import { formatString } from "@/lib/formatString";
-import { ProposalDTO } from "@/types/propoalDTO"
-import { Calendar, CircleDot, Wallet, FileText, MessageSquare, DollarSign, Clock, Paperclip, CheckCircle2, FileX, X, Pencil, Loader2 } from "lucide-react";
+import { Calendar, CircleDot, Wallet, FileText, MessageSquare, DollarSign, Clock, Paperclip, CheckCircle2, FileX, X, Pencil, Loader2, ExternalLink } from "lucide-react";
 import { useState } from "react";
 import ProposalForm from "./ProposalForm";
 import { withdrawProposalAction } from "@/actions/developer.action";
@@ -12,6 +11,7 @@ import toast from "react-hot-toast";
 import { fetchAndSetProposals } from "@/lib/fetchProposals";
 import { useProposalStore } from "@/store/proposalStore";
 import CollapsibleText from "@/components/reusable/CollapsibleText";
+import Link from "next/link";
 
 
 
@@ -80,7 +80,15 @@ const ProposalDetails = ({ proposalId }: ProposalProps) => {
                     </span>
                 </div>
 
-                <button className="text-green-500 hover:underline cursor-pointer">View job details</button>
+                <Link
+                    href={`/job/?_id=${proposal.job.id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-green-500 flex items-center gap-2 text-sm"
+                >
+                    <ExternalLink />
+                    Open Job in a new Window
+                </Link>
             </div>
 
 
