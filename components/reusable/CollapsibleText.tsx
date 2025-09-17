@@ -23,7 +23,7 @@ const CollapsibleText = ({ text }: ReadMoreParagraphProps) => {
 
             {isLong && (
                 <button
-                    className="mt-1 text-blue-500 text-sm font-medium hover:underline"
+                    className="mt-1 text-green-500 text-sm font-medium hover:underline"
                     onClick={() => setReadMore(!readMore)}
                 >
                     {readMore ? "Hide" : "Read More"}

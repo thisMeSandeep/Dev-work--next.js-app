@@ -9,7 +9,8 @@ import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import ProposalDetails from "../components/ProposalDetails";
 import { useProposalStore } from "@/store/proposalStore";
-const Proposals = () => {
+
+const ProposalsList = () => {
   const [proposalId, setproposalId] = useState<string | null>(null);
 
   const proposals = useProposalStore((state) => state.proposals);
@@ -52,7 +53,7 @@ const Proposals = () => {
                   <h1 className="text-2xl font-semibold">{proposal.job.title}</h1>
                   <p className="text-gray-500 ">Proposal submitted on {formatDate(proposal?.createdAt.toString())}</p>
                 </div>
-                <p className="text-gray-800 text-sm">{proposal.coverLetter}</p>
+                <p className="text-gray-800 text-sm whitespace-pre-line line-clamp-3">{proposal.coverLetter}</p>
                 <button onClick={() => handleDrawerOpen(proposal.id)} className="text-green-600 font-medium hover:underline cursor-pointer">View full details</button>
                 <p>Status:<span className="text-gray-800 font-semibold">{proposal.status}</span></p>
               </div>
@@ -73,4 +74,4 @@ const Proposals = () => {
   );
 };
 
-export default Proposals;
+export default ProposalsList;

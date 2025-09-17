@@ -11,6 +11,7 @@ import { withdrawProposalAction } from "@/actions/developer.action";
 import toast from "react-hot-toast";
 import { fetchAndSetProposals } from "@/lib/fetchProposals";
 import { useProposalStore } from "@/store/proposalStore";
+import CollapsibleText from "@/components/reusable/CollapsibleText";
 
 
 
@@ -25,9 +26,6 @@ const ProposalDetails = ({ proposalId }: ProposalProps) => {
     const proposal = useProposalStore(state => state.getProposalById(proposalId));
 
     if (!proposal) return <p>No proposal found</p>;
-
-
-
 
 
     // withdraw proposal
@@ -61,9 +59,7 @@ const ProposalDetails = ({ proposalId }: ProposalProps) => {
                     {proposal.job.title}
                 </h1>
 
-                <p className="text-gray-600 text-sm leading-relaxed">
-                    {proposal.job.description}
-                </p>
+                <CollapsibleText text={proposal.job.description} />
 
                 <div className="flex items-center gap-6 text-sm">
                     {/* Budget */}
@@ -101,9 +97,7 @@ const ProposalDetails = ({ proposalId }: ProposalProps) => {
                     <p className="flex items-center gap-2 text-sm font-medium text-gray-700">
                         <FileText size={16} className="text-gray-500" /> Cover Letter
                     </p>
-                    <p className="text-gray-600 text-sm leading-relaxed">
-                        {proposal.coverLetter}
-                    </p>
+                    <CollapsibleText text={proposal.coverLetter} />
                 </div>
 
                 {/* Message */}
@@ -165,36 +159,67 @@ const ProposalDetails = ({ proposalId }: ProposalProps) => {
 
                 {/* Actions */}
                 <div className="flex flex-col sm:flex-row gap-3 pt-4">
-                    <Button onClick={withdrawProposal} variant="destructive" className="w-full sm:w-auto cursor-pointer">
-                        {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Withdraw proposal"}
-                    </Button>
-                    <Button
-                        onClick={() => setIsEdit((prev) => !prev)}
-                        variant="outline"
-                        className="w-full sm:w-auto flex items-center gap-2 justify-center px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition cursor-pointer"
-                    >
-                        {isEdit ? (
-                            <>
-                                <X size={16} className="text-red-500" />
-                                Cancel edit
-                            </>
-                        ) : (
-                            <>
-                                <Pencil size={16} className="text-green-500" />
-                                Edit proposal
-                            </>
-                        )}
-                    </Button>
+                    {proposal.status === "PENDING" && (
+                        <>
+                            <Button
+                                onClick={withdrawProposal}
+                                variant="destructive"
+                                className="w-full sm:w-auto cursor-pointer"
+                            >
+                                {loading ? (
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                ) : (
+                                    "Withdraw proposal"
+                                )}
+                            </Button>
+
+                            <Button
+                                onClick={() => setIsEdit((prev) => !prev)}
+                                variant="outline"
+                                className="w-full sm:w-auto flex items-center gap-2 justify-center px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition cursor-pointer"
+                            >
+                                {isEdit ? (
+                                    <>
+                                        <X size={16} className="text-red-500" />
+                                        Cancel edit
+                                    </>
+                                ) : (
+                                    <>
+                                        <Pencil size={16} className="text-green-500" />
+                                        Edit proposal
+                                    </>
+                                )}
+                            </Button>
+                        </>
+                    )}
+
+                    {proposal.status === "WITHDRAWN" && (
+                        <Button
+                            onClick={() => setIsEdit((prev) => !prev)}
+                            variant="outline"
+                            className="w-full sm:w-auto flex items-center gap-2 justify-center px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition cursor-pointer"
+                        >
+                            {isEdit ? (
+                                <>
+                                    <X size={16} className="text-red-500" />
+                                    Cancel edit
+                                </>
+                            ) : (
+                                <>
+                                    <Pencil size={16} className="text-green-500" />
+                                    Edit proposal
+                                </>
+                            )}
+                        </Button>
+                    )}
                 </div>
+
             </div>
 
             {/* proposal form */}
             <div>
                 {isEdit && <ProposalForm proposalId={proposalId} />}
             </div>
-
-
-
         </div>
     )
 }

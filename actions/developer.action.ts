@@ -215,7 +215,7 @@ export const getSavedJobsAction = async () => {
   }
 };
 
-// ---------- send a proposal action--------------
+// -----------------------send a proposal action------------------
 export async function createProposalAction(
   jobId: string,
   data: ProposalSchemaType
@@ -258,7 +258,7 @@ export async function createProposalAction(
     if (existingProposal) {
       return {
         success: false,
-        message: "You already have an active proposal for this job.",
+        message: "You have already sent a proposal for this job.",
       };
     }
 
@@ -307,11 +307,20 @@ export async function createProposalAction(
   }
 }
 
-//update a proposal action
+//--------------------------update a proposal action------------------
 export async function updateProposalAction(
   proposalId: string,
   data: ProposalSchemaType
 ) {
+  const userId = await getUserId();
+
+  if (!userId) {
+    return {
+      success: false,
+      message: "User not authenticated",
+    };
+  }
+
   try {
     if (!proposalId) {
       return { success: false, message: "Proposal ID not provided" };
@@ -333,16 +342,7 @@ export async function updateProposalAction(
       return { success: false, message: "Proposal not found" };
     }
 
-    // Optional: check if the user owns this proposal (security)
-    const userId = await getUserId();
-
-    if (!userId) {
-      return {
-        success: false,
-        message: "User not authenticated",
-      };
-    }
-
+    // Check if the user owns this proposal
     const freelancer = await prisma.freelancerProfile.findUnique({
       where: { userId },
       select: { id: true },
@@ -351,6 +351,17 @@ export async function updateProposalAction(
       return {
         success: false,
         message: "Not authorized to update this proposal",
+      };
+    }
+
+    // Allow update only if proposal is pending or withdrawn
+    if (
+      existingProposal.status !== "PENDING" &&
+      existingProposal.status !== "WITHDRAWN"
+    ) {
+      return {
+        success: false,
+        message: `Proposal cannot be updated once ${existingProposal.status.toLowerCase()}`,
       };
     }
 
@@ -366,6 +377,12 @@ export async function updateProposalAction(
       }
     }
 
+    // If proposal was withdrawn and user updates it, switch back to pending
+    const newStatus =
+      existingProposal.status === "WITHDRAWN"
+        ? "PENDING"
+        : existingProposal.status;
+
     // Update the proposal
     await prisma.proposal.update({
       where: { id: proposalId },
@@ -375,6 +392,7 @@ export async function updateProposalAction(
         rate: rate ?? null,
         duration: (duration as EstimatedDuration) ?? null,
         attachedFile: fileUrl ?? null,
+        status: newStatus,
       },
     });
 

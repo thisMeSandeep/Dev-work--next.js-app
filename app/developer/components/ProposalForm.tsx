@@ -13,7 +13,6 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
 import { Sparkle, UploadIcon } from "lucide-react";
 import {
   Tooltip,
@@ -27,6 +26,7 @@ import { createProposalAction, updateProposalAction } from "@/actions/developer.
 import toast from "react-hot-toast";
 import { fetchAndSetProposals } from "@/lib/fetchProposals";
 import { useProposalStore } from "@/store/proposalStore";
+import LoadingButton from "@/components/loader/LoadingButton";
 
 
 
@@ -178,7 +178,7 @@ export default function ProposalForm({
       {/* Rate */}
       <div className="space-y-2">
         <Label htmlFor="rate">
-          Rate (Optional - Your offered price for this job)
+          Rate (Your offered price for this job)
         </Label>
         <Input
           id="rate"
@@ -195,7 +195,7 @@ export default function ProposalForm({
       {/* Duration */}
       <div className="space-y-2 relative">
         <Label htmlFor="duration">
-          Duration (Optional - Estimated time you can finish this job)
+          Duration (Estimated time you can finish this job)
         </Label>
         <Select value={getValues("duration")} onValueChange={(val) => setValue("duration", val)} >
           <SelectTrigger className={selectStyles}>
@@ -249,13 +249,15 @@ export default function ProposalForm({
       </div>
 
       {/* Submit */}
-      <Button
-        type="submit"
-        disabled={loading}
-        className="bg-green-500 hover:bg-green-600 cursor-pointer disabled:cursor-not-allowed"
-      >
-        {loading ? "Sending proposal..." : "Submit Proposal"}
-      </Button>
+      <div className="w-full sm:w-[250px]">
+        <LoadingButton
+          type="submit"
+          isLoading={loading}
+          disabled={loading}
+        >
+          {loading ? "Sending proposal..." : "Submit Proposal"}
+        </LoadingButton>
+      </div>
     </form>
   );
 }
