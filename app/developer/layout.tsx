@@ -11,6 +11,7 @@ const navLinks = [
   { name: "Find work", path: "/developer" },
   { name: "Saved Jobs", path: "/developer/saved-jobs" },
   { name: "Proposals", path: "/developer/proposals" },
+  { name: "Requests", path: "/developer/requests" },
 ];
 
 const profileLinks = [

@@ -12,6 +12,7 @@ import { ProposalSchemaType } from "@/lib/schemas/proposal.schema";
 import { EstimatedDuration } from "@prisma/client";
 import { ProposalDTO } from "@/types/propoalDTO";
 import { JobCoreDTO } from "@/types/CoreDTO";
+import { RequestWithClient } from "@/types/type";
 
 // -----------------action to update developer profile---------------
 export const updateDeveloperProfileAction = async (
@@ -523,3 +524,41 @@ export async function withdrawProposalAction(proposalId: string) {
     };
   }
 }
+
+//-----------------------get all requests made to a dev---------------
+export const getRequestsAction = async () => {
+  const userId = await getUserId();
+
+  if (!userId) {
+    return { success: false, message: "User not authenticated" };
+  }
+
+  try {
+    const freelancer = await prisma.freelancerProfile.findUnique({
+      where: { userId },
+      select: { id: true },
+    });
+
+    if (!freelancer) {
+      return { success: false, message: "Profile not found" };
+    }
+
+    // Fetch requests with client + user data
+    const requests: RequestWithClient[] = await prisma.clientRequest.findMany({
+      where: { developerId: freelancer.id },
+      include: {
+        client: { include: { user: true } },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    return {
+      success: true,
+      requests,
+    };
+  } catch (error) {
+    console.error("getRequestsAction error:", error);
+    return { success: false, message: "Something went wrong" };
+  }
+};
+

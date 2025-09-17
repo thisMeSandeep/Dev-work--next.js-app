@@ -1,5 +1,6 @@
 import {
   ClientProfileCoreDTO,
+  ClientRequestCoreDTO,
   FreelancerProfileCoreDTO,
   JobCoreDTO,
   UserCoreDTO,
@@ -16,5 +17,9 @@ export type ClientWithUser = ClientProfileCoreDTO & {
 };
 
 export type JobWithClient = JobCoreDTO & {
+  client: ClientWithUser;
+};
+
+export type RequestWithClient = ClientRequestCoreDTO & {
   client: ClientWithUser;
 };
