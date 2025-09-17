@@ -25,6 +25,7 @@ const SavedJobsList = ({ jobs }: { jobs: JobCoreDTO[] }) => {
                 toast.error(response.message);
             } else {
                 toast.success(response.message);
+                router.refresh();
             }
         } catch (err) {
             console.error(err);

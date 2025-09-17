@@ -79,7 +79,6 @@ export interface JobCoreDTO {
   createdAt: Date;
   clientId: string;
   hiredFreelancerId?: string | null;
-
 }
 
 // Proposal

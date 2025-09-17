@@ -31,6 +31,8 @@ const cardVariants: Variants = {
 const WorkCard = ({ job, onClick, index = 0 }: JobCardProps) => {
   const { saveJob, loading } = useSaveJob();
 
+  
+
   // handle save job action
   const handleSaveJob = async () => {
     const response = await saveJob(job.id);
