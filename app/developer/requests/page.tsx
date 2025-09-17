@@ -39,10 +39,10 @@ const Requests = async () => {
 
                     <Link
                         href="/developer/profile"
-                        className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-blue-600 text-white hover:bg-blue-700 transition"
+                        className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-green-600 text-white hover:bg-green-700 transition"
                     >
                         <User size={20} />
-                        <span>Fill your profile to get noticed</span>
+                        <span className='text-sm sm:text-lg'>Fill your profile to get noticed</span>
                     </Link>
 
                 </div>
