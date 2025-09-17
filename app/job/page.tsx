@@ -14,11 +14,12 @@ import ErrorPage from "@/components/reusable/ErrorPage";
 
 
 interface JobPageProps {
-    searchParams: { _id?: string };
+    searchParams: Record<string, string | string[] | undefined>;
 }
 
 const Job = async ({ searchParams }: JobPageProps) => {
-    const jobId = searchParams._id;
+    
+    const jobId = searchParams._id as string | undefined;
 
     if (!jobId) {
         return <ErrorPage />
