@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { formatString } from "@/lib/formatString";
 import { useUserStore } from "@/store/userStore";
+import CollapsibleText from "@/components/reusable/CollapsibleText";
 
 const DeveloperProfileDisplay = () => {
 
@@ -52,9 +53,7 @@ const DeveloperProfileDisplay = () => {
           <span className="flex items-center gap-2 font-medium text-green-700">
             <FileText className="w-4 h-4" /> Bio
           </span>
-          <span className="whitespace-pre-wrap">
-            {user?.FreelancerProfile?.bio || "No bio provided"}
-          </span>
+          <CollapsibleText text={ user?.FreelancerProfile?.bio || "No bio provided"} />
         </div>
 
         {/* Skills */}

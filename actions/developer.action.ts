@@ -9,7 +9,7 @@ import { getUserId } from "@/lib/server-utils";
 import { uploadFile } from "@/lib/uploadFile";
 import { proposalSchema } from "@/lib/schemas/proposal.schema";
 import { ProposalSchemaType } from "@/lib/schemas/proposal.schema";
-import { EstimatedDuration } from "@prisma/client";
+import { ClientRequestStatus, EstimatedDuration } from "@prisma/client";
 import { ProposalDTO } from "@/types/propoalDTO";
 import { JobCoreDTO } from "@/types/CoreDTO";
 import { RequestWithClient } from "@/types/type";
@@ -545,7 +545,7 @@ export const getRequestsAction = async () => {
 
     // Fetch requests with client + user data
     const requests: RequestWithClient[] = await prisma.clientRequest.findMany({
-      where: { developerId: freelancer.id },
+      where: { developerId: freelancer.id , status: "PENDING"},
       include: {
         client: { include: { user: true } },
       },
@@ -561,4 +561,71 @@ export const getRequestsAction = async () => {
     return { success: false, message: "Something went wrong" };
   }
 };
+
+
+//-------------------set status of a request---------------------
+export const setRequestStatusAction = async (
+  requestId: string,
+  status: ClientRequestStatus
+) => {
+  try {
+    const userId = await getUserId();
+    if (!userId) {
+      return { success: false, message: "User not authenticated" };
+    }
+
+    // Fetch freelancer profile of logged-in user
+    const freelancer = await prisma.freelancerProfile.findUnique({
+      where: { userId },
+      select: { id: true },
+    });
+
+    if (!freelancer) {
+      return { success: false, message: "Freelancer profile not found" };
+    }
+
+    // Fetch the request
+    const request = await prisma.clientRequest.findUnique({
+      where: { id: requestId },
+      select: { id: true, developerId: true, status: true },
+    });
+
+    if (!request) {
+      return { success: false, message: "Request not found" };
+    }
+
+    // Only assigned freelancer can update
+    if (request.developerId !== freelancer.id) {
+      return {
+        success: false,
+        message: "Not authorized to update this request",
+      };
+    }
+
+    // Prevent redundant updates
+    if (request.status === status) {
+      return { success: false, message: `Request is already ${status}` };
+    }
+
+    // Prevent updates once request is finalized (ACCEPTED or REJECTED)
+    if (["ACCEPTED", "REJECTED"].includes(request.status)) {
+      return {
+        success: false,
+        message: "Cannot update a request that has already been finalized",
+      };
+    }
+
+    await prisma.clientRequest.update({
+      where: { id: requestId },
+      data: { status },
+    });
+
+    return { success: true, message: "Request status updated successfully" };
+  } catch (error) {
+    console.error("Error updating request status:", error);
+    return { success: false, message: "Something went wrong" };
+  }
+};
+
+
 

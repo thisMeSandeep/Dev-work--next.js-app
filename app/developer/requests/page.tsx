@@ -5,7 +5,8 @@ import { RequestWithClient } from '@/types/type';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
-import { User,  Clipboard,  X } from 'lucide-react';  
+import { User, Clipboard, X } from 'lucide-react';
+import RequestActions from './RequestAction';
 
 const Requests = async () => {
     const response = await getRequestsAction();
@@ -26,7 +27,7 @@ const Requests = async () => {
                     {/* Empty illustration */}
                     <div className="w-48 h-48">
                         <img
-                            src="https://undraw.co/illustration/empty_4zx0"   
+                            src="/assets/empty.svg"
                             alt="No requests illustration"
                             className="w-full h-full object-contain"
                         />
@@ -96,16 +97,7 @@ const Requests = async () => {
                             </div>
 
                             {/* Action buttons */}
-                            <div className="flex flex-col sm:flex-row sm:justify-end gap-3 mt-6">
-                                <button className="px-4 py-2 text-sm rounded-2xl bg-green-600 text-white hover:bg-green-700 cursor-pointer transition w-full sm:w-auto flex items-center justify-center gap-1">
-                                    <User size={16} /> {/* Replace with relevant Lucide icon */}
-                                    Accept
-                                </button>
-                                <button className="px-4 py-2 text-sm rounded-2xl bg-red-600 text-white hover:bg-red-700 cursor-pointer transition w-full sm:w-auto flex items-center justify-center gap-1">
-                                    <X size={16} />
-                                    Reject
-                                </button>
-                            </div>
+                            <RequestActions requestId={req.id} />
                         </div>
                     ))}
                 </div>
