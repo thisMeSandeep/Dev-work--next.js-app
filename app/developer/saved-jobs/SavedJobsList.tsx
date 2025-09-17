@@ -9,6 +9,7 @@ import Drawer from "@/components/reusable/Drawer";
 import JobDescription from "@/components/jobDescription/JobDescription";
 import { JobCoreDTO } from "@/types/CoreDTO";
 import { useRouter } from "next/navigation";
+import { formatString } from "@/lib/formatString";
 
 const SavedJobsList = ({ jobs }: { jobs: JobCoreDTO[] }) => {
 
@@ -103,7 +104,7 @@ const SavedJobsList = ({ jobs }: { jobs: JobCoreDTO[] }) => {
 
                         {/* meta */}
                         <p className="mt-3 text-gray-500 text-sm">
-                            {job.category} • {job.experienceRequired} • ${job.budget}
+                            {formatString(job.category)} • {job.experienceRequired} • ${job.budget}
                         </p>
 
                         {/* description */}

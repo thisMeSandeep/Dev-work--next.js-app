@@ -100,7 +100,7 @@ const WorkCard = ({ job, onClick, index = 0 }: JobCardProps) => {
         </div>
 
         {/* client info */}
-        <div className="mt-5 text-gray-500 flex items-center gap-6 text-sm">
+        <div className="mt-5 text-gray-500 flex items-center  flex-wrap gap-6 text-sm text-nowrap ">
           <span>
             <span className="font-medium">Client:</span>{" "}
             {job.client.user.firstName} {job.client.user.lastName}

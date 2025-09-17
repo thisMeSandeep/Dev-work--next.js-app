@@ -21,7 +21,7 @@ const JobsList = ({ jobs }: { jobs: JobWithClient[] }) => {
         <div>
         
             {/* jobs list */}
-            <div className="mt-10">
+            <div className="mt-5 md:mt-8">
                 {jobs.length === 0 ? (
                     <div className="h-[60vh] flex flex-col items-center justify-center text-center text-gray-500">
                         <FileQuestion className="h-16 w-16 mb-4 text-gray-400" />

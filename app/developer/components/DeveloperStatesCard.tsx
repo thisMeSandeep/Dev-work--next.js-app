@@ -23,7 +23,7 @@ export const DeveloperStatsCard = ({
   totalEarnings,
 }: DeveloperStatsCardProps) => {
   return (
-    <Card className="w-full p-6 rounded-md border-none shadow-none">
+    <Card className="w-full border-none shadow-none">
       <h2 className="text-xl md:text-2xl font-semibold text-green-700 mb-6">
         Developer Stats
       </h2>

@@ -117,7 +117,9 @@ const MakeProposal = () => {
               </p>
 
               <Link
-                href={`/job?jobId=${job?.id}`}
+                href={`/job/?_id=${jobId}`}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-green-600 underline"
               >
                 View job posting

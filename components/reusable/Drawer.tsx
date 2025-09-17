@@ -57,7 +57,7 @@ const Drawer= ({
               </div>
 
               {/* Scrollable Content */}
-              <div className="flex-1 overflow-y-auto p-6">{children}</div>
+              <div className="flex-1 overflow-y-auto p-4 sm:p-5 md:p-6">{children}</div>
             </div>
           </motion.div>
         </div>

@@ -31,7 +31,7 @@ const DeveloperProfile = () => {
 
   return (
 
-    <div className="max-w-7xl mx-auto py-10 px-4 md:px-10 space-y-5">
+    <div className="max-w-7xl mx-auto py-10 px-5 sm:px-6 md:px-10 space-y-5">
 
 
       {/* Profile Header: image + name + location + edit button */}

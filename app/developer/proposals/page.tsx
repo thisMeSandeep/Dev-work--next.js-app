@@ -1,14 +1,12 @@
 "use client";
 
-import { fetchProposalsAction } from "@/actions/developer.action";
 import ProposalSkeleton from "@/components/loader/ProposalSkeleton";
 import Drawer from "@/components/reusable/Drawer";
 import { formatDate } from "@/lib/formatDate";
-import { ProposalDTO } from "@/types/propoalDTO";
 import React, { useEffect, useState } from "react";
-import toast from "react-hot-toast";
 import ProposalDetails from "../components/ProposalDetails";
 import { useProposalStore } from "@/store/proposalStore";
+import { Star } from "lucide-react";
 
 const ProposalsList = () => {
   const [proposalId, setproposalId] = useState<string | null>(null);
@@ -30,7 +28,7 @@ const ProposalsList = () => {
 
   return (
     <>
-      <div className="max-w-7xl mx-auto py-10 px-4 md:px-10 space-y-10">
+      <div className="max-w-7xl mx-auto py-10 px-5 md:px-10 space-y-10">
         <h1 className="text-2xl md:text-3xl font-semibold mb-10">
           Your Proposals
         </h1>
@@ -50,7 +48,12 @@ const ProposalsList = () => {
             {proposals?.map((proposal) => (
               <div key={proposal.id} className="space-y-5">
                 <div className="flex items-start gap-5 justify-between flex-col sm:flex-row">
-                  <h1 className="text-2xl font-semibold">{proposal.job.title}</h1>
+                  <h1 className="text-2xl font-semibold flex items-center gap-2">
+                    {proposal.job.title}
+                    {proposal.status === "ACCEPTED" && (
+                      <Star className="shrink-0 w-6 h-6 text-yellow-500 fill-yellow-500" />
+                    )}
+                  </h1>
                   <p className="text-gray-500 ">Proposal submitted on {formatDate(proposal?.createdAt.toString())}</p>
                 </div>
                 <p className="text-gray-800 text-sm whitespace-pre-line line-clamp-3">{proposal.coverLetter}</p>

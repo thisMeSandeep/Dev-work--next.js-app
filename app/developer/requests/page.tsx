@@ -23,7 +23,7 @@ const Requests = async () => {
             </h1>
 
             {response.requests?.length === 0 ? (
-                <div className="flex flex-col items-center justify-center bg-gray-50 border border-gray-200 rounded-xl p-10 space-y-6 text-center">
+                <div className="flex flex-col items-center justify-center space-y-6 text-center">
                     {/* Empty illustration */}
                     <div className="w-48 h-48">
                         <img

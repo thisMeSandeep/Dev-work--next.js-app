@@ -23,6 +23,7 @@ import { JobWithClient } from "@/types/type";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import CollapsibleText from "../reusable/CollapsibleText";
+import { formatString } from "@/lib/formatString";
 
 
 const JobDescription = () => {
@@ -70,7 +71,7 @@ const JobDescription = () => {
 
 
   return (
-    <div className="max-w-5xl mx-auto px-6 sm:px-10 py-5 space-y-12">
+    <div className="max-w-5xl mx-auto  sm:px-10 py-5 space-y-12">
 
       <Link
         href={`/job/?_id=${jobId}`}
@@ -149,6 +150,44 @@ const JobDescription = () => {
           </div>
         </div>
       </section>
+
+      <hr />
+
+      {/* other states */}
+      <section className="mt-8">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="p-4 ">
+            <p className="text-sm text-gray-500">Category</p>
+            <p className="text-base font-medium text-gray-800">{job?.category && formatString(job.category)}</p>
+          </div>
+          <div className="p-4">
+            <p className="text-sm text-gray-500">Scope</p>
+            <p className="text-base font-medium text-gray-800">{job?.scopeSize}</p>
+          </div>
+          <div className="p-4">
+            <p className="text-sm text-gray-500">Duration</p>
+            <p className="text-base font-medium text-gray-800">{job?.duration && formatString(job.duration)}</p>
+          </div>
+          <div className="p-4 ">
+            <p className="text-sm text-gray-500">Proposals Received</p>
+            <p className="text-base font-medium text-gray-800">{job?.numberOfProposals}</p>
+          </div>
+          <div className="p-4 ">
+            <p className="text-sm text-gray-500">Status</p>
+            <p
+              className={`text-base font-medium ${job?.status === "OPEN"
+                ? "text-green-600"
+                : job?.status === "CLOSED"
+                  ? "text-red-600"
+                  : "text-gray-800"
+                }`}
+            >
+              {job?.status}
+            </p>
+          </div>
+        </div>
+      </section>
+
 
       {/* Attachment */}
       <section className="border-t border-gray-200 pt-8">
@@ -293,8 +332,8 @@ const JobDescription = () => {
       <Reviews />
 
       {/* Action Buttons */}
-      <div className="flex flex-wrap gap-4 mt-10">
-        <Button className="flex-1 bg-green-600 hover:bg-green-700 text-white font-medium rounded-md cursor-pointer p-0 transition">
+      <div className="flex items-center flex-col sm:flex-row gap-4 mt-10">
+        <Button className="w-full flex-1 bg-green-600 hover:bg-green-700 text-white font-medium rounded-md cursor-pointer p-0 transition">
           <Link
             href={`/developer/make-proposal?jobId=${jobId}`}
             className="flex items-center justify-center w-full h-full py-3"
@@ -305,7 +344,7 @@ const JobDescription = () => {
 
         <Button
           onClick={handleSaveJob}
-          className="flex-1 bg-white border border-green-600 text-green-600 font-medium rounded-md py-3 flex items-center justify-center gap-2 hover:bg-green-500 hover:text-white transition"
+          className=" w-full flex-1 bg-white border border-green-600 text-green-600 font-medium rounded-md py-3 flex items-center justify-center gap-2 hover:bg-green-500 hover:text-white transition"
         >
           {saveJobLoading ? (
             <Loader2 className="h-5 w-5 animate-spin text-green-700" />

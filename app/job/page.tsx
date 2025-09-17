@@ -11,11 +11,12 @@ import { getJobDetailsAction } from "@/actions/job.action";
 import Image from "next/image";
 import CollapsibleText from "@/components/reusable/CollapsibleText";
 import ErrorPage from "@/components/reusable/ErrorPage";
+import { formatString } from "@/lib/formatString";
 
 
 interface JobPageProps {
     searchParams: Promise<{ _id?: string }>;
-  }
+}
 
 const Job = async ({ searchParams }: JobPageProps) => {
 
@@ -99,6 +100,41 @@ const Job = async ({ searchParams }: JobPageProps) => {
                             {job.experienceRequired}
                         </p>
                         <p className="text-sm text-gray-500">Experience</p>
+                    </div>
+                </div>
+            </section>
+
+            {/* other states */}
+            <section className="mt-8">
+                <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="p-4 ">
+                        <p className="text-sm text-gray-500">Category</p>
+                        <p className="text-base font-medium text-gray-800">{job?.category && formatString(job.category)}</p>
+                    </div>
+                    <div className="p-4">
+                        <p className="text-sm text-gray-500">Scope</p>
+                        <p className="text-base font-medium text-gray-800">{job?.scopeSize}</p>
+                    </div>
+                    <div className="p-4">
+                        <p className="text-sm text-gray-500">Duration</p>
+                        <p className="text-base font-medium text-gray-800">{job?.duration && formatString(job.duration)}</p>
+                    </div>
+                    <div className="p-4 ">
+                        <p className="text-sm text-gray-500">Proposals Received</p>
+                        <p className="text-base font-medium text-gray-800">{job?.numberOfProposals}</p>
+                    </div>
+                    <div className="p-4 ">
+                        <p className="text-sm text-gray-500">Status</p>
+                        <p
+                            className={`text-base font-medium ${job?.status === "OPEN"
+                                ? "text-green-600"
+                                : job?.status === "CLOSED"
+                                    ? "text-red-600"
+                                    : "text-gray-800"
+                                }`}
+                        >
+                            {job?.status}
+                        </p>
                     </div>
                 </div>
             </section>

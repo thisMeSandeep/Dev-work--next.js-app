@@ -115,7 +115,7 @@ const DeveloperProfileForm = ({ onSuccess }: Props) => {
   };
 
   return (
-    <div className="w-full p-6 rounded-md border-none shadow-none">
+    <div className="w-full">
       {/* Header */}
       <div className="mb-6">
         <h2 className="text-xl md:text-2xl font-semibold text-green-700">
