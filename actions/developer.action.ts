@@ -13,6 +13,7 @@ import { ClientRequestStatus, EstimatedDuration } from "@prisma/client";
 import { ProposalDTO } from "@/types/propoalDTO";
 import { JobCoreDTO } from "@/types/CoreDTO";
 import { RequestWithClient } from "@/types/type";
+import { revalidateTag, unstable_cache } from "next/cache";
 
 // -----------------action to update developer profile---------------
 export const updateDeveloperProfileAction = async (
@@ -93,6 +94,9 @@ export const updateDeveloperProfileAction = async (
       },
     });
 
+    // Invalidate developer profile caches
+    revalidateTag("dev:" + developer.id + ":profile");
+
     return { success: true, message: "Developer profile updated" };
   } catch (err) {
     console.error("Error updating developer profile:", err);
@@ -138,6 +142,9 @@ export const saveJobAction = async (jobId: string) => {
         },
       },
     });
+
+    // Invalidate saved jobs cache for developer
+    revalidateTag("dev:" + profile.id + ":saved-jobs");
 
     return { success: true, message: "Job saved" };
   } catch (error) {
@@ -185,6 +192,9 @@ export const unsaveJobAction = async (jobId: string) => {
       },
     });
 
+    // Invalidate saved jobs cache for developer
+    revalidateTag("dev:" + profile.id + ":saved-jobs");
+
     return { success: true, message: "Job unsaved" };
   } catch (error) {
     console.error("Error unsaving job:", error);
@@ -200,14 +210,29 @@ export const getSavedJobsAction = async () => {
       return { success: false, message: "User not authenticated" };
     }
 
-    //get saved jobs
-    const savedJobs: JobCoreDTO[] = await prisma.job.findMany({
-      where: {
-        savedBy: {
-          some: { userId },
-        },
-      },
+    // get developer id for tagging
+    const dev = await prisma.freelancerProfile.findUnique({
+      where: { userId },
+      select: { id: true },
     });
+
+    //get saved jobs (cached)
+    const getSavedJobsCached = unstable_cache(
+      async (uid: string) => {
+        const savedJobs: JobCoreDTO[] = await prisma.job.findMany({
+          where: {
+            savedBy: {
+              some: { userId: uid },
+            },
+          },
+        });
+        return savedJobs;
+      },
+      ["dev-saved-jobs", String(userId)],
+      { tags: dev ? ["dev:" + dev.id + ":saved-jobs"] : undefined }
+    );
+
+    const savedJobs = await getSavedJobsCached(userId);
 
     return { success: true, data: savedJobs };
   } catch (error) {
@@ -297,6 +322,10 @@ export async function createProposalAction(
       where: { id: jobId },
       data: { numberOfProposals: { increment: 1 } },
     });
+
+    // Invalidate caches related to proposals for this job and developer
+    revalidateTag("job:" + jobId + ":proposals");
+    revalidateTag("dev:" + freelancer.id + ":proposals");
 
     return { success: true, message: "Proposal created successfully" };
   } catch (error: any) {
@@ -397,6 +426,10 @@ export async function updateProposalAction(
       },
     });
 
+    // Invalidate developer proposals cache
+    revalidateTag("dev:" + freelancer.id + ":proposals");
+    revalidateTag("job:" + existingProposal.jobId + ":proposals");
+
     return { success: true, message: "Proposal updated successfully" };
   } catch (error: any) {
     console.error("Error updating proposal:", error);
@@ -433,25 +466,34 @@ export async function fetchProposalsAction(): Promise<FetchProposalsResponse> {
       return { success: false, message: "Freelancer profile not found" };
     }
 
-    //  Fetch proposals
-    const proposals: ProposalDTO[] = await prisma.proposal.findMany({
-      where: { freelancerProfileId: freelancer.id },
-      include: {
-        job: {
-          select: {
-            id: true,
-            title: true,
-            description: true,
-            budget: true,
-            status: true,
-            createdAt: true,
+    //  Fetch proposals (cached)
+    const getDevProposalsCached = unstable_cache(
+      async (freelancerId: string) => {
+        const proposals: ProposalDTO[] = await prisma.proposal.findMany({
+          where: { freelancerProfileId: freelancerId },
+          include: {
+            job: {
+              select: {
+                id: true,
+                title: true,
+                description: true,
+                budget: true,
+                status: true,
+                createdAt: true,
+              },
+            },
           },
-        },
+          orderBy: {
+            createdAt: "desc",
+          },
+        });
+        return proposals;
       },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
+      ["dev-proposals", freelancer.id],
+      { tags: ["dev:" + freelancer.id + ":proposals"] }
+    );
+
+    const proposals = await getDevProposalsCached(freelancer.id);
 
     return {
       success: true,
@@ -515,6 +557,9 @@ export async function withdrawProposalAction(proposalId: string) {
       data: { status: "WITHDRAWN" },
     });
 
+    // Invalidate caches
+    revalidateTag("dev:" + freelancer.id + ":proposals");
+
     return { success: true, message: "Proposal withdrawn successfully" };
   } catch (error: any) {
     console.error("Error withdrawing proposal:", error);
@@ -543,14 +588,23 @@ export const getRequestsAction = async () => {
       return { success: false, message: "Profile not found" };
     }
 
-    // Fetch requests with client + user data
-    const requests: RequestWithClient[] = await prisma.clientRequest.findMany({
-      where: { developerId: freelancer.id , status: "PENDING"},
-      include: {
-        client: { include: { user: true } },
+    // Fetch requests with client + user data (cached)
+    const getRequestsCached = unstable_cache(
+      async (developerId: string) => {
+        const requests: RequestWithClient[] = await prisma.clientRequest.findMany({
+          where: { developerId, status: "PENDING" },
+          include: {
+            client: { include: { user: true } },
+          },
+          orderBy: { createdAt: "desc" },
+        });
+        return requests;
       },
-      orderBy: { createdAt: "desc" },
-    });
+      ["dev-requests", freelancer.id],
+      { tags: ["dev:" + freelancer.id + ":requests"] }
+    );
+
+    const requests = await getRequestsCached(freelancer.id);
 
     return {
       success: true,
@@ -619,6 +673,9 @@ export const setRequestStatusAction = async (
       where: { id: requestId },
       data: { status },
     });
+
+    // Invalidate requests cache for this developer
+    revalidateTag("dev:" + freelancer.id + ":requests");
 
     return { success: true, message: "Request status updated successfully" };
   } catch (error) {

@@ -1,16 +1,12 @@
-"use client";
-
-import { useUserStore } from "@/store/userStore";
 import { Award, Briefcase, DollarSign, User, Users } from "lucide-react";
-import { useClientJobsStore } from "@/store/clientJobsStore";
 import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
 import { formatString } from "@/lib/formatString";
+import { getPostedJobsAction } from "@/actions/client.actions";
 
-const PostedJobs = () => {
-  const user = useUserStore((state) => state.user);
-
-  const jobs = useClientJobsStore((state) => state.jobs);
+const PostedJobs = async () => {
+  const res = await getPostedJobsAction();
+  const jobs = res.success ? res.jobs ?? [] : [];
 
   return (
     <div className="max-w-7xl mx-auto py-5  px-4 md:px-10">
@@ -35,7 +31,7 @@ const PostedJobs = () => {
 
       {/* Show empty jobs area */}
       <div className=" mt-10">
-        {!user?.ClientProfile?.jobsPosted ? (
+        {jobs.length === 0 ? (
           <div className="flex flex-col items-center text-center space-y-3 text-gray-600">
             <Briefcase className="h-12 w-12 text-green-600" />
             <p className="text-lg font-medium">No jobs posted yet</p>
@@ -52,11 +48,11 @@ const PostedJobs = () => {
         ) : (
           <div>
             <h3 className="text-lg font-semibold text-gray-700">
-              {jobs?.length} jobs posted
+              {jobs.length} jobs posted
             </h3>
           {/* jobs list */}
             <div className="space-y-5 mt-5">
-              {jobs?.map((job) => (
+              {jobs.map((job) => (
                 <Card
                   key={job.id}
                   className="transition-all border-none shadow-none"

@@ -3,10 +3,9 @@
 import { changeJobStatusAction } from "@/actions/client.actions";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { JobStatus } from "@prisma/client";
-import { fetchClientJobsAndSet } from "@/lib/fetchClientJobs";
 import { useTransition } from "react";
 import toast from "react-hot-toast";
-// import { updateJobStatusAction } from "@/actions/job";
+import { useRouter } from "next/navigation";
 
 const statuses = ["OPEN", "ONGOING", "CLOSED", "COMPLETED"] as const;
 
@@ -18,6 +17,7 @@ export function JobStatusToggle({
   currentStatus: JobStatus;
 }) {
   const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
   const handleStatusChange = (newStatus: JobStatus) => {
     if (!newStatus || newStatus === currentStatus) return;
@@ -28,7 +28,7 @@ export function JobStatusToggle({
         status: newStatus,
       });
       if (response.success) {
-        await fetchClientJobsAndSet();
+        router.refresh();
         toast.success(response.message);
       } else {
         toast.error(response.message);

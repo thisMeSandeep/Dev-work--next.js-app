@@ -1,10 +1,10 @@
-import { getJobProposalsAction } from "@/actions/client.actions";
+"use client";
 import {
   FreelancerProfileCoreDTO,
   ProposalCoreDTO,
   UserCoreDTO,
 } from "@/types/CoreDTO";
-import { useEffect, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import {
   Table,
   TableBody,
@@ -20,14 +20,13 @@ import Popup from "@/components/reusable/Popup";
 import DeveloperProfile from "@/components/reusable/DeveloperProfile";
 import ProposalView from "./ProposalView";
 
-type ProposalWithUser = ProposalCoreDTO & {
+export type ProposalWithUser = ProposalCoreDTO & {
   freelancerProfile: FreelancerProfileCoreDTO & {
     user: UserCoreDTO;
   };
 };
 
-const ProposalsTable = ({ jobId }: { jobId: string }) => {
-  const [proposals, setProposals] = useState<ProposalWithUser[]>([]);
+const ProposalsTable = ({ proposals }: { proposals: ProposalWithUser[] }) => {
   const [openPopup, setOpenPopup] = useState(false);
   const [selectedProposal, setSelectedProposal] =
     useState<ProposalWithUser | null>(null);
@@ -35,37 +34,41 @@ const ProposalsTable = ({ jobId }: { jobId: string }) => {
     null
   );
 
-  // fetch proposals
-  const fetchProposals = async () => {
-    const response = await getJobProposalsAction(jobId);
-    if (response.success) {
-      setProposals(response.proposals ?? []);
-    }
-  };
+  const developerData = useMemo(
+    () => ({
+      firstName: selectedProposal?.freelancerProfile.user.firstName ?? "",
+      lastName: selectedProposal?.freelancerProfile.user.lastName ?? "",
+      email: selectedProposal?.freelancerProfile.user.email ?? "",
+      country: selectedProposal?.freelancerProfile.user.country ?? null,
+      profileImage:
+        selectedProposal?.freelancerProfile.user.profileImage ?? null,
 
-  useEffect(() => {
-    fetchProposals();
-  }, [jobId]);
+      mobile: selectedProposal?.freelancerProfile.mobile ?? null,
+      bio: selectedProposal?.freelancerProfile.bio ?? null,
+      skills: selectedProposal?.freelancerProfile.skills ?? [],
+      category: selectedProposal?.freelancerProfile.category ?? null,
+      speciality: selectedProposal?.freelancerProfile.speciality ?? null,
+      experienceLevel:
+        selectedProposal?.freelancerProfile.experienceLevel ?? null,
+      perHourRate: selectedProposal?.freelancerProfile.perHourRate ?? null,
+      languages: selectedProposal?.freelancerProfile.languages ?? null,
+      portfolioLink: selectedProposal?.freelancerProfile.portfolioLink ?? null,
+      otherLink: selectedProposal?.freelancerProfile.otherLink ?? null,
+    }),
+    [selectedProposal]
+  );
 
-  const developerData = {
-    firstName: selectedProposal?.freelancerProfile.user.firstName ?? "",
-    lastName: selectedProposal?.freelancerProfile.user.lastName ?? "",
-    email: selectedProposal?.freelancerProfile.user.email ?? "",
-    country: selectedProposal?.freelancerProfile.user.country ?? null,
-    profileImage: selectedProposal?.freelancerProfile.user.profileImage ?? null,
+  const onViewProposal = useCallback((proposal: ProposalWithUser) => {
+    setSelectedProposal(proposal);
+    setViewType("proposal");
+    setOpenPopup(true);
+  }, []);
 
-    mobile: selectedProposal?.freelancerProfile.mobile ?? null,
-    bio: selectedProposal?.freelancerProfile.bio ?? null,
-    skills: selectedProposal?.freelancerProfile.skills ?? [],
-    category: selectedProposal?.freelancerProfile.category ?? null,
-    speciality: selectedProposal?.freelancerProfile.speciality ?? null,
-    experienceLevel:
-      selectedProposal?.freelancerProfile.experienceLevel ?? null,
-    perHourRate: selectedProposal?.freelancerProfile.perHourRate ?? null,
-    languages: selectedProposal?.freelancerProfile.languages ?? null,
-    portfolioLink: selectedProposal?.freelancerProfile.portfolioLink ?? null,
-    otherLink: selectedProposal?.freelancerProfile.otherLink ?? null,
-  };
+  const onViewDeveloper = useCallback((proposal: ProposalWithUser) => {
+    setSelectedProposal(proposal);
+    setViewType("developer");
+    setOpenPopup(true);
+  }, []);
 
   return (
     <div className="p-5">
@@ -111,11 +114,7 @@ const ProposalsTable = ({ jobId }: { jobId: string }) => {
               <TableCell>{proposal.status}</TableCell>
               <TableCell>
                 <button
-                  onClick={() => {
-                    setSelectedProposal(proposal);
-                    setViewType("proposal");
-                    setOpenPopup(true);
-                  }}
+                  onClick={() => onViewProposal(proposal)}
                   className=" flex items-center gap-2  hover:text-green-500 hover:underline cursor-pointer"
                 >
                   <ExternalLink className="h-4 w-4" />
@@ -124,11 +123,7 @@ const ProposalsTable = ({ jobId }: { jobId: string }) => {
               </TableCell>
               <TableCell>
                 <button
-                  onClick={() => {
-                    setSelectedProposal(proposal);
-                    setViewType("developer");
-                    setOpenPopup(true);
-                  }}
+                  onClick={() => onViewDeveloper(proposal)}
                   className=" flex items-center gap-2  hover:text-green-500 hover:underline cursor-pointer"
                 >
                   <ExternalLink className="h-4 w-4" />

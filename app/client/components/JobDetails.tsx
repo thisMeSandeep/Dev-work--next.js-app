@@ -1,6 +1,3 @@
-"use client";
-
-import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatString } from "@/lib/formatString";
 import { JobCoreDTO } from "@/types/CoreDTO";
@@ -16,13 +13,13 @@ import {
   UserCheck,
   Award,
 } from "lucide-react";
+import CollapsibleText from "@/components/reusable/CollapsibleText";
 
 interface JobDetailsProps {
   job: JobCoreDTO;
 }
 
 export default function JobDetails({ job }: JobDetailsProps) {
-  const [showFullDesc, setShowFullDesc] = useState(false);
 
   return (
     <Card className="border-none shadow-none p-0">
@@ -43,23 +40,7 @@ export default function JobDetails({ job }: JobDetailsProps) {
 
         {/* Description with Read More */}
         {job.description && (
-          <div className="flex flex-col gap-1">
-            <p
-              className={`text-gray-700 leading-relaxed whitespace-pre-line ${
-                showFullDesc ? "" : "line-clamp-3"
-              }`}
-            >
-              {job.description}
-            </p>
-            {job.description.length > 150 && (
-              <button
-                className="text-green-700 text-sm font-medium w-fit hover:underline"
-                onClick={() => setShowFullDesc((prev) => !prev)}
-              >
-                {showFullDesc ? "Show less" : "Read more"}
-              </button>
-            )}
-          </div>
+          <CollapsibleText text={job.description} />
         )}
 
         {/* Category & Speciality */}

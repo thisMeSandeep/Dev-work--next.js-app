@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
 import { getUserId } from "@/lib/server-utils";
 import { uploadFile } from "@/lib/uploadFile";
 import {
@@ -62,6 +63,78 @@ export const setClientProfileAction = async (data: ClientDataType) => {
     return { success: true, message: "Client profile saved" };
   } catch (err: any) {
     console.error(err);
+    return { success: false, message: "Something went wrong" };
+  }
+};
+
+// -------------- get single job by id (for current client scope) -----------
+export const getJobByIdAction = async (jobId: string) => {
+  try {
+    const userId = await getUserId();
+    if (!userId) {
+      return { success: false, message: "User not authenticated" };
+    }
+
+    // Ensure job belongs to current client
+    const client = await prisma.clientProfile.findUnique({
+      where: { userId },
+      select: { id: true },
+    });
+    if (!client) {
+      return { success: false, message: "Client profile not found" };
+    }
+
+    const job = await prisma.job.findFirst({
+      where: { id: jobId, clientId: client.id },
+    });
+
+    if (!job) {
+      return { success: false, message: "Job not found" };
+    }
+
+    return { success: true, job };
+  } catch (err) {
+    console.error("Error fetching job:", err);
+    return { success: false, message: "Something went wrong" };
+  }
+};
+
+// -------------- get hired developer profile for a job -----------
+export const getHiredDeveloperForJobAction = async (jobId: string) => {
+  try {
+    const job = await prisma.job.findUnique({
+      where: { id: jobId },
+      select: { hiredFreelancerId: true },
+    });
+
+    if (!job || !job.hiredFreelancerId) {
+      return { success: false, message: "No hired developer for this job" };
+    }
+
+    const profile = await prisma.freelancerProfile.findUnique({
+      where: { id: job.hiredFreelancerId },
+      include: {
+        user: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            country: true,
+            email: true,
+            role: true,
+            profileImage: true,
+          },
+        },
+      },
+    });
+
+    if (!profile) {
+      return { success: false, message: "Hired developer profile not found" };
+    }
+
+    return { success: true, profile };
+  } catch (err) {
+    console.error("Error fetching hired developer:", err);
     return { success: false, message: "Something went wrong" };
   }
 };
@@ -146,6 +219,15 @@ export const createJobAction = async (data: JobSchemaType) => {
       return job;
     });
 
+    // Revalidate client jobs cache and page so newly posted job appears immediately
+    const clientForTag = await prisma.clientProfile.findUnique({
+      where: { userId },
+      select: { id: true },
+    });
+    if (clientForTag) {
+      revalidateTag("client:" + clientForTag.id + ":jobs");
+    }
+    revalidatePath("/client/jobs");
     return {
       success: true,
       message: "Job posted successfully",
@@ -183,11 +265,20 @@ export const getPostedJobsAction = async () => {
       };
     }
 
-    //  get all the posted jobs by client
-    const jobs: JobCoreDTO[] = await prisma.job.findMany({
-      where: { clientId: client.id },
-      orderBy: { createdAt: "desc" },
-    });
+    //  get all the posted jobs by client (cached with tag)
+    const getClientJobsCached = unstable_cache(
+      async (clientId: string) => {
+        const jobs: JobCoreDTO[] = await prisma.job.findMany({
+          where: { clientId },
+          orderBy: { createdAt: "desc" },
+        });
+        return jobs;
+      },
+      ["client-jobs", client.id],
+      { tags: ["client:" + client.id + ":jobs"] }
+    );
+
+    const jobs = await getClientJobsCached(client.id);
 
     return {
       success: true,
@@ -238,6 +329,10 @@ export const changeJobStatusAction = async ({
       data: { status: status },
     });
 
+    // Invalidate caches
+    revalidateTag("job:" + jobId);
+    revalidateTag("client:" + client.id + ":jobs");
+
     return {
       success: true,
       message: `Job status changed to ${status.toLowerCase()} `,
@@ -254,28 +349,36 @@ export const changeJobStatusAction = async ({
 // --------------get all the proposals for a job------------
 export const getJobProposalsAction = async (jobId: string) => {
   try {
-    const proposals: (ProposalCoreDTO & {
-      freelancerProfile: FreelancerProfileCoreDTO & { user: UserCoreDTO };
-    })[] = await prisma.proposal.findMany({
-      where: { jobId },
-      include: {
-        freelancerProfile: {
+    const getProposalsCached = unstable_cache(
+      async (id: string) => {
+        const proposals: (ProposalCoreDTO & {
+          freelancerProfile: FreelancerProfileCoreDTO & { user: UserCoreDTO };
+        })[] = await prisma.proposal.findMany({
+          where: { jobId: id },
           include: {
-            user: {
-              select: {
-                id: true,
-                firstName: true,
-                lastName: true,
-                role: true,
-                country: true,
-                email: true,
-                profileImage: true,
+            freelancerProfile: {
+              include: {
+                user: {
+                  select: {
+                    id: true,
+                    firstName: true,
+                    lastName: true,
+                    role: true,
+                    country: true,
+                    email: true,
+                    profileImage: true,
+                  },
+                },
               },
             },
           },
-        },
+        });
+        return proposals;
       },
-    });
+      ["job-proposals", jobId],
+      { tags: ["job:" + jobId + ":proposals"] }
+    );
+    const proposals = await getProposalsCached(jobId);
     return { success: true, proposals };
   } catch (err) {
     console.error("Error fetching proposals:", err);
@@ -292,27 +395,35 @@ export const getSuggestedDevProfileAction = async ({
   speciality: Speciality;
 }) => {
   try {
-    // get profiles
-    const profiles = await prisma.freelancerProfile.findMany({
-      where: {
-        category: category,
-        speciality: speciality,
-        NOT: [{ category: null }, { speciality: null }],
-      },
-      include: {
-        user: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            country: true,
-            email: true,
-            role: true,
-            profileImage: true,
+    // get profiles (cached)
+    const getSuggestedCached = unstable_cache(
+      async (cat: Category, spec: Speciality) => {
+        const profiles = await prisma.freelancerProfile.findMany({
+          where: {
+            category: cat,
+            speciality: spec,
+            NOT: [{ category: null }, { speciality: null }],
           },
-        },
+          include: {
+            user: {
+              select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                country: true,
+                email: true,
+                role: true,
+                profileImage: true,
+              },
+            },
+          },
+        });
+        return profiles;
       },
-    });
+      ["suggested-devs", String(category), String(speciality)],
+      { tags: ["suggested:" + String(category) + ":" + String(speciality)] }
+    );
+    const profiles = await getSuggestedCached(category, speciality);
     return {
       success: true,
       profiles,
@@ -477,6 +588,12 @@ export const acceptProposalAction = async (proposalId: string) => {
       });
     });
 
+    // Invalidate related caches
+    revalidateTag("job:" + proposal.jobId + ":proposals");
+    revalidateTag("job:" + proposal.jobId + ":hired");
+    revalidateTag("job:" + proposal.jobId);
+    revalidateTag("client:" + client.id + ":jobs");
+
     return {
       success: true,
       message: "Proposal accepted successfully",
@@ -530,6 +647,9 @@ export const rejectProposalAction = async (proposalId: string) => {
       where: { id: proposalId },
       data: { status: "REJECTED" },
     });
+
+    // Invalidate proposals cache for job
+    revalidateTag("job:" + proposal.jobId + ":proposals");
 
     return {
       success: true,

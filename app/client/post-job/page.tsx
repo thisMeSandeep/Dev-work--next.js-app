@@ -28,7 +28,7 @@ import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
 import LoadingButton from "@/components/loader/LoadingButton";
 import { useGenerateJobData } from "@/hooks/useGenerateJobData";
-
+import { useRouter } from "next/navigation";
 
 // ------------------ Zod Schema ------------------
 const jobSchema = z.object({
@@ -74,6 +74,7 @@ const errorStyle = "text-red-500 text-sm";
 export default function CreateJob() {
   const [isLoading, setIsLoading] = useState(false);
   const [prompt, setPrompt] = useState("");
+  const router = useRouter();
 
   const { data, error, loading: aiLoading, generate } = useGenerateJobData();
 
@@ -88,8 +89,9 @@ export default function CreateJob() {
       toast.error("Please provide your job description");
       return;
     }
-    generate(prompt)
-  }
+    generate(prompt);
+    setPrompt("");
+  };
 
   const {
     register,
@@ -154,6 +156,7 @@ export default function CreateJob() {
       await fetchAndSetUser();
       reset();
       toast.success(response.message);
+      router.push("/client/jobs");
     } else {
       toast.error(response.message);
     }
@@ -182,7 +185,7 @@ export default function CreateJob() {
             className="flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-lime-500 hover:from-emerald-600 hover:to-lime-600 text-white font-medium px-4 py-2 rounded-sm  transition cursor-pointer"
           >
             <Sparkles className="w-4 h-4" />
-            {aiLoading ? 'Generating...' : 'Generate with AI'}
+            {aiLoading ? "Generating..." : "Generate with AI"}
           </Button>
         </div>
       </div>

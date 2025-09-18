@@ -1,8 +1,6 @@
 "use client";
 
-import { getSuggestedDevProfileAction } from "@/actions/client.actions";
-import { Category, Speciality } from "@prisma/client";
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { FreelancerProfileCoreDTO, UserCoreDTO } from "@/types/CoreDTO";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,38 +8,20 @@ import { formatString } from "@/lib/formatString";
 import Drawer from "@/components/reusable/Drawer";
 import DevProfileView from "./DevProfileView";
 
-type Props = {
-  category: Category;
-  speciality: Speciality;
-};
-
-type DevWithUser = FreelancerProfileCoreDTO & {
+export type DevWithUser = FreelancerProfileCoreDTO & {
   user: UserCoreDTO;
 };
 
-const SuggestedDevs = ({ category, speciality }: Props) => {
-  const [profiles, setProfiles] = useState<DevWithUser[]>([]);
+const SuggestedDevs = ({ profiles }: { profiles: DevWithUser[] }) => {
   const [viewProfile, setViewProfile] = useState<DevWithUser | null>(null);
 
-  // fetch suggested dev list
-  const fetchSuggestedDevs = async () => {
-    const response = await getSuggestedDevProfileAction({
-      category,
-      speciality,
-    });
-    if (response.success) {
-      setProfiles(response.profiles ?? []);
-    }
-  };
-
-  useEffect(() => {
-    fetchSuggestedDevs();
-  }, [category, speciality]);
-
-  const getInitials = (firstName?: string | null, lastName?: string | null) => {
-    if (!firstName && !lastName) return "NA";
-    return `${firstName?.[0] ?? ""}${lastName?.[0] ?? ""}`.toUpperCase();
-  };
+  const getInitials = useCallback(
+    (firstName?: string | null, lastName?: string | null) => {
+      if (!firstName && !lastName) return "NA";
+      return `${firstName?.[0] ?? ""}${lastName?.[0] ?? ""}`.toUpperCase();
+    },
+    []
+  );
 
   return (
     <section className="p-4">
