@@ -1,36 +1,100 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## Getting Started
+# 🚀 Dev Work
 
-First, run the development server:
+Dev Work is a freelance marketplace platform inspired by Upwork, built with **Next.js 15 App Router**. It connects clients and developers, providing authentication, project postings, and AI-powered enhancements.
+
+## 📌 Features
+
+* 🔐 **Authentication** – JWT + NextAuth with Google & GitHub providers
+* 🗄 **Database** – PostgreSQL with Prisma ORM
+* 🎨 **UI/UX** – Tailwind CSS, Radix UI, shadcn components, Lucide Icons
+* ⚡ **State Management** – Zustand
+* 📤 **Email Services** – Nodemailer integration
+* 🤖 **AI Integration** – Google Generative AI + Vercel AI SDK
+* 📦 **Form Handling** – React Hook Form + Zod validation
+* ☁️ **Supabase** – For storage and real-time features
+
+## 🛠 Tech Stack
+
+* **Framework**: Next.js 15 (App Router + Turbopack)
+* **Database**: PostgreSQL (Neon + Prisma)
+* **Auth**: NextAuth.js (Google, GitHub, JWT)
+* **Styling**: Tailwind CSS 4, Radix UI, Motion
+* **AI**: Vercel AI SDK, Google Generative AI
+* **Other**: Zustand, Supabase, Nodemailer
+
+## ⚙️ Installation & Setup
+
+### 1️⃣ Clone the repo
+
+```bash
+git clone https://github.com/yourusername/devwork.git
+cd devwork
+```
+
+### 2️⃣ Install dependencies
+
+```bash
+npm install
+# or
+yarn install
+```
+
+### 3️⃣ Set up environment variables
+
+Create a `.env.local` file in the root directory and add:
+
+```env
+DATABASE_URL="YOUR_DATABASE_URL"
+
+AUTH_SECRET="YOUR_AUTH_SECRET" 
+AUTH_TRUST_HOST=true
+
+AUTH_GOOGLE_ID="YOUR_GOOGLE_CLIENT_ID"
+AUTH_GOOGLE_SECRET="YOUR_GOOGLE_CLIENT_SECRET"
+
+AUTH_GITHUB_ID="YOUR_GITHUB_CLIENT_ID"
+AUTH_GITHUB_SECRET="YOUR_GITHUB_CLIENT_SECRET"
+
+NEXT_PUBLIC_SUPABASE_URL="YOUR_SUPABASE_URL"
+NEXT_PUBLIC_SUPABASE_ANON_KEY="YOUR_SUPABASE_ANON_KEY"
+
+GOOGLE_GENERATIVE_AI_API_KEY="YOUR_GOOGLE_GENERATIVE_AI_KEY"
+```
+
+
+### 4️⃣ Run Prisma migrations
+
+```bash
+npx prisma generate
+npx prisma migrate dev
+```
+
+### 5️⃣ Start the development server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Visit 👉 https://devwork-two.vercel.app
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🌐 Deployment
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The easiest way to deploy Dev Work is on **Vercel**.
 
-## Learn More
+* Add all environment variables in your Vercel dashboard.
+* Push your repo to GitHub/GitLab/Bitbucket.
+* Connect it to Vercel and deploy.
 
-To learn more about Next.js, take a look at the following resources:
+## 📂 Project Scripts
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+* `npm run dev` – Start dev server with Turbopack
+* `npm run build` – Build project
+* `npm run start` – Start production server
+* `npm run lint` – Run ESLint checks
+* `postinstall` – Auto-generate Prisma client
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🤝 Contributing
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Contributions, issues, and feature requests are welcome!
+Feel free to open a PR or submit an issue.
