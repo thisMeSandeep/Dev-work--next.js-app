@@ -33,7 +33,6 @@ const JobsList = ({ jobs }: { jobs: JobWithClient[] }) => {
                             <JobCard
                                 key={job.id}
                                 job={job}
-                                index={i}
                                 onClick={handleJobClick}
                             />
                         ))}

@@ -25,8 +25,10 @@ import { ImageUp, Sparkles } from "lucide-react";
 import { createJobAction } from "@/actions/client.actions";
 import { fetchAndSetUser } from "@/lib/fetchUser";
 import toast from "react-hot-toast";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import LoadingButton from "@/components/loader/LoadingButton";
+import { useGenerateJobData } from "@/hooks/useGenerateJobData";
+
 
 // ------------------ Zod Schema ------------------
 const jobSchema = z.object({
@@ -71,6 +73,23 @@ const errorStyle = "text-red-500 text-sm";
 
 export default function CreateJob() {
   const [isLoading, setIsLoading] = useState(false);
+  const [prompt, setPrompt] = useState("");
+
+  const { data, error, loading: aiLoading, generate } = useGenerateJobData();
+
+  if (error) {
+    toast.error(error);
+  }
+
+  console.log("ai generated data:", data);
+
+  const handleAiGenerate = () => {
+    if (!prompt) {
+      toast.error("Please provide your job description");
+      return;
+    }
+    generate(prompt)
+  }
 
   const {
     register,
@@ -96,6 +115,29 @@ export default function CreateJob() {
     },
     mode: "onChange",
   });
+
+  // Watch select field values for controlled components
+  const watchedCategory = watch("category");
+  const watchedSpeciality = watch("speciality");
+  const watchedScopeSize = watch("scopeSize");
+  const watchedDuration = watch("duration");
+  const watchedExperienceRequired = watch("experienceRequired");
+
+  // Auto-fill form when AI data is available
+  useEffect(() => {
+    if (data) {
+      setValue("title", data.title);
+      setValue("description", data.description);
+      setValue("category", data.category);
+      setValue("speciality", data.speciality);
+      setValue("skills", data.skills.join(", ")); // Convert array to comma-separated string
+      setValue("budget", data.budget.toString()); // Convert number to string
+      setValue("scopeSize", data.scopeSize);
+      setValue("duration", data.duration);
+      setValue("experienceRequired", data.experienceRequired);
+      setValue("connectsRequired", data.connectsRequired.toString()); // Convert number to string
+    }
+  }, [data, setValue]);
 
   const onSubmit = async (data: JobSchemaType) => {
     setIsLoading(true);
@@ -129,15 +171,18 @@ export default function CreateJob() {
         {/* AI input field */}
         <div className="p-5 bg-gray-50 border border-green-400/50 rounded-sm space-y-3 ">
           <Textarea
+            onChange={(e) => setPrompt(e.target.value)}
             placeholder="e.g. I need a Next.js developer to build a portfolio website with animations..."
             className="w-full min-h-[120px] text-gray-600 resize-none rounded-sm border border-gray-300 px-3 py-2 text-sm focus-visible:border-green-500 focus-visible:ring-2 focus-visible:ring-green-500/20 focus-visible:outline-none transition"
           />
           <Button
             type="button"
+            onClick={handleAiGenerate}
+            disabled={aiLoading}
             className="flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-lime-500 hover:from-emerald-600 hover:to-lime-600 text-white font-medium px-4 py-2 rounded-sm  transition cursor-pointer"
           >
             <Sparkles className="w-4 h-4" />
-            Generate with AI
+            {aiLoading ? 'Generating...' : 'Generate with AI'}
           </Button>
         </div>
       </div>
@@ -176,7 +221,10 @@ export default function CreateJob() {
           {/* Category */}
           <div className={`${fieldStyle} w-full`}>
             <Label className={LabelStyle}>Category</Label>
-            <Select onValueChange={(val) => setValue("category", val)}>
+            <Select
+              value={watchedCategory}
+              onValueChange={(val) => setValue("category", val)}
+            >
               <SelectTrigger className={`${inputStyle} w-full`}>
                 <SelectValue placeholder="Select category" />
               </SelectTrigger>
@@ -196,7 +244,10 @@ export default function CreateJob() {
           {/* Speciality */}
           <div className={`${fieldStyle} w-full`}>
             <Label className={LabelStyle}>Speciality</Label>
-            <Select onValueChange={(val) => setValue("speciality", val)}>
+            <Select
+              value={watchedSpeciality}
+              onValueChange={(val) => setValue("speciality", val)}
+            >
               <SelectTrigger className={`${inputStyle} w-full`}>
                 <SelectValue placeholder="Select speciality" />
               </SelectTrigger>
@@ -246,7 +297,10 @@ export default function CreateJob() {
           {/* Scope Size */}
           <div className={`${fieldStyle} w-full`}>
             <Label className={LabelStyle}>Scope Size</Label>
-            <Select onValueChange={(val) => setValue("scopeSize", val)}>
+            <Select
+              value={watchedScopeSize}
+              onValueChange={(val) => setValue("scopeSize", val)}
+            >
               <SelectTrigger className={`${inputStyle} w-full`}>
                 <SelectValue placeholder="Select scope size" />
               </SelectTrigger>
@@ -266,7 +320,10 @@ export default function CreateJob() {
           {/* Duration */}
           <div className={`${fieldStyle} w-full`}>
             <Label className={LabelStyle}>Duration</Label>
-            <Select onValueChange={(val) => setValue("duration", val)}>
+            <Select
+              value={watchedDuration}
+              onValueChange={(val) => setValue("duration", val)}
+            >
               <SelectTrigger className={`${inputStyle} w-full`}>
                 <SelectValue placeholder="Select duration" />
               </SelectTrigger>
@@ -290,6 +347,7 @@ export default function CreateJob() {
           <div className={`${fieldStyle} w-full`}>
             <Label className={LabelStyle}>Experience Level</Label>
             <Select
+              value={watchedExperienceRequired}
               onValueChange={(val) => setValue("experienceRequired", val)}
             >
               <SelectTrigger className={`${inputStyle} w-full`}>
