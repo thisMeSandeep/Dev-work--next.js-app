@@ -17,7 +17,8 @@ const HiredSection = async ({ jobId }: { jobId: string }) => {
         <CardContent className="p-4 flex items-center gap-4">
           {dev.user.profileImage ? (
             <Image
-              fill
+              width={56}
+              height={56}
               src={dev.user.profileImage}
               alt={dev.user.firstName ?? "Developer"}
               className="w-14 h-14 rounded-full object-cover"
