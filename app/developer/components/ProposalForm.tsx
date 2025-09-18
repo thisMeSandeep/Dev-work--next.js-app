@@ -27,6 +27,7 @@ import toast from "react-hot-toast";
 import { fetchAndSetProposals } from "@/lib/fetchProposals";
 import { useProposalStore } from "@/store/proposalStore";
 import LoadingButton from "@/components/loader/LoadingButton";
+import { useEnhanceText } from "@/hooks/useEnhanceText";
 
 
 
@@ -80,6 +81,23 @@ export default function ProposalForm({
 
   const [filePreview, setFilePreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const { enhance, loading: enhancingCover } = useEnhanceText();
+
+  const handleEnhanceCoverLetter = async () => {
+    const current = getValues("coverLetter") || "";
+    const trimmed = (current as string).trim();
+    if (!trimmed || enhancingCover) {
+      if (!trimmed) toast.error("Please write something to enhance.");
+      return;
+    }
+    const result = await enhance(trimmed, { tone: "persuasive" });
+    if (typeof result === "string" && result.length > 0) {
+      setValue("coverLetter", result, { shouldValidate: true, shouldDirty: true });
+      toast.success("Enhanced with AI");
+    } else {
+      toast.error("Failed to enhance text. Please try again.");
+    }
+  };
 
 
   const onSubmit = async (data: ProposalSchemaType) => {
@@ -148,8 +166,17 @@ export default function ProposalForm({
           />
           <div className="absolute right-4 bottom-0">
             <Tooltip>
-              <TooltipTrigger type="button" className="cursor-pointer">
-                <Sparkle className="size-5 text-emerald-700" />
+              <TooltipTrigger
+                type="button"
+                className="cursor-pointer"
+                onClick={handleEnhanceCoverLetter}
+                aria-busy={enhancingCover}
+              >
+                {enhancingCover ? (
+                  <span className="text-sm text-emerald-700">Enhancing...</span>
+                ) : (
+                  <Sparkle className="size-5 text-emerald-700" />
+                )}
               </TooltipTrigger>
               <TooltipContent>
                 <p>Enhance with AI</p>

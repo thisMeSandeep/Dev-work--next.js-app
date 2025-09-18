@@ -30,6 +30,7 @@ import {
 } from "@/lib/schemas/developerProfile.schema";
 import { useUserStore } from "@/store/userStore";
 import LoadingButton from "@/components/loader/LoadingButton";
+import { useEnhanceText } from "@/hooks/useEnhanceText";
 
 // Reusable input styles
 const inputStyles = "w-full border-green-300 focus-visible:border-green-500 focus-visible:ring-2 focus-visible:ring-green-500/20 focus-visible:outline-none";
@@ -42,6 +43,23 @@ interface Props {
 const DeveloperProfileForm = ({ onSuccess }: Props) => {
   const [skill, setSkill] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const { enhance, loading: enhancingBio } = useEnhanceText();
+
+  const handleEnhanceBio = async () => {
+    const current = watch("bio") || "";
+    const trimmed = (current as string).trim();
+    if (!trimmed || enhancingBio) {
+      if (!trimmed) toast.error("Please write something to enhance.");
+      return;
+    }
+    const result = await enhance(trimmed, { tone: "professional" });
+    if (typeof result === "string" && result.length > 0) {
+      setValue("bio", result, { shouldValidate: true, shouldDirty: true });
+      toast.success("Enhanced with AI");
+    } else {
+      toast.error("Failed to enhance text. Please try again.");
+    }
+  };
 
   const user = useUserStore((state) => state.user);
 
@@ -203,8 +221,17 @@ const DeveloperProfileForm = ({ onSuccess }: Props) => {
             />
             <div className="absolute right-4 bottom-0">
               <Tooltip>
-                <TooltipTrigger type="button" className="cursor-pointer">
-                  <Sparkle className="size-5 text-emerald-700" />
+                <TooltipTrigger
+                  type="button"
+                  className="cursor-pointer"
+                  onClick={handleEnhanceBio}
+                  aria-busy={enhancingBio}
+                >
+                  {enhancingBio ? (
+                    <span className="text-sm text-emerald-700">Enhancing...</span>
+                  ) : (
+                    <Sparkle className="size-5 text-emerald-700" />
+                  )}
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>Enhance with AI</p>

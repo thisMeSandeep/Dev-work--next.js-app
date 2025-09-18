@@ -2,26 +2,35 @@
 import { prisma } from "@/lib/prisma";
 import { getUserId } from "@/lib/server-utils";
 import { JobWithClient } from "@/types/type";
+import { unstable_cache } from "next/cache";
 
 // -------------------get jobs---------------------
 export const getAllJobsAction = async () => {
   try {
-    // Fetch jobs
-    const jobs = await prisma.job.findMany({
-      where: { status: "OPEN" },
-      orderBy: { createdAt: "desc" },
-      omit: {
-        hiredFreelancerId: true,
-        completed: true,
-      },
-      include: {
-        client: {
-          include: {
-            user: true,
+    const getOpenJobsCached = unstable_cache(
+      async () => {
+        const jobs = await prisma.job.findMany({
+          where: { status: "OPEN" },
+          orderBy: { createdAt: "desc" },
+          omit: {
+            hiredFreelancerId: true,
+            completed: true,
           },
-        },
+          include: {
+            client: {
+              include: {
+                user: true,
+              },
+            },
+          },
+        });
+        return jobs;
       },
-    });
+      ["open-jobs"],
+      { tags: ["jobs:open"] }
+    );
+
+    const jobs = await getOpenJobsCached();
 
     const transformedJobs: JobWithClient[] = jobs.map((job: any) => ({
       id: job.id,
@@ -38,7 +47,7 @@ export const getAllJobsAction = async () => {
       experienceRequired: job.experienceRequired,
       connectsRequired: job.connectsRequired,
       attachment: job.attachment,
-      createdAt: job.createdAt.toISOString(),
+      createdAt: job.createdAt,
       clientId: job.clientId,
       client: {
         id: job.client.id,
@@ -109,18 +118,35 @@ export const getPersonalizedJobsAction = async () => {
         : {}),
     };
 
-    // Fetch jobs
-    const jobs = await prisma.job.findMany({
-      where,
-      orderBy: { createdAt: "desc" },
-      include: {
-        client: {
+    // Fetch jobs (cached per user and preferences; invalidated with jobs:open)
+    const key = [
+      "personalized-jobs",
+      userId,
+      String(freelancer.category ?? ""),
+      String(freelancer.speciality ?? ""),
+      ...(Array.isArray(freelancer.skills) ? [...freelancer.skills].sort() : []),
+    ];
+
+    const getPersonalizedCached = unstable_cache(
+      async (whereArg: any) => {
+        const jobs = await prisma.job.findMany({
+          where: whereArg,
+          orderBy: { createdAt: "desc" },
           include: {
-            user: true,
+            client: {
+              include: {
+                user: true,
+              },
+            },
           },
-        },
+        });
+        return jobs;
       },
-    });
+      key as any,
+      { tags: ["jobs:open", `user:${userId}:personalized`] }
+    );
+
+    const jobs = await getPersonalizedCached(where);
 
     const transformedJobs: JobWithClient[] = jobs.map((job: any) => ({
       id: job.id,
@@ -137,7 +163,7 @@ export const getPersonalizedJobsAction = async () => {
       experienceRequired: job.experienceRequired,
       connectsRequired: job.connectsRequired,
       attachment: job.attachment,
-      createdAt: job.createdAt.toISOString(),
+      createdAt: job.createdAt,
       clientId: job.clientId,
       client: {
         id: job.client.id,
@@ -181,23 +207,32 @@ export const getJobDetailsAction = async (jobId: string) => {
     };
   }
 
-  // fetch job
-  const job = await prisma.job.findUnique({
-    where: {
-      id: jobId,
-    },
-    omit: {
-      hiredFreelancerId: true,
-      completed: true,
-    },
-    include: {
-      client: {
-        include: {
-          user: true,
+  // fetch job (cached by job id; invalidated via job tag)
+  const getJobDetailsCached = unstable_cache(
+    async (id: string) => {
+      const job = await prisma.job.findUnique({
+        where: {
+          id,
         },
-      },
+        omit: {
+          hiredFreelancerId: true,
+          completed: true,
+        },
+        include: {
+          client: {
+            include: {
+              user: true,
+            },
+          },
+        },
+      });
+      return job;
     },
-  });
+    ["job-details", jobId],
+    { tags: ["job:" + jobId] }
+  );
+
+  const job = await getJobDetailsCached(jobId);
 
   if (!job) {
     return {

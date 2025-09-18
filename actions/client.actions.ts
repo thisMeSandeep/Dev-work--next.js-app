@@ -220,7 +220,7 @@ export const createJobAction = async (data: JobSchemaType) => {
       return job;
     });
 
-    // Revalidate client jobs cache and page so newly posted job appears immediately
+    // Revalidate caches so newly posted job appears immediately
     const clientForTag = await prisma.clientProfile.findUnique({
       where: { userId },
       select: { id: true },
@@ -228,6 +228,8 @@ export const createJobAction = async (data: JobSchemaType) => {
     if (clientForTag) {
       revalidateTag("client:" + clientForTag.id + ":jobs");
     }
+    // global open jobs caches
+    revalidateTag("jobs:open");
     revalidatePath("/client/jobs");
     return {
       success: true,
