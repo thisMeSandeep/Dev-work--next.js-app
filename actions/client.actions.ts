@@ -24,7 +24,8 @@ import {
   ProposalCoreDTO,
   UserCoreDTO,
 } from "@/types/CoreDTO";
-import { success } from "zod";
+
+ 
 
 // ------------- Set client profile---------------
 export const setClientProfileAction = async (data: ClientDataType) => {
@@ -496,6 +497,48 @@ export const sendRequestAction = async (data: Request) => {
     };
   } catch (error) {
     console.error("Error in sendRequestAction:", error);
+    return { success: false, message: "Something went wrong" };
+  }
+};
+
+// ------------- get all requests sent by the current client -------------
+export const getClientRequestsAction = async () => {
+  try {
+    const userId = await getUserId();
+    if (!userId) {
+      return { success: false, message: "User not authenticated" };
+    }
+
+    const client = await prisma.clientProfile.findUnique({
+      where: { userId },
+      select: { id: true },
+    });
+
+    if (!client) {
+      return { success: false, message: "Client profile not found" };
+    }
+
+    // cache client requests with developer and user data
+    const getRequestsCached = unstable_cache(
+      async (clientId: string) => {
+        const requests = await prisma.clientRequest.findMany({
+          where: { clientId },
+          include: {
+            developer: { include: { user: true } },
+          },
+          orderBy: { createdAt: "desc" },
+        });
+        return requests;
+      },
+      ["client-requests", client.id],
+      { tags: ["client:" + client.id + ":requests"] }
+    );
+
+    const requests = await getRequestsCached(client.id);
+
+    return { success: true, requests };
+  } catch (error) {
+    console.error("getClientRequestsAction error:", error);
     return { success: false, message: "Something went wrong" };
   }
 };
