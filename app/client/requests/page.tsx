@@ -30,7 +30,7 @@ const Requests = async () => {
       {response.requests?.length === 0 ? (
         <div className="flex flex-col items-center justify-center space-y-6 text-center">
           <div className="w-48 h-48">
-            <img src="/assets/empty.svg" alt="No requests illustration" className="w-full h-full object-contain" />
+            <Image fill src="/assets/empty.svg" alt="No requests illustration" className="w-full h-full object-contain" />
           </div>
           <p className="text-gray-600 text-lg">You haven not sent any requests yet.</p>
           <div className="flex items-center gap-3">

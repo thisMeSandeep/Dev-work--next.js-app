@@ -9,10 +9,10 @@ import ProposalsSection from "./proposals-section";
 import SuggestedDevsSection from "./suggested-section";
 import HiredSection from "./hired-section";
 
-type PageProps = { params: { jobId: string } };
+type PageProps = { params: Promise<{ jobId: string }> };
 
 const JobDescriptionPage = async ({ params }: PageProps) => {
-  const { jobId } = params;
+  const { jobId } = await params;
   const jobRes = await getJobByIdAction(jobId);
 
   if (!jobRes.success || !jobRes.job)

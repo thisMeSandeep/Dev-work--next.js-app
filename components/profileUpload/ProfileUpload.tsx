@@ -50,6 +50,7 @@ const ProfileUpload = ({
         toast.error(response.message);
       }
     } catch (err) {
+      console.log(err)
       toast.error("Something went wrong. Please try again.");
       reset();
     } finally {
