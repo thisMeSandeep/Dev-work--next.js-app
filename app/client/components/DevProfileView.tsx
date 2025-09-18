@@ -11,6 +11,7 @@ import { useState } from "react";
 import { sendRequestAction } from "@/actions/client.actions";
 import { useParams } from "next/navigation";
 import toast from "react-hot-toast";
+import CollapsibleText from "@/components/reusable/CollapsibleText";
 
 type DevWithUser = FreelancerProfileCoreDTO & {
   user: UserCoreDTO;
@@ -60,7 +61,7 @@ const DevProfileView = ({ dev }: { dev: DevWithUser }) => {
   };
 
   return (
-    <div className="w-full py-5 px-6 space-y-8">
+    <div className="w-full  space-y-8">
       {/* Header */}
       <div className="flex items-center gap-6">
         <Avatar className="h-24 w-24 border-2 border-green-500">
@@ -101,7 +102,7 @@ const DevProfileView = ({ dev }: { dev: DevWithUser }) => {
       {developerData.bio && (
         <div>
           <h2 className="text-xl font-semibold mb-2 text-gray-800">About</h2>
-          <p className="text-gray-600 leading-relaxed">{developerData.bio}</p>
+          <CollapsibleText text={developerData.bio} />
         </div>
       )}
 

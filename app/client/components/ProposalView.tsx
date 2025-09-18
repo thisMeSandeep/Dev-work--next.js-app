@@ -8,6 +8,7 @@ import { acceptProposalAction, rejectProposalAction } from "@/actions/client.act
 import LoadingButton from "@/components/loader/LoadingButton";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import CollapsibleText from "@/components/reusable/CollapsibleText";
 
 type ProposalWithUser = ProposalCoreDTO & {
   freelancerProfile: FreelancerProfileCoreDTO & {
@@ -83,15 +84,19 @@ const ProposalView = ({ proposal }: { proposal: ProposalWithUser }) => {
       <div className="p-4 md:p-6 space-y-6">
         {/* Status */}
         <div>
-          <p className="text-sm font-semibold text-gray-500 uppercase">Status</p>
+          <p className="text-sm font-semibold text-gray-500 uppercase">
+            Status
+          </p>
           <div className="flex items-center gap-2">
-            <p className={`font-medium ${
-              proposalStatus === "ACCEPTED" 
-                ? "text-green-600" 
-                : proposalStatus === "REJECTED" 
-                ? "text-red-600" 
-                : "text-yellow-600"
-            }`}>
+            <p
+              className={`font-medium ${
+                proposalStatus === "ACCEPTED"
+                  ? "text-green-600"
+                  : proposalStatus === "REJECTED"
+                  ? "text-red-600"
+                  : "text-yellow-600"
+              }`}
+            >
               {proposalStatus}
             </p>
             {proposalStatus === "ACCEPTED" && (
@@ -107,14 +112,14 @@ const ProposalView = ({ proposal }: { proposal: ProposalWithUser }) => {
           <p className="text-sm font-semibold text-gray-500 uppercase">
             Cover Letter
           </p>
-          <p className="text-gray-700 mt-1 leading-relaxed whitespace-pre-line">
-            {proposal.coverLetter}
-          </p>
+          <CollapsibleText text={proposal.coverLetter} />
         </div>
 
         {/* Message */}
         <div>
-          <p className="text-sm font-semibold text-gray-500 uppercase">Message</p>
+          <p className="text-sm font-semibold text-gray-500 uppercase">
+            Message
+          </p>
           <p className="text-gray-700 mt-1 leading-relaxed">
             {proposal.message ?? "-"}
           </p>
@@ -133,7 +138,7 @@ const ProposalView = ({ proposal }: { proposal: ProposalWithUser }) => {
               Proposed Duration
             </p>
             <p className="text-lg font-semibold text-gray-800">
-               {formatString(proposal.duration)}
+              {formatString(proposal.duration)}
             </p>
           </div>
         </div>
@@ -182,10 +187,9 @@ const ProposalView = ({ proposal }: { proposal: ProposalWithUser }) => {
         ) : (
           <div className="flex items-center gap-2">
             <p className="text-sm text-gray-600">
-              {proposalStatus === "ACCEPTED" 
-                ? "This proposal has been accepted" 
-                : "This proposal has been rejected"
-              }
+              {proposalStatus === "ACCEPTED"
+                ? "This proposal has been accepted"
+                : "This proposal has been rejected"}
             </p>
           </div>
         )}

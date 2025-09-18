@@ -10,7 +10,7 @@ type PopupProps = {
 export default function Popup({ headerTitle, children, onClose }: PopupProps) {
     return (
         <div className="fixed inset-0 z-9999 flex items-center justify-center bg-black/50">
-            <div className="relative w-full max-w-5xl max-h-[80vh] bg-white rounded-2xl shadow-lg flex flex-col">
+            <div className="relative w-[90%] max-w-5xl max-h-[80vh] bg-white rounded-2xl shadow-lg flex flex-col">
                 {/* Header */}
                 <div className="flex items-center justify-between p-4 border-b">
                     <h2 className="text-lg font-semibold">{headerTitle}</h2>

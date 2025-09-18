@@ -23,7 +23,7 @@ export default function JobDetails({ job }: JobDetailsProps) {
 
   return (
     <Card className="border-none shadow-none p-0">
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-6 p-0">
         {/* Title */}
         <div className="flex items-center gap-3">
           <Briefcase className="text-green-600 size-6 shrink-0" />

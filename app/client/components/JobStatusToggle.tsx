@@ -41,7 +41,7 @@ export function JobStatusToggle({
       type="single"
       defaultValue={currentStatus}
       onValueChange={handleStatusChange}
-      className="gap-2"
+      className="gap-2 flex-wrap"
       disabled={isPending}
     >
       {statuses.map((status) => (

@@ -31,7 +31,7 @@ export default function Header({ navItems, profileLinks, user }: HeaderProps) {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 border-b border-black/10 bg-white/90 backdrop-blur-md">
       {/* Left: menu toggle + logo + desktop nav */}
-      <div className="flex items-center gap-12">
+      <div className="flex items-center gap-4 sm:gap-12">
         {/* Mobile toggle */}
         <button
           aria-label="Toggle navigation"

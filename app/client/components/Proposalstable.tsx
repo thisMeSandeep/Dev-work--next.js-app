@@ -71,7 +71,7 @@ const ProposalsTable = ({ proposals }: { proposals: ProposalWithUser[] }) => {
   }, []);
 
   return (
-    <div className="p-5">
+    <div className="">
       <h1 className="text-2xl font-semibold mb-5">
         Proposals received for this job
       </h1>

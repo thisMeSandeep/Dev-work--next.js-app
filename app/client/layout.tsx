@@ -46,7 +46,7 @@ const Clientlayout = ({ children }: { children: React.ReactNode }) => {
           profileLinks={profileLinks}
           user={userData}
         />
-        <main className="mt-15">
+        <main className="mt-20">
           {children}
         </main>
       </div>

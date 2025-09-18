@@ -11,10 +11,10 @@ const PostedJobs = async () => {
   return (
     <div className="max-w-7xl mx-auto py-5  px-4 md:px-10">
       {/* create job + profile buttons */}
-      <div className="flex items-center justify-center sm:justify-end gap-4">
+      <div className="flex items-center justify-center sm:justify-end gap-4 mt-2">
         <Link
           href="/client/post-job"
-          className="flex items-center gap-2 rounded-xl bg-green-50 px-4 py-2 text-green-600 font-medium shadow-sm transition-colors hover:bg-green-100"
+          className="flex items-center gap-2 rounded-xl bg-green-50 px-4 py-2 text-green-600 font-medium  transition-colors hover:bg-green-100"
         >
           <Briefcase className="h-5 w-5 stroke-[2.5]" />
           <span className="text-sm">Post a Job</span>
@@ -22,7 +22,7 @@ const PostedJobs = async () => {
 
         <Link
           href="/client/profile"
-          className="flex items-center gap-2 rounded-xl bg-gray-50 px-4 py-2 text-gray-700 font-medium shadow-sm transition-colors hover:bg-gray-100"
+          className="flex items-center gap-2 rounded-xl bg-gray-50 px-4 py-2 text-gray-700 font-medium  transition-colors hover:bg-gray-100"
         >
           <User className="h-5 w-5 stroke-[2.5]" />
           <span className="text-sm">Complete Profile</span>
@@ -55,9 +55,9 @@ const PostedJobs = async () => {
               {jobs.map((job) => (
                 <Card
                   key={job.id}
-                  className="transition-all border-none shadow-none"
+                  className="transition-all border-none shadow-none "
                 >
-                  <CardContent className="space-y-3">
+                  <CardContent className="space-y-3 p-0">
                     {/* Job Title */}
                     <Link
                       href={`/client/jobs/${job.id}`}

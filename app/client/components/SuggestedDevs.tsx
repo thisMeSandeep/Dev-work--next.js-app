@@ -25,7 +25,7 @@ const SuggestedDevs = ({ profiles }: { profiles: DevWithUser[] }) => {
   );
 
   return (
-    <section className="p-4">
+    <section className="">
       <h2 className="text-2xl font-semibold mb-4 text-gray-800">
         Suggested Developers
       </h2>
