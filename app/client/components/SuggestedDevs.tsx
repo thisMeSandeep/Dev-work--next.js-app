@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { formatString } from "@/lib/formatString";
 import Drawer from "@/components/reusable/Drawer";
 import DevProfileView from "./DevProfileView";
+import Image from "next/image";
 
 export type DevWithUser = FreelancerProfileCoreDTO & {
   user: UserCoreDTO;
@@ -41,7 +42,9 @@ const SuggestedDevs = ({ profiles }: { profiles: DevWithUser[] }) => {
           >
             <CardContent className="p-4 flex items-center space-x-4">
               {dev.user.profileImage ? (
-                <img
+                <Image
+                  width={48}
+                  height={48}
                   src={dev.user.profileImage}
                   alt={dev.user.firstName ?? "Dev"}
                   className="w-12 h-12 rounded-full object-cover"

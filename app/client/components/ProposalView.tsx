@@ -22,36 +22,27 @@ const ProposalView = ({ proposal }: { proposal: ProposalWithUser }) => {
 
   const handleAccept = async () => {
     setIsAccepting(true);
-    try {
-      const response = await acceptProposalAction(proposal.id);
-      if (response.success) {
-        toast.success(response.message);
-        setProposalStatus("ACCEPTED");
-      } else {
-        toast.error(response.message);
-      }
-    } catch (error) {
-      toast.error("Something went wrong");
-    } finally {
-      setIsAccepting(false);
+    const response = await acceptProposalAction(proposal.id);
+    if (response.success) {
+      toast.success(response.message);
+      setProposalStatus("ACCEPTED");
     }
+    else{
+      toast.error(response.message)
+    }
+    setIsAccepting(false);
   };
 
   const handleReject = async () => {
     setIsRejecting(true);
-    try {
-      const response = await rejectProposalAction(proposal.id);
-      if (response.success) {
-        toast.success(response.message);
-        setProposalStatus("REJECTED");
-      } else {
-        toast.error(response.message);
-      }
-    } catch (error) {
-      toast.error("Something went wrong");
-    } finally {
-      setIsRejecting(false);
+    const response = await rejectProposalAction(proposal.id);
+    if (response.success) {
+      toast.success(response.message);
+      setProposalStatus("REJECTED");
+    } else {
+      toast.error(response.message);
     }
+    setIsRejecting(false);
   };
 
   const isProcessed = proposalStatus !== "PENDING";

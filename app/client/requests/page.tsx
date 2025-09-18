@@ -4,6 +4,7 @@ import ErrorPage from '@/components/reusable/ErrorPage'
 import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
+import { RequestWithDev } from '@/types/type'
 import { Clipboard, User } from 'lucide-react'
 
 const statusClasses: Record<string, string> = {
@@ -41,7 +42,7 @@ const Requests = async () => {
         </div>
       ) : (
         <div className="space-y-6">
-          {response.requests?.map((req: any) => (
+          {response.requests?.map((req: RequestWithDev) => (
             <div key={req.id} className="bg-white p-6 rounded-xl border border-gray-200">
               <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                 {req.developer?.user?.profileImage ? (

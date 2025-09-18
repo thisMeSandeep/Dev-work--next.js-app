@@ -16,7 +16,7 @@ const ProposalsSection = async ({ jobId }: Props) => {
     );
   }
 
-  return <ProposalsTable proposals={proposals as any} />;
+  return <ProposalsTable proposals={proposals} />;
 };
 
 export default ProposalsSection;

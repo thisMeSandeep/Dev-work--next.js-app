@@ -3,7 +3,7 @@
 import ProposalSkeleton from "@/components/loader/ProposalSkeleton";
 import Drawer from "@/components/reusable/Drawer";
 import { formatDate } from "@/lib/formatDate";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import ProposalDetails from "../components/ProposalDetails";
 import { useProposalStore } from "@/store/proposalStore";
 import { Star } from "lucide-react";

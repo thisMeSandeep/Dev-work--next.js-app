@@ -23,3 +23,7 @@ export type JobWithClient = JobCoreDTO & {
 export type RequestWithClient = ClientRequestCoreDTO & {
   client: ClientWithUser;
 };
+
+export type RequestWithDev = ClientRequestCoreDTO & {
+  developer: FreelancerProfileCoreDTO & { user: UserCoreDTO };
+};

@@ -29,7 +29,7 @@ const JobsList = ({ jobs }: { jobs: JobWithClient[] }) => {
                     </div>
                 ) : (
                     <div className="space-y-8">
-                        {jobs.map((job, i) => (
+                        {jobs.map((job) => (
                             <JobCard
                                 key={job.id}
                                 job={job}

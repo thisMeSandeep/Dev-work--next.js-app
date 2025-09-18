@@ -5,7 +5,7 @@ import { RequestWithClient } from '@/types/type';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
-import { User, Clipboard, X } from 'lucide-react';
+import { User, Clipboard} from 'lucide-react';
 import RequestActions from './RequestAction';
 
 const Requests = async () => {
@@ -26,7 +26,8 @@ const Requests = async () => {
                 <div className="flex flex-col items-center justify-center space-y-6 text-center">
                     {/* Empty illustration */}
                     <div className="w-48 h-48">
-                        <img
+                        <Image
+                            fill
                             src="/assets/empty.svg"
                             alt="No requests illustration"
                             className="w-full h-full object-contain"

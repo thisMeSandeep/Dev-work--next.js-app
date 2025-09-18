@@ -17,7 +17,7 @@ const SuggestedDevsSection = async ({ category, speciality }: Props) => {
     );
   }
 
-  return <SuggestedDevs profiles={profiles as any} />;
+  return <SuggestedDevs profiles={profiles} />;
 };
 
 export default SuggestedDevsSection;

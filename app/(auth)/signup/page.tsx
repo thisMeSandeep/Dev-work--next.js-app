@@ -18,7 +18,6 @@ import {
 } from "@/components/ui/select";
 import { countries } from "@/data/countries";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Button } from "@/components/ui/button";
 import { motion } from "motion/react";
 import Link from "next/link";
 import { registerUserAction } from "@/actions/auth.action";
