@@ -6,6 +6,7 @@ import { fetchAndSetUser } from "@/lib/fetchUser";
 import { useUserStore } from "@/store/userStore";
 import { Settings, User } from "lucide-react";
 import React, { useEffect } from "react";
+import Footer from "../(public)/components/Footer";
 
 const navLinks = [
   { name: "Find work", path: "/developer" },
@@ -52,9 +53,10 @@ const Developerlayout = ({ children }: { children: React.ReactNode }) => {
           profileLinks={profileLinks}
           user={userData}
         />
-        <main className="mt-15">
-          {children}
-        </main>
+        <main className="mt-15">{children}</main>
+        <section className="mt-20">
+          <Footer />
+        </section>
       </div>
     </div>
   );

@@ -71,7 +71,7 @@ const Requests = async () => {
                   </p>
                 </div>
 
-                <span className={`text-xs sm:text-sm px-3 py-1 rounded-full border ${statusClasses[req.status] ?? 'bg-gray-100 text-gray-800 border-gray-200'}`}>
+                <span className={`text-xs sm:text-sm px-3 py-1 rounded-full border flex-shrink-0 ${statusClasses[req.status] ?? 'bg-gray-100 text-gray-800 border-gray-200'}`}>
                   {req.status}
                 </span>
               </div>

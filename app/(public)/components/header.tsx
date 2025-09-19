@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -22,22 +22,21 @@ const Header = () => {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 bg-white transition-all ${scrolled ? "border-b border-gray-200 shadow-sm" : ""
-        }`}
+      className={`fixed top-0 left-0 right-0 z-50 bg-white transition-all ${
+        scrolled ? "border-b border-gray-200 " : ""
+      }`}
     >
       <div className="mx-auto flex justify-between items-center px-4 md:px-8 py-3">
         {/* Logo */}
-        <div className="flex items-center gap-12">
-          <Link href="/" className="w-32 h-10 relative flex items-center justify-center">
-            <Image
-              src="/logo.png"
-              alt="Logo"
-              height={40}
-              width={128}
-              priority
-              className="bg-green-500 size-full"
-            />
-          </Link>
+        <div className="w-28 h-8 relative flex items-center justify-center">
+          <Image
+            src="/logo.png"
+            alt="Logo"
+            height={32}
+            width={112}
+            priority
+            className="size-full object-contain"
+          />
         </div>
 
         {/* Action Links */}

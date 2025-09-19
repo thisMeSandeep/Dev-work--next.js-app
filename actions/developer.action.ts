@@ -272,6 +272,23 @@ export async function createProposalAction(
       return { success: false, message: "Freelancer profile not found" };
     }
 
+    // Check if job exists and is OPEN
+    const job = await prisma.job.findUnique({
+      where: { id: jobId },
+      select: { status: true },
+    });
+
+    if (!job) {
+      return { success: false, message: "Job not found" };
+    }
+
+    if (job.status !== "OPEN") {
+      return {
+        success: false,
+        message: `Cannot submit proposal. Job status is ${job.status.toLowerCase()}.`,
+      };
+    }
+
     // Check if proposal already exists
     const existingProposal = await prisma.proposal.findFirst({
       where: {
@@ -364,12 +381,25 @@ export async function updateProposalAction(
 
     const { coverLetter, message, rate, duration, attachedFile } = result.data;
 
-    // Fetch the existing proposal
+    // Fetch the existing proposal with job details
     const existingProposal = await prisma.proposal.findUnique({
       where: { id: proposalId },
+      include: {
+        job: {
+          select: { status: true },
+        },
+      },
     });
     if (!existingProposal) {
       return { success: false, message: "Proposal not found" };
+    }
+
+    // Check if job is still OPEN
+    if (existingProposal.job.status !== "OPEN") {
+      return {
+        success: false,
+        message: `Cannot update proposal. Job status is ${existingProposal.job.status.toLowerCase()}.`,
+      };
     }
 
     // Check if the user owns this proposal
@@ -526,14 +556,28 @@ export async function withdrawProposalAction(proposalId: string) {
       return { success: false, message: "Freelancer profile not found" };
     }
 
-    // 3. Fetch proposal
+    // 3. Fetch proposal with job details
     const proposal = await prisma.proposal.findUnique({
       where: { id: proposalId },
-      select: { freelancerProfileId: true, status: true },
+      select: { 
+        freelancerProfileId: true, 
+        status: true,
+        job: {
+          select: { status: true },
+        },
+      },
     });
 
     if (!proposal) {
       return { success: false, message: "Proposal not found" };
+    }
+
+    // Check if job is still OPEN
+    if (proposal.job.status !== "OPEN") {
+      return {
+        success: false,
+        message: `Cannot withdraw proposal. Job status is ${proposal.job.status.toLowerCase()}.`,
+      };
     }
 
     //ensure proposal belongs to this freelancer

@@ -6,6 +6,7 @@ import { fetchAndSetUser } from "@/lib/fetchUser";
 import { useUserStore } from "@/store/userStore";
 import { User } from "lucide-react";
 import React, { useEffect } from "react";
+import Footer from "../(public)/components/Footer";
 
 const navLinks = [
   { name: "Jobs", path: "/client/jobs" },
@@ -46,9 +47,10 @@ const Clientlayout = ({ children }: { children: React.ReactNode }) => {
           profileLinks={profileLinks}
           user={userData}
         />
-        <main className="mt-20">
-          {children}
-        </main>
+        <main className="mt-20">{children}</main>
+        <section className="mt-20">
+          <Footer />
+        </section>
       </div>
     </div>
   );

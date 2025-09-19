@@ -1,8 +1,8 @@
 "use client";
 
 import { testimonials } from "@/data/testimonials";
-import { motion, useScroll, useTransform, MotionValue } from "motion/react";
-import { useRef } from "react";
+import { motion } from "motion/react";
+import { useState } from "react";
 import { Quote } from "lucide-react";
 import Image from "next/image";
 
@@ -16,34 +16,13 @@ type Testimonial = {
 interface TestimonialCardProps {
   item: Testimonial;
   index: number;
-  totalCards: number;
-  scrollYProgress: MotionValue<number>;
 }
 
-function TestimonialCard({
-  item,
-  index,
-  totalCards,
-  scrollYProgress,
-}: TestimonialCardProps) {
-  const start = index / totalCards;
-  const end = (index + 1) / totalCards;
-
-  // map scroll progress to [0,1] just for this card
-  const cardProgress = useTransform(scrollYProgress, [start, end], [0, 1], {
-    clamp: true,
-  });
-
-  // y: card comes up and then freezes
-  const y = useTransform(cardProgress, [0, 1], ["100%", "0%"]);
-
+function TestimonialCard({ item, index }: TestimonialCardProps) {
   return (
-    <motion.div
-      style={{ y, zIndex: index }}
-      className="absolute w-[88vw] max-w-sm bg-white rounded-2xl shadow-xl p-5 flex flex-col border border-emerald-100"
-    >
+    <div className="flex-shrink-0 w-80 bg-white rounded-2xl shadow-xl p-6 mx-4 border border-emerald-100">
       {/* Quote icon header */}
-      <div className="flex justify-between items-center mb-3">
+      <div className="flex justify-between items-center mb-4">
         <Quote className="w-6 h-6 text-emerald-500 opacity-70" />
       </div>
 
@@ -70,22 +49,22 @@ function TestimonialCard({
 
       {/* Decorative gradient footer strip */}
       <div className="h-1.5 w-full rounded-full bg-gradient-to-r from-emerald-400 via-emerald-500 to-emerald-600" />
-    </motion.div>
+    </div>
   );
 }
 
 function MobileTestimonials() {
-  const cardsRef = useRef<HTMLDivElement | null>(null);
-  const { scrollYProgress } = useScroll({
-    target: cardsRef,
-    offset: ["start start", "end end"],
-  });
+  const [isPaused, setIsPaused] = useState(false);
 
-  const totalCards = testimonials.length;
-  const scrollLengthPerCard = 100; // vh per card
+  // Duplicate testimonials for seamless loop
+  const duplicatedTestimonials = [...testimonials, ...testimonials];
+
+  // Calculate total width needed for animation
+  const cardWidth = 320; // 80 * 4 (w-80 = 320px) + margins
+  const totalWidth = testimonials.length * cardWidth;
 
   return (
-    <section className="relative block sm:hidden bg-white py-12">
+    <section className="relative block sm:hidden bg-white py-12 overflow-hidden">
       {/* Heading */}
       <div className="text-center mb-8 px-4">
         <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight">
@@ -98,23 +77,38 @@ function MobileTestimonials() {
         </p>
       </div>
 
-      {/* Cards scroll wrapper */}
-      <div
-        ref={cardsRef}
-        style={{ height: `${totalCards * scrollLengthPerCard}vh` }}
-        className="relative mt-8"
-      >
-        <div className="sticky top-0 h-screen flex items-center justify-center">
-          {testimonials.map((item, i) => (
+      {/* Fade overlays */}
+      <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
+      <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
+
+      {/* Scrolling container */}
+      <div className="relative">
+        <motion.div
+          className="flex"
+          animate={{
+            x: isPaused ? undefined : [-totalWidth, 0],
+          }}
+          transition={{
+            x: {
+              repeat: Infinity,
+              repeatType: "loop",
+              duration: testimonials.length * 4, // 4 seconds per testimonial
+              ease: "linear",
+            },
+          }}
+          onHoverStart={() => setIsPaused(true)}
+          onHoverEnd={() => setIsPaused(false)}
+          onTouchStart={() => setIsPaused(true)}
+          onTouchEnd={() => setIsPaused(false)}
+        >
+          {duplicatedTestimonials.map((item, index) => (
             <TestimonialCard
-              key={i}
-              item={item as Testimonial} 
-              index={i}
-              totalCards={totalCards}
-              scrollYProgress={scrollYProgress}
+              key={`${index}-${item.name}`}
+              item={item as Testimonial}
+              index={index}
             />
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

@@ -230,6 +230,10 @@ export const createJobAction = async (data: JobSchemaType) => {
     }
     // global open jobs caches
     revalidateTag("jobs:open");
+    // Invalidate personalized jobs cache for all users since new job affects recommendations
+    revalidateTag("user:*:personalized");
+    // Also invalidate the specific job cache that might be used in job details
+    revalidateTag("job-details");
     revalidatePath("/client/jobs");
     return {
       success: true,
@@ -335,6 +339,12 @@ export const changeJobStatusAction = async ({
     // Invalidate caches
     revalidateTag("job:" + jobId);
     revalidateTag("client:" + client.id + ":jobs");
+    // Invalidate global jobs cache since status affects visibility
+    revalidateTag("jobs:open");
+    // Invalidate personalized jobs cache for all users
+    revalidateTag("user:*:personalized");
+    // Also invalidate the specific job cache that might be used in job details
+    revalidateTag("job-details");
 
     return {
       success: true,
@@ -638,6 +648,12 @@ export const acceptProposalAction = async (proposalId: string) => {
     revalidateTag("job:" + proposal.jobId + ":hired");
     revalidateTag("job:" + proposal.jobId);
     revalidateTag("client:" + client.id + ":jobs");
+    // Invalidate global jobs cache since job status changed to ONGOING
+    revalidateTag("jobs:open");
+    // Invalidate personalized jobs cache for all users
+    revalidateTag("user:*:personalized");
+    // Also invalidate the specific job cache that might be used in job details
+    revalidateTag("job-details");
 
     return {
       success: true,
@@ -695,6 +711,8 @@ export const rejectProposalAction = async (proposalId: string) => {
 
     // Invalidate proposals cache for job
     revalidateTag("job:" + proposal.jobId + ":proposals");
+    // Also invalidate job cache in case proposal count affects display
+    revalidateTag("job:" + proposal.jobId);
 
     return {
       success: true,

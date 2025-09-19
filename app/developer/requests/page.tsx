@@ -23,28 +23,31 @@ const Requests = async () => {
             </h1>
 
             {response.requests?.length === 0 ? (
-                <div className="flex flex-col items-center justify-center space-y-6 text-center">
+                <div className="flex flex-col items-center justify-center space-y-6 text-center py-16">
                     {/* Empty illustration */}
-                    <div className="w-48 h-48">
+                    <div className="w-48 h-48 relative">
                         <Image
-                            fill
+                            width={192}
+                            height={192}
                             src="/assets/empty.svg"
                             alt="No requests illustration"
-                            className="w-full h-full object-contain"
+                            className="object-contain"
                         />
                     </div>
 
-                    <p className="text-gray-600 text-lg">
-                        Looks like no one has sent you a request yet.
-                    </p>
+                    <div className="space-y-4">
+                        <p className="text-gray-600 text-lg">
+                            Looks like no one has sent you a request yet.
+                        </p>
 
-                    <Link
-                        href="/developer/profile"
-                        className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-green-600 text-white hover:bg-green-700 transition"
-                    >
-                        <User size={20} />
-                        <span className='text-sm sm:text-lg'>Fill your profile to get noticed</span>
-                    </Link>
+                        <Link
+                            href="/developer/profile"
+                            className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-green-600 text-white hover:bg-green-700 transition-colors duration-200"
+                        >
+                            <User size={20} />
+                            <span className='text-sm sm:text-lg'>Fill your profile to get noticed</span>
+                        </Link>
+                    </div>
 
                 </div>
             ) : (
